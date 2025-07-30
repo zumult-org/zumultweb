@@ -57,7 +57,6 @@
 
 <% 
     
-    String username = "bratislav.metulski@takkatukka.fr";
     
     BackendInterface backend = BackendInterfaceFactory.newBackendInterface(); 
     
@@ -364,6 +363,23 @@
                 });
             });
             
+            function showSpeaker(speakerID){
+                $.post(
+                    BASE_URL + "/ZumultDataServlet",
+                    { 
+                        command: 'getSpeakerMetadata',
+                        format: 'html',
+                        speakerID : speakerID
+                    },
+                    function( data ) {
+                        $("#metadata-body").html(data);
+                        $("#metadata-title").html(speechEventID);
+                        $('#metadataModal').modal("toggle");
+                    }
+                );                                                    
+            }
+            
+            
             
         </script>
         <script src="../js/media.js"></script>
@@ -557,7 +573,6 @@
         <%@include file="../WEB-INF/jspf/metadataModal.jspf" %>                                                
         <%@include file="../WEB-INF/jspf/parametersModal.jspf" %>                                                
         <%@include file="../WEB-INF/jspf/downloadModal.jspf" %>                                                
-        <%@include file="../WEB-INF/jspf/collectionsModal.jspf" %>                                                
         <%@include file="../WEB-INF/jspf/downloadStopperModal.jspf" %>                                                
         <!-- issue #53 -->
         <%@include file="../WEB-INF/jspf/POSHelperModal.jspf" %>                                                

@@ -43,6 +43,7 @@
         <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
         <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>
         <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.colVis.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>        
         
 
         <script type="text/javascript">
@@ -75,7 +76,8 @@
                 $.post(
                     BASE_URL + "/ZumultDataServlet",
                     { 
-                        command: 'getEventHTML',
+                        command: 'getSpeechEventMetadata',
+                        format: 'html',
                         speechEventID : speechEventID
                     },
                     function( data ) {
@@ -84,6 +86,22 @@
                         $('#metadataModal').modal("toggle");
                     }
                 );                                    
+            }
+            
+            function showSpeakers(speechEventID){
+                $.post(
+                    BASE_URL + "/ZumultDataServlet",
+                    { 
+                        command: 'getSpeakerMetadata',
+                        format: 'html',
+                        speechEventID : speechEventID
+                    },
+                    function( data ) {
+                        $("#metadata-body").html(data);
+                        $("#metadata-title").html("<i class=\"fa-solid fa-comment-dots\" aria-hidden=\"true\"></i> " + speechEventID);
+                        $('#metadataModal').modal("toggle");
+                    }
+                );                                                    
             }
         </script>
         
@@ -150,6 +168,10 @@
                                 <th>
                                     <button onclick="openMetadata('<%= speechEventID %>')" type="button" class="btn btn-sm py-0 px-1" title="Show all metadata">
                                         <i class="fas fa-info-circle"></i>
+                                    </button>
+                                    <button onclick="showSpeakers('<%= speechEventID %>')" type="button" class="btn btn-sm py-0 px-1" 
+                                            title="Speakers of speech event <%= speechEventID %>">
+                                        <i class="fa-solid fa-people" aria-hidden="true"></i>
                                     </button>
                                     <button onclick="openMedia('<%= speechEventID %>')" type="button" class="btn btn-sm py-0 px-1" 
                                             title="Open media overview (<%= speechEventID %>) in ZuViel">

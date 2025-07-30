@@ -121,6 +121,28 @@
                         </div>
                       </li>
 
+
+                      <li class="media my-4">
+                        <img src="./images/start-speechevents.png" class="mr-3 start" alt="..." 
+                             style="width:480px; border: 2px solid gray; border-radius: 5px;">
+                        <div class="media-body">
+                          <h5 class="mt-0 mb-1">Speech events and speakers: Overview</h5>
+                          <p>
+                              Speech events and speakers of a corpus are displayed with their metadata in sortable and searchable tables.
+                              <br/>
+                              The following corpus was chosen at random: <br/>
+                              <small class="text-muted ml-2"><%= randomCorpusID %></small> 
+                              <a href="./jsp/speecheventstable.jsp?corpusID=<%= randomCorpusID %>" class="btn btn-primary float-right mt-3" target="_blank">
+                                Speech events overview table
+                              </a><br/>
+                              <a href="./jsp/speakerstable.jsp?corpusID=<%= randomCorpusID %>" class="btn btn-primary float-right mt-3" target="_blank">
+                                Speakers overview table
+                              </a>
+                          </p>
+                        </div>
+                      </li>
+
+
                       <li class="media my-4">
                         <img src="./images/query.png" class="mr-3 start" alt="..." 
                              style="width:480px; border: 2px solid gray; border-radius: 5px;">

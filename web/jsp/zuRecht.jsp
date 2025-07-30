@@ -516,7 +516,8 @@
                 $.post(
                     BASE_URL + "/ZumultDataServlet",
                     { 
-                        command: 'getSpeakerMetadataHTML',
+                        command: 'getSpeakerMetadata',
+                        format: 'html',
                         speakerID: speakerID,
                         transcriptID: transcriptID
                     },
