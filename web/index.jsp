@@ -104,6 +104,10 @@
                 <div class="col-10">
                     <ul class="list-unstyled">
                         
+                      
+                      <!-- *************** -->
+                      <!-- CORPUS OVERVIEW -->  
+                      <!-- *************** -->
                       <li class="media">
                         <img src="./images/start-corpusoverview.png" class="mr-3 start" alt="..." 
                              style="width:480px; border: 2px solid gray; border-radius: 5px;">
@@ -122,6 +126,9 @@
                       </li>
 
 
+                      <!-- *************** -->
+                      <!-- OVERVIEW TABLES -->  
+                      <!-- *************** -->
                       <li class="media my-4">
                         <img src="./images/start-speechevents.png" class="mr-3 start" alt="..." 
                              style="width:480px; border: 2px solid gray; border-radius: 5px;">
@@ -142,7 +149,29 @@
                         </div>
                       </li>
 
+                      <!-- *************** -->
+                      <!-- STATISTICS       -->  
+                      <!-- *************** -->
+                      <li class="media my-4">
+                        <img src="./images/start-statistics.png" class="mr-3 start" alt="..." 
+                             style="width:480px; border: 2px solid gray; border-radius: 5px;">
+                        <div class="media-body">
+                          <h5 class="mt-0 mb-1">Corpus Statistics</h5>
+                          <p>
+                              Basic statistics for a corpus
+                              <br/>
+                              The following corpus was chosen at random: <br/>
+                              <small class="text-muted ml-2"><%= randomCorpusID %></small> 
+                              <a href="./jsp/statistics.jsp?corpusID=<%= randomCorpusID %>" class="btn btn-primary float-right mt-3" target="_blank">
+                                Corpus statistics
+                              </a>
+                          </p>
+                        </div>
+                      </li>
 
+                      <!-- *************** -->
+                      <!-- CORPUS QUERY  -->  
+                      <!-- *************** -->
                       <li class="media my-4">
                         <img src="./images/query.png" class="mr-3 start" alt="..." 
                              style="width:480px; border: 2px solid gray; border-radius: 5px;">
@@ -160,6 +189,9 @@
                         </div>
                       </li>
                       
+                      <!-- *************** -->
+                      <!-- TRANSCRIPT DISPLAY  -->  
+                      <!-- *************** -->
                       <li class="media my-4">
                         <img src="./images/transcript2.png" class="mr-3 start" alt="..."  
                              style="width:480px; border: 2px solid gray; border-radius: 5px;">
@@ -179,6 +211,9 @@
                         </div>
                       </li>
 
+                      <!-- *************** -->
+                      <!-- ZUMIN  -->  
+                      <!-- *************** -->
                       <li class="media my-4">
                         <img src="./images/zumin.png" class="mr-3 start" alt="..."  
                              style="width:480px; border: 2px solid gray; border-radius: 5px;">
@@ -202,6 +237,9 @@
                         </div>
                       </li>
 
+                      <!-- *************** -->
+                      <!-- OTHER VIEWS  -->  
+                      <!-- *************** -->
                       <li class="media my-4">
                         <img src="./images/zupass.png" class="mr-3 start" alt="..."  
                              style="width:480px; border: 2px solid gray; border-radius: 5px;">

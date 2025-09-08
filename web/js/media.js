@@ -24,6 +24,7 @@ function getVideoImage(videoID){
     );       
 }
 
+// go to the specified time and start the player
 function jump(time){
     var player = getMasterMediaPlayer();
     player.currentTime=time;
@@ -42,9 +43,17 @@ function frameBackward(){
     player.currentTime = player.currentTime - 0.04;
 }
 
-
 function stop(){
     getMasterMediaPlayer().pause();
+}
+
+
+function playFromButton(element){
+    jump(element.dataset.start);    
+}
+
+function pauseFromButton(element){
+    stop();
 }
 
 function preventMediaContextMenu() {
