@@ -33,7 +33,10 @@
     String pageName = "ZuPass";
     String pageTitle = transcriptID;
     
-    String speechEventID = backend.getSpeechEvent4Transcript(transcriptID);
+    String speechEventID = backend.getSpeechEvent4Transcript(transcriptID);    
+    String corpusID = backend.getCorpus4Event(backend.getEvent4SpeechEvent(speechEventID));
+
+    
     //String transcriptID = "ISO_robmus_2015_01_002";
     //String transcriptID = "IDE57E5B6C-E67B-B454-E462-4E4868C79333";
     Transcript exbTranscript = backend.getTranscript(transcriptID, Transcript.TranscriptFormats.EXB);

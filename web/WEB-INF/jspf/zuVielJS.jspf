@@ -123,13 +123,10 @@
         var selectedForm = formlistDropdown.options[formlistDropdown.selectedIndex].value;
         form = selectedForm;
 
-        var wordlistDropdown = document.getElementById('refwordlist');
-        var selectedWordlist = wordlistDropdown.options[wordlistDropdown.selectedIndex].value;       
-
         $.post('./zuViel.jsp', 
             {
                 transcriptID: transcriptID, 
-                wordlistID: selectedWordlist,
+                wordlistID: 'NONE',
                 startAnnotationBlockID: startSelection,
                 endAnnotationBlockID: endSelection,
                 form: selectedForm,
@@ -370,15 +367,13 @@
         var selectedForm = formlistDropdown.options[formlistDropdown.selectedIndex].value;
         form = selectedForm;
 
-        var wordlistDropdown = document.getElementById('refwordlist');
-        var selectedWordlist = wordlistDropdown.options[wordlistDropdown.selectedIndex].value;       
         
         $.post(
                 BASE_URL + "/ZumultDataServlet",
                 { 
                     command: 'getTranscript',
                     transcriptID: transcriptID, 
-                    wordlistID: selectedWordlist,
+                    wordlistID: 'NONE',
                     startAnnotationBlockID: startAnnotationBlockID,
                     endAnnotationBlockID: endAnnotationBlockID,
                     form: selectedForm,
@@ -432,14 +427,12 @@
     function reloadWordlist(){
         //alert("Yip!");
         $('#waitSpinner').toggle();
-        var wordlistDropdown = document.getElementById('refwordlist');
-        var selectedWordlist = wordlistDropdown.options[wordlistDropdown.selectedIndex].value;
         $.post(
             BASE_URL + "/ZumultDataServlet",
             { 
                 command: 'getWordlist',
                 transcriptID: transcriptID, 
-                wordlistID: selectedWordlist,
+                wordlistID: 'NONE',
                 startAnnotationBlockID: startAnnotationBlockID,
                 endAnnotationBlockID: endAnnotationBlockID,
                 tokenList : tokenList

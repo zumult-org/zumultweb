@@ -31,6 +31,7 @@
     for (MetadataKey mk : metadataKeys){
         selectionSet.add(mk.getName("en"));
     }
+    
 
 
 
@@ -66,9 +67,13 @@
                 //$('#myTable').DataTable();
                 $('#myTable').DataTable( {
                     serverSide: true,
+                    processing : true,
+                    language: {
+                        processing: "Loading data from server..."  // custom message
+                    },                    
                     ajax: {
                         url: '../DataTableServlet', // <-- your server endpoint
-                        type: 'GET',       // or 'GET' depending on your backend
+                        type: 'POST',       // or 'GET' depending on your backend
                         data: {
                             corpusID : '<%=corpusID%>',
                             command : 'communications'
@@ -197,7 +202,7 @@
         </script>
         
     </head>
-    <body>
+    <body margin-top="80px;">
         <%@include file="../WEB-INF/jspf/zumultNav.jspf" %>                                                
         
         <div class="row">

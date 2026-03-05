@@ -9,7 +9,7 @@ and open the template in the editor.
 */
 
     body#zuviel-body { 
-        padding-top: 70px; 
+        padding-top: 140px; 
         padding-bottom: 100px;
     }
     td {
@@ -70,13 +70,13 @@ and open the template in the editor.
     }
     
     /* this one for distinguishing speakers */
-    .color-1{color : navy; fill: navy; stroke: navy;}
-    .color-2{color : maroon; fill: maroon; stroke: maroon;}
-    .color-3{color : green; fill: green; stroke: green;}
-    .color-4{color : teal; fill: teal; stroke: teal;}
-    .color-5{color : purple; fill: purple; stroke: purple;}
-    .color-6{color : orange; fill: orange; stroke: orange;}
-    .color-7{color : olive; fill: olive; stroke: olive;}
+    .color-1{color : navy !important; fill: navy; stroke: navy;}
+    .color-2{color : maroon !important; fill: maroon; stroke: maroon;}
+    .color-3{color : green !important; fill: green; stroke: green;}
+    .color-4{color : teal !important; fill: teal; stroke: teal;}
+    .color-5{color : purple !important; fill: purple; stroke: purple;}
+    .color-6{color : orange !important; fill: orange; stroke: orange;}
+    .color-7{color : olive !important; fill: olive; stroke: olive;}
     
     
     /* the following ones for different types of highlighting */
@@ -156,8 +156,16 @@ and open the template in the editor.
     }
     
     /* this is for getting a smaller dropdown icon */
-    .dropdown-toggle::after {
-        display: none;
+    .navbar .dropdown-toggle::after {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        margin-left: 0.255em;
+        vertical-align: 0.255em;
+        content: "";
+        border-top: 0.3em solid currentColor;   /* uses text color automatically */
+        border-right: 0.3em solid transparent;
+        border-left: 0.3em solid transparent;
     }    
     
     span.titleID {
@@ -275,6 +283,14 @@ and open the template in the editor.
         border : 1px solid gray;
         padding-left : 5px;
         padding-right : 5px;        
+    }
+    
+    span.ol-marker {
+        color : gray;
+    }
+    
+    span.annotating-anchor {
+        color : gray;        
     }
 
 

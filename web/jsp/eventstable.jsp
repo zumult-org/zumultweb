@@ -47,7 +47,6 @@
         </script>
         
         
-        <%@include file="../WEB-INF/jspf/matomoTracking.jspf" %>                
         
     </head>
     <body>

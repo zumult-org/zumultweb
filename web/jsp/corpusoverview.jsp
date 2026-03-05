@@ -17,6 +17,7 @@
 <%@include file="../WEB-INF/jspf/locale.jspf" %>     
 <html>
     <%
+       String corpusID = null; // needed to inform menu bar
        BackendInterface backendInterface = BackendInterfaceFactory.newBackendInterface();
        String backendName = backendInterface.getName();
        String backendAcronym = backendInterface.getAcronym();
@@ -50,7 +51,7 @@
         </script>
         
     </head>
-    <body>
+    <body style="margin-top: 80px;">
         <% String pageTitle = "Korpusübersicht"; 
            if ("en".equals(language)) {
                pageTitle = "Corpus overview";
@@ -83,8 +84,8 @@
             <div class="col-sm-8">
         
         <%
-            for (String corpusID : corpora){
-                Corpus corpus = backendInterface.getCorpus(corpusID); 
+            for (String cID : corpora){
+                Corpus corpus = backendInterface.getCorpus(cID); 
                 String acronym = corpus.getAcronym();
                 String name = corpus.getName(language);
                 String description = corpus.getDescription(language);
@@ -95,7 +96,8 @@
                         <figure class="figure">
                             <%
                                 String corpusImgSrc = "../images/words.jpg";
-                                String tryPath = "/images/corpora/" + corpusID + ".png";
+                                String tryPath = "/images/corpora/" + cID + ".png";
+                                System.out.println("Trying " + tryPath);
                                 String path = request.getSession().getServletContext().getRealPath(tryPath);
                                 if (path!=null){
                                     File image = new File(path);    
@@ -112,8 +114,8 @@
                             <h5 class="card-title"><%=acronym%></h5>
                             <h6 class="card-subtitle mb-2 text-muted"><%=name%></h6>
                             <p class="card-text"><%=description%></p>
-                            <a class="card-link"  target="_blank" href="speecheventstable.jsp?corpusID=<%=corpusID%>">
-                                <%= backendInterface.getSpeechEvents4Corpus(corpusID).size() %>
+                            <a class="card-link"  target="_blank" href="speecheventstable.jsp?corpusID=<%=cID%>">
+                                <%= backendInterface.getSpeechEvents4Corpus(cID).size() %>
                                 <% if ("en".equals(language)) { %>
                                     Speech events
                                 <% } else { %>
@@ -121,8 +123,8 @@
                                 <% } %>
                                 
                             </a>
-                            <a class="card-link"  target="_blank" href="speakerstable.jsp?corpusID=<%=corpusID%>">
-                                <%= backendInterface.getSpeakers4Corpus(corpusID).size() %> 
+                            <a class="card-link"  target="_blank" href="speakerstable.jsp?corpusID=<%=cID%>">
+                                <%= backendInterface.getSpeakers4Corpus(cID).size() %> 
                                 <% if ("en".equals(language)) { %>
                                     Speakers
                                 <% } else { %>
@@ -134,16 +136,6 @@
                     </div>
                 </div>
                 </div>
-                <!-- <h2><%=acronym%></h2>
-                <h3><%=name%></h3>
-                <p><%=description%></p>
-                <p>
-                    <a target="_blank" href="eventstable.jsp?corpusID=<%=corpusID%>">Events</a>
-                    <span>  *  </span>
-                    <a target="_blank" href="speecheventstable.jsp?corpusID=<%=corpusID%>">Speech Events</a>
-                    <span>  *  </span>
-                    <a target="_blank" href="speakerstable.jsp?corpusID=<%=corpusID%>">Speakers</a>
-                </p> -->
         <%
             }
         %>

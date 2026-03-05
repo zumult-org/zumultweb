@@ -11,27 +11,32 @@
 <%@page import="org.zumult.objects.IDList"%>
 <%@ page pageEncoding="UTF-8" %>
     
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <nav 
+        class="navbar navbar-expand-lg fixed-top"
+        style="background: rgb(53, 104, 17); color: white;">
        
         <div class="container-fluid">
-            <!-- **************************************** -->
-            <!-- * a logo if you want one               * -->
-            <!-- **************************************** -->
+
             <a class="navbar-brand" href="http://zumult.org">
-                <% String imgSrc = "../images/agd.png"; %>
-                <!-- <img src="<%= imgSrc %>" height="30" class="d-inline-block align-top" alt=""/> -->
+                <img 
+                    src="/zumult/images/cropped-ZuMult.png" 
+                    class="d-inline-block align-top ms-3" 
+                    style="width:20%"
+                    alt="ZuMult Logo"/>
             </a>
+            
+
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- ******************************************* -->
                 <!-- * Page name linked to the ZuMult homepage * -->
                 <!-- ******************************************* -->
-                <a class="navbar-brand" href="http://www.zumult.org"><b><%= pageName %></b></a>
+                <a class="navbar-brand" href="http://www.zumult.org"><b style="color:white;"><%= pageName %></b></a>
                 <!-- ******************************************* -->
                 <!-- * Title of this particular page           * -->
                 <!-- ******************************************* -->
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
+                    <li class="nav-item active" style="color:white;">
                         <%= pageTitle %>
                     </li>
 
@@ -41,15 +46,23 @@
                     <!-- ******************* -->
                     <!-- * PROJECT LINKS  ** -->
                     <!-- ******************* -->
-                    <ul class="navbar-nav ml-auto>
+                    <ul class="navbar-nav ml-auto">
+                       <li class="nav-item dropdown">
+                         <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false" style="color:white;">Navigation</a>
+                         <div class="dropdown-menu">
+                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL()%>"><%=myResources.getString("Home")%></a>                             
+                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/corpusoverview.jsp"%>"><%=myResources.getString("CorpusOverview")%></a>                             
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/zuRecht.jsp"%>"><%=myResources.getString("Query")%></a>                             
+                            <% if (corpusID!=null){ %>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/speecheventstable.jsp?corpusID=" + corpusID %>"><%=myResources.getString("SpeechEvent") + " (" + corpusID + ")"%></a>                             
+                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/speakerstable.jsp?corpusID=" + corpusID %>"><%=myResources.getString("Speaker") + " (" + corpusID + ")"%></a>                             
+                            <% } %>
+                         </div>
+                       </li>                      
                       <li class="nav-item">
-                        <a class="nav-link" href="<%= Configuration.getWebAppBaseURL()%>"><%=myResources.getString("Home")%></a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" target="_blank" href="<%= Constants.ZUMULT_PROJECT_ULR%>"><%=myResources.getString("Project")%></a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" target="_blank" href="../../doc/Handreichung-<%=pageName%>.html">Help</a>
+                          <a class="nav-link" target="_blank"  style="color:white;" href="<%= Configuration.getHelpURL() %>">Help</a>
                       </li>
                       <!-- *********************** -->
                       <!-- * LANGUAGE SELECTOR  ** -->

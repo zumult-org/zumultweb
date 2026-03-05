@@ -20,7 +20,7 @@
     String corpusID = request.getParameter("corpusID");
 
     String pageName = "ZuMult";
-    String pageTitle = "Speech events overview";
+    String pageTitle = "Speakers overview";
     //String imgSrc = "../images/eslo_bandeau.jpg";
 
     BackendInterface backendInterface = BackendInterfaceFactory.newBackendInterface();
@@ -64,9 +64,13 @@
                 //$('#myTable').DataTable();
                 $('#myTable').DataTable( {
                     serverSide: true,
+                    processing : true,
+                    language: {
+                        processing: "Loading data from server..."  // custom message
+                    },                                        
                     ajax: {
                         url: '../DataTableServlet', // <-- your server endpoint
-                        type: 'GET',       // or 'GET' depending on your backend
+                        type: 'POST',       // or 'GET' depending on your backend
                         data: {
                             corpusID : '<%=corpusID%>',
                             command : 'speakers'
@@ -104,7 +108,7 @@
                 $.post(
                     BASE_URL + "/ZumultDataServlet",
                     { 
-                        command: 'getSpeakerMetadataHTML',
+                        command: 'getSpeakerMetadata',
                         speakerID : speakerID
                     },
                     function( data ) {
@@ -136,7 +140,7 @@
         </script>
         
     </head>
-    <body>
+    <body margin-top="80px;">
         <%@include file="../WEB-INF/jspf/zumultNav.jspf" %>                                                
         
         <div class="row">

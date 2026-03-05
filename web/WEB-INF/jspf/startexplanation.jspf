@@ -1,10 +1,23 @@
 <%-- any content can be specified here e.g.: --%>
 <%@ page pageEncoding="UTF-8" %>
-<div class="px-4" id="start-explanation">    
-    <div class="table-wrapper table-responsive myKWIC" id="kwic_display">
-        <p>Simple CQP queries can look like this:</p>
+<div class="px-4 collapse show" id="query_intro" style="border: 1px solid rgb(220,220,220); background: rgb(250,250,250); padding: 5px;">
+    <div>
+        <p>The most <b>basic query (no CQP)</b> is just a word or a sequence of words, e.g.:</p>
+        <ul>
+            <li>
+                <span onclick="insertQuery(this)" class="text-monospace" style="cursor:pointer; font-size:14pt; color: #337AB7; font-weight: bold">Cowboy</span> will find all tokens whose normalized form is "Cowboy"<br/>
+            </li>
+            <li>
+                <span onclick="insertQuery(this)" class="text-monospace" style="cursor:pointer; font-size:14pt; color: #337AB7; font-weight: bold">in Texas</span> will find "in" followed by "Texas" (normalized forms)
+            </li>
+        </ul>
 
-        <table class=table table-striped">
+        <p>
+            For more complex queries on different annotation levels, you can use CQP queries. 
+            <b>Simple CQP queries</b> for individual token annotations can look like this:
+        </p>
+
+        <table class="table table-striped">
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">CQP Query</th>
@@ -12,37 +25,60 @@
                 </tr>
             </thead>
             <tr>
-                <th scope="row" class="text-monospace" style="font-size:14pt">[word="in"]</th>
-                <td>all instances of the transcribed form "in"</td>
+                <th onclick="insertQuery(this)" scope="row" class="text-monospace" style="cursor:pointer; font-size:14pt">[word="nice"]</th>
+                <td>all instances of the transcribed form "nice"</td>
             </tr>
             <tr>
-                <th scope="row" class="text-monospace" style="font-size:14pt">[lemma="go"]</th>
-                <td>all tokens whose lemma is “gehen”, i.e., “go”, but also “went”, “goes”, “going”, etc. </td>
+                <th onclick="insertQuery(this)" scope="row" class="text-monospace" style="cursor:pointer; font-size:14pt">[norm="Kühe"]</th>
+                <td>all tokens whose normalized form is “Kühe”, i.e., “Kühe”, but also “Kie”, “Kee”, “Kuhe”, “Küh”, etc. </td>
             </tr>
             <tr>
-                <th scope="row" class="text-monospace" style="font-size:14pt">[pos="JJ"]</th>
-                <td>
-                    all tokens whose POS is JJ (for adjective in the Penn POS tagset), e.g., “young”, “small”, “wide”, “good”, etc. <br/>
-                    Please note that tagsets vary between corpora and languages.
-                </td>
+                <th onclick="insertQuery(this)" scope="row" class="text-monospace" style="cursor:pointer; font-size:14pt">[lemma="gehen"]</th>
+                <td>all tokens whose lemma is “gehen”, i.e., “gehen”, but also “gegangen”, “gehst”, “ging”, etc. </td>
             </tr>
+            <tr>
+                <th onclick="insertQuery(this)" scope="row" class="text-monospace" style="cursor:pointer; font-size:14pt">[pos="ADJD"]</th>
+                <td>all tokens whose POS is ADJD (for predicative/adverbial adjective), e.g., “jung”, “klein”, “weit”, “gut”, etc. </td>
+            </tr>
+            <tr>
+                <th onclick="insertQuery(this)" scope="row" class="text-monospace" style="cursor:pointer; font-size:14pt">[lang="amb"]</th>
+                <td>all tokens whose language tag is “amb” (for "ambiguous"), e.g., “Großjungens” or “Friedrichsburch”</td>
+            </tr>
+
         </table>
 
         <p>
-            You can add metadata restriction to a query, e.g.:                            
+            <b>More complex CQP</b> queries can <b>combine one or several tokens</b> and/or use <b>regular expressions</b>, e.g.:
         </p>
         <ul>
             <li>
-                <span class="text-monospace">[norm="in"] within &lt;Sex="female"/&gt;</span>
-                to restrict query to female speakers
+                <span onclick="insertQuery(this)" class="text-monospace" style="cursor:pointer; font-size:14pt; color: #337AB7; font-weight: bold">[lemma="klein"][pos="NN"]</span> will find forms of the lemma "klein" followed by a noun                                                           
             </li>
             <li>
-                <span class="text-monospace">[norm="in"] within &lt;Recording_Date="2007.*"/&gt;</span>
-                to restrict query to interviews from 2007
+                <span onclick="insertQuery(this)" class="text-monospace" style="cursor:pointer; font-size:14pt; color: #337AB7; font-weight: bold">[norm="[Mm]ass.*"]</span> will find small and capitalized forms of normalied words starting in "mass"                                                           
             </li>
         </ul>
 
         <p>
+            You can add <b>metadata restriction</b> to a query, e.g.:                            
+        </p>
+        <ul>
+            <li>
+                <span onclick="insertQuery(this)" class="text-monospace" style="cursor:pointer; font-size:14pt; color: #337AB7; font-weight: bold">[norm="in"] within &lt;Interview_Location="New Braunfels"/&gt;</span>
+                to restrict a query to interviews from New Braunfels
+            </li>
+            <li>
+                <span onclick="insertQuery(this)" class="text-monospace" style="cursor:pointer; font-size:14pt; color: #337AB7; font-weight: bold">[norm="in"] within &lt;Sex="female"/&gt;</span>
+                to restrict a query to female speakers
+            </li>
+            <li>
+                <span onclick="insertQuery(this)" class="text-monospace" style="cursor:pointer; font-size:14pt; color: #337AB7; font-weight: bold">[norm="in"] within &lt;Recording_Date="2007.*"/&gt;</span>
+                to restrict a query to interviews from 2007
+            </li>
+        </ul>
+
+        <p>
+            You can also query the <b>English translations</b> and the stretches marked by transcribers as potential <b>transfer</b> phenomena.<br/>
             For more query examples, please see
             <a href="https://docs.google.com/document/d/1InEQzxIZ_G-0f5KpED6djpzzm2bX9IqANfvb3lxZZ6o/edit#heading=h.iher1aozbmv6"
                target="_blank">this GoogleDoc</a>
@@ -50,3 +86,4 @@
         </p>
     </div>
 </div>
+

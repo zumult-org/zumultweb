@@ -36,6 +36,7 @@
     String pageTitle = transcriptID + " - " + annotationBlockID;
     
     String speechEventID = backend.getSpeechEvent4Transcript(transcriptID);
+    String corpusID = backend.getCorpus4Event(backend.getEvent4SpeechEvent(speechEventID));
     
     String videoIDsParameter = request.getParameter("videoIDs");
     List<String> videoIDs = new ArrayList<>();
@@ -68,6 +69,7 @@
         {"HIGHLIGHT_ANNOTATION_BLOCK", annotationBlockID},        
         {"TOKEN_LIST_URL", ""},
         {"DROPDOWN", "FALSE"},
+        {"PLAYPAUSEBUTTONS", "FALSE"},
         {"TRANSLATION", ""}
     };
     
@@ -87,7 +89,7 @@
                 <link rel="stylesheet" href="../css/transcript.css"/>
                 <script src="../js/media_zumin.js"></script>
                 <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>        
-                <script src="https://kit.fontawesome.com/e215b03c17.js" crossorigin="anonymous"></script>
+                <script src="https://kit.fontawesome.com/ed5adda70b.js" crossorigin="anonymous"></script>
                 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/>
                 <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="crossorigin="anonymous"></script>        
                 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>                
@@ -124,6 +126,31 @@
                         );                    
                         
                     }
+                    
+                    function rangeSliderChanged(inputId){
+                      const input = document.getElementById(inputId);
+                      const newValue = input.value;
+                      if (inputId==='playbackSpeedRange'){
+                          const video = document.getElementById("master-video");
+                          if (video!==null){
+                              video.playbackRate = newValue / 100.0;
+                          }
+                          const audio = document.getElementById("master-audio");
+                          if (audio!==null){
+                              audio.playbackRate = newValue / 100.0;
+                          }
+                      } else if (inputId==='zoomRange'){
+                          stretchX(newValue);
+                      }
+                        
+                    }
+                    
+                    function stretchX(percentage) {
+                      const svg = document.getElementById("outerSVGWrapper");
+                      const factor = percentage / 100;
+                      svg.style.transform = `scaleX(${factor})`;
+                      svg.style.transformOrigin = "left center";
+                    }                    
                     
                 </script>
                 
@@ -208,6 +235,85 @@
             </div>
             <div class="col-1"></div>
         </div>
+            
+        <div id="zumi-controls" class="row mt-2">
+            <div class="col-1"></div>
+            <div class="col-10 overflow-auto">
+
+                <div class="row justify-content-center">
+                    <div class="btn-group m-3" role="group"> 
+                         <button class="btn btn-outline-dark btn-lg" title="To start of section" onclick="backward-fast()">
+                          <i class="fa-solid fa-backward-fast"></i>
+                        </button>                                    
+
+                        <button class="btn btn-outline-dark btn-lg" title="Ten frames (0.25s) backward" onclick="wind(-0.25)">
+                          <i class="fa-solid fa-backward"></i>
+                        </button>                                    
+
+                        <button class="btn btn-outline-dark btn-lg" title="One frame (0.04s) backward" onclick="frameBackward()">
+                          <i class="fa-solid fa-backward-step"></i>
+                        </button>                                    
+
+                        <button class="btn btn-dark btn-lg pl-5 pr-5" title="Play section" onclick="playSelection()" id="sync-play-pause-button">
+                          <i class="fa-solid fa-play"></i><i class="fa-light fa-pipe-section ml-3"></i>
+                        </button>                                    
+
+                        <button class="btn btn-outline-dark btn-lg" title="One frame (0.04s) forward" onclick="frameForward()">
+                          <i class="fa-solid fa-forward-step"></i>
+                        </button>                                    
+
+                        <button class="btn btn-outline-dark btn-lg" title="Ten frames (0.25s) forward" onclick="wind(0.25)">
+                          <i class="fa-solid fa-forward"></i>
+                        </button>     
+
+                         <button class="btn btn-outline-dark btn-lg" title="To end of section" onclick="forward-fast()">
+                          <i class="fa-solid fa-forward-fast"></i>
+                        </button>       
+                    </div>
+                            
+        <div class="row g-3 align-items-center">
+            <!-- Slider 1 -->
+            <div class="col-12 col-md-6">
+              <label for="playbackSpeedRange" class="form-label d-flex justify-content-between">
+                <span>Speed</span>
+                <!-- value badge placed to the right -->
+                <span id="playbackSpeedValue" class="badge bg-secondary">100</span>
+              </label>
+              <input
+                id="playbackSpeedRange"
+                class="form-range"
+                type="range"
+                min="50"
+                max="150"
+                step="1"
+                value="100"
+              >
+            </div>
+
+            <!-- Slider 2 -->
+            <div class="col-12 col-md-6">
+              <label for="zoomRange" class="form-label d-flex justify-content-between">
+                <span>Zoom</span>
+                <span id="zoomValue" class="badge bg-secondary">100</span>
+              </label>
+              <input
+                id="zoomRange"
+                class="form-range"
+                type="range"
+                min="50"
+                max="400"
+                step="5"
+                value="100"
+              >
+            </div>
+          </div>
+
+                        </div>
+            </div>
+
+            <div class="col-1"></div>
+
+        </div>
         
         <div id="partitur-form" class="row mt-2">
             <div class="col-1"></div>
@@ -220,8 +326,11 @@
                             </td>
                             <td>
                                 ZuMin is zoomin' in. <br/>
-                                <a href="https://www.youtube.com/watch?v=UxXW6tfl2Y0" target="_blank">Very, very witty. </a><br/>
-                                Please wait while ZuMult is asking MAUS, Praat and FFMPEG what to do.                                
+                                Getting forced alignment via <b>MAUS</b> (Thanks to BAS Munich), <br/>
+                                pitch contour via <b>Praat</b> (Thanks to Paul Boersma)
+                                <% if (videoIDs.size()>0){ %><br/>
+                                and video stills via <b>FFMPEG</b>.       
+                                <% } %>
                             </td>
                         </tr>
 
@@ -232,6 +341,27 @@
         </div>
         
         <script type="text/javascript">
+            // to keep the range sliders updated
+            const sliders = [
+              { inputId: 'playbackSpeedRange', valueId: 'playbackSpeedValue' },
+              { inputId: 'zoomRange', valueId: 'zoomValue' }
+            ];
+
+            sliders.forEach(({ inputId, valueId }) => {
+              const input = document.getElementById(inputId);
+              const valueEl = document.getElementById(valueId);
+              if (!input || !valueEl) return;
+
+              // Initialize display
+              valueEl.textContent = input.value;
+
+              // Update on input for instant feedback
+              input.addEventListener('input', () => {
+                valueEl.textContent = input.value;
+                rangeSliderChanged(inputId);
+              });
+            });
+
             loadMicroView();
             jump(startTime);
             getMasterMediaPlayer().pause();

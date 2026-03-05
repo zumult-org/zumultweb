@@ -69,6 +69,14 @@
     AnnotationTagSet annotationTagSet = backend.getAnnotationTagSet(Constants.DEFAULT_POS_TAGSET);
     String annotationTagSetString = annotationTagSet.toXML().replaceAll("[\\t\\n\\r]+","").replaceAll("\\s+"," ").replaceAll("> <", "><");
     String annotationTagSetXML = annotationTagSetString.replace("\"", "\\\"").replace("\'", "\\\'");
+    
+    String pageName = "ZuMult";
+    String pageTitle = "ZuRecht - CQP Query"; 
+    String imgSrc = "";
+    String imgSrc2 = "";
+    
+    String corpusID = null; // for completeness sake
+
 
 %>
 <%@include file="../WEB-INF/jspf/locale.jspf" %>     
@@ -88,11 +96,6 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
         <script src="https://kit.fontawesome.com/ed5adda70b.js" crossorigin="anonymous"></script>
         
-        
-        <!-- <script src="https://unpkg.com/wavesurfer.js"></script>
-        <script src="https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.regions.min.js"></script>
-        <script src="https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.min.js"></script>
-        <script src="https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.timeline.min.js"></script> -->
 
         <script src="../js/jquery.twbsPagination.js" type="text/javascript"></script>
         <script src="../js/zuRecht.collapsible.js" type="text/javascript"></script>
@@ -102,10 +105,9 @@
         <link rel="stylesheet" type="text/css" href="../css/query.css" />
         <link rel="stylesheet" type="text/css" href="../css/transcript.css" />
         
-        <%@include file="../WEB-INF/jspf/matomoTracking.jspf" %>                
 
     </head>
-    <body>
+    <body style="margin-top:80px;">
 
         <div id="autocompleteForQueryInputField" class="list-group"></div>
 
@@ -115,51 +117,65 @@
         <% String maxNumberForDownload =  String.valueOf(Constants.MAX_NUMBER_FOR_KWIC_DOWNLOAD); %>
       
         <!-- navigation  -->
-        <%@include file="../WEB-INF/jspf/zuRechtNavBar.jspf" %>
+        <%@include file="../WEB-INF/jspf/zumultNav.jspf" %>
+        
 
         <br/>
-        <div class="container-fluid">
-            <div class="row">
+        <div class="d-flex" id="wrapper">
+            <!-- Sidebar -->
+            <div class="bg-light border-right" id="sidebar-wrapper">
+
+                <!-- Toggle Button -->
+                <button class="btn btn-sm btn-light border position-absolute"
+                        id="menu-toggle"
+                        style="top:10px; right:-18px; z-index:1000;">
+                    <span>&#9776;</span>
+                </button>                
                 
-                <!-- corpora -->
-                <div class="col-md-2"> 
+                <div class="px-3 py-3"> 
                     <%@include file="../WEB-INF/jspf/zuRechtCorpora.jspf" %>
                 </div>
+            </div>            
 
-                <!-- workspace -->
-                <div class="col-md-10">
+            <div class="container-fluid">
+                <div class="row">
 
-                    <!-- Nav tabs -->
-                    <ul class="nav nav-tabs small" role="tablist">
-                        <li class="nav-item"><a class="nav-link active" data-toggle="tab" id="query-tab" href="#query-tab-content" role="tab"><%=myResources.getString("Query")%></a></li>
-                    </ul>
+                    <!-- corpora -->
 
-                    <!-- Tab panes -->
-                    <div class="tab-content">
+                    <!-- workspace -->
+                    <div class="col-md-10">
 
-                        <!-- Query tab -->
-                        <div class="tab-pane mt-3 active" id="query-tab-content">
-                            <h2><%=myResources.getString("SearchByQuery")%></h2>
-                            <%@include file="../WEB-INF/jspf/zuRechtKWICSearchForm.jspf" %>
-                            <%@include file="../WEB-INF/jspf/zuRechtKWICSearchOptionsModal.jspf" %>
-                            <div id="kwic-search-result-area" class="searchResultArea">
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs small" role="tablist">
+                            <li class="nav-item"><a class="nav-link active" data-toggle="tab" id="query-tab" href="#query-tab-content" role="tab"><%=myResources.getString("Query")%></a></li>
+                        </ul>
+
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+
+                            <!-- Query tab -->
+                            <div class="tab-pane mt-3 active" id="query-tab-content">
+                                <%@include file="../WEB-INF/jspf/zuRechtKWICSearchForm.jspf" %>
+                                <%@include file="../WEB-INF/jspf/zuRechtKWICSearchOptionsModal.jspf" %>
+                                <div id="kwic-search-result-area" class="searchResultArea">
+                                </div>
                             </div>
                         </div>
+
+                        <!-- include start explanations -->        
+                        <%@include file="../WEB-INF/jspf/startexplanation.jspf" %>
                     </div>
-                            
-                    <!-- include start explanations -->        
-                    <%@include file="../WEB-INF/jspf/startexplanation.jspf" %>
                 </div>
+
+
             </div>
-                            
-                            
-        </div>
-        <%@include file="../WEB-INF/jspf/metadataModal.jspf" %>
+        </div>                                
+        <%@include file="../WEB-INF/jspf/metadataModal.jspf" %>        
         <%@include file="../WEB-INF/jspf/videoModal.jspf" %>
         <%@include file="../WEB-INF/jspf/imageModal.jspf" %>
   
         <%@include file="../WEB-INF/jspf/zuRechtConstants.jspf" %>
-         <%@include file="../WEB-INF/jspf/zuRechtAudioPlayback.jspf" %>
+        <%@include file="../WEB-INF/jspf/zuRechtAudioPlayback.jspf" %>
         <script type="text/javascript">
             var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';
             var languageTag = '<%=currentLocale.toLanguageTag()%>';
@@ -224,27 +240,6 @@
                     $('#modal-searchTabOptions').modal('show');
                 });
                 
-                /************* sample queries ****************/
-                addSampleQueries();
-                
-                $('input[type=checkbox]').change(function () {
-                    updateSampleQueries();
-                });
-                
-                /* This function displays sample queries in the query input field */
-                (function(){
-                    var show = document.getElementById("queryInputField");
-                    var instructions = document.getElementById("instructions");
-                    var sample = document.getElementById("sampleQueries");
-                    sample.addEventListener("change", function(){
-                        var str = sample.value;
-                        var txt = str.replace(/%22/g, "\"").replace(/%26/g, " & ")
-                                .replace(/%3C/g, "<").replace(/%3E/g, ">").replace(/%2B/g, "+").replace(/%23/g, "#");
-                        show.value=txt;
-                        instructions.innerHTML="";
-                    });
-                })();
-
 
                 // load html for displaying kwic results
                 $("#kwic-search-result-area").load(zuRechtKWICResultView, function() {
@@ -311,6 +306,13 @@
                 }
                 
             }
+            
+            function insertQuery(element){
+                let queryString = element.textContent;
+                let qif = document.getElementById("queryInputField");
+                qif.value = queryString;
+            }
+            
             
             /**********************************************************/
             /*                      ajax calls                        */
@@ -793,16 +795,7 @@
             
             /* This function is used in updateSampleQueries() and in $(document).ready(function(){...})*/
             function addSampleQueries(){
-
-                <% ArrayList<SampleQuery> queries2 = IOHelper.getQueriesFromFile(Constants.SAMPLE_QUERIES_FOR_TRASCRIPT_BASED_SEARCH);
-                        for (int i = 0; i < queries2.size(); i++) { 
-                            SampleQuery query = queries2.get(i); 
-                        %>
-
-                        addQuery('<%=query.getCorpus() %>', '<%=query.getQueryString() %>', '<%=query.getQueryString().replaceAll("\"", "%22") %>', '<%=query.getDescription().replaceAll("\'", "%22") %>');
-
-
-                <%}%>
+                    // do nothing here
             }
   
             /* This function is used in addSampleQueries() */

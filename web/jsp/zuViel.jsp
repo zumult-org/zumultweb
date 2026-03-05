@@ -304,22 +304,36 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>ZuViel : <%= transcriptID %></title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/>
-        <!-- <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script> -->
+        
+        <!-- ************************************************* -->
+        <!-- *************** JS UTILITIES ******************** -->
+        <!-- ************************************************* -->
         <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="crossorigin="anonymous"></script>        
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>                
-        <!-- <script src="https://kit.fontawesome.com/e215b03c17.js" crossorigin="anonymous"></script> -->
         <script src="https://kit.fontawesome.com/ed5adda70b.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>        
+        
+        
+        <!-- ************************************************* -->
+        <!-- *************** BOOTSTRAP 5 ********************* -->
+        <!-- ************************************************* -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" 
+            integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous"/>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" 
+            integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
 
-        <link rel="stylesheet" href="../css/transcript.css"/>
-        <!-- issue #54 -->
-        <link rel="stylesheet" href="../css/transcript_print.css" media="print"/>
-        <!-- <script src="../js/transcript.js"></script> -->
+            
+        <link href="../css/transcript.css" rel="stylesheet" />
+        <link href="../css/overview.css" rel="stylesheet"/>         
+        <link href="../css/transcript_print.css" rel="stylesheet" media="print"/>         <!-- issue #54 -->
+        <link href="../css/query.css" rel="stylesheet"/>
+        
         <%@include file="../WEB-INF/jspf/zuVielJS.jspf" %>     
         <script src="../js/metadata.js"></script>
         <script src="../js/download.js"></script>
         <script src="../js/collections.js"></script>
+
+        <!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>  -->              
         
         <script>
             // probably all variables from the URL should be mirrored in this way
@@ -393,98 +407,28 @@
         <!-- ************************************** -->
         <!-- ************************************** -->
         <!-- ************************************** -->
-        <div class="row">
-        </div>
+
 
         <div class="row">
 
             <!-- *********************** -->
             <!-- *****LEFT COL    ****** -->
             <!-- *********************** -->
-            <div class="col-sm-2" id="columnLeft" style="overflow-y: auto;">
-                <div style="position:fixed">
-                    
-                    <!-- **************************** -->
-                    <!-- ***** WORDLIST SELECTION   * -->
-                    <!-- **************************** -->
-                    <div class="input-group mb-3 input-group-sm" style="padding-left:20px; padding-right:10px;visibility:hidden;">
-                        <div class="input-group-prepend" style="width:90px;">
-                            <span class="input-group-text" id="subtitletypelabel" title="<%=myResources.getString("ReferenceWordlist")%>"><%=myResources.getString("RefWordlist")%></span>
-                        </div>
-                        <select class="form-control" id="refwordlist" 
-                                <% if (!isGerman){ %>
-                                    disabled="disabled"
-                                <% } %>
-                                onchange="changeRefWordlist()">
-                          <option value="NONE">None</option>
-                          
-                          <% String[] wordlistIDs = Constants.LEIPZIG_WORDLISTS;
-                                for (String id : wordlistIDs){%>
-                                <option value="<%= id %>"
-                                    <% if (isGerman && wordlistID.equals(id)) {%>
-                                        selected="selected"
-                                    <% } %>
-                                >
-                                <%= id %>
-                                </option>
-                          <% } %>
-                        </select>                          
-                    </div>
-                    
-                        
-                    <!-- **************************** -->
-                    <!-- ***** WORDLIST             * -->
-                    <!-- **************************** -->
-                    <div class="wordlist">                    
-                        <div id="wordlist-container">
-                            <%//= wordListHTML %>
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p style="color:gray"><%=myResources.getString("WaitWordlistLoading")%></p>                            
-                        </div>
-                    </div>
-                        
-                    <!-- ******************************** -->
-                    <!-- ***** DOWNLOAD /PRINT WORDLIST * -->
-                    <!-- ******************************** -->
-                    <!-- issue #55 -->
-                    <div class="container" style="margin-top: 20px;">
-                      <div class="row">
-                        <div class="col">
-                            <button type="button" class="btn btn-secondary btn-lg" title="<%=myResources.getString("PrintDownloadOptions")%>"
-                                 data-toggle="modal" data-target="#printDownloadWordlistModal">
-                                <i class="fas fa-download"></i>
-                                <i class="fas fa-print"></i>                     
-                            </button>
-                        </div>
-                      </div>
-                    </div>                    
-                    
-                        
-                        
+            <div class="col-auto d-flex flex-column align-items-end" id="columnLeft" style="height: 85vh;">
+                <!-- **************************** -->
+                <!-- ***** WORDLIST             * -->
+                <!-- **************************** -->
+                <div id="wordlist-container" class="container flex-grow-1 overflow-auto px-5">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p style="color:gray"><%=myResources.getString("WaitWordlistLoading")%></p>                            
                 </div>
-
             </div>
                 
-            <!-- <div class="col-sm-1">
-                <div style="position: fixed;" class="wordlist">                    
-                    //posListHTML
-                </div>
-            </div> -->
             
             <!-- *********************** -->
             <!-- ****  CENTER COL   **** -->
             <!-- *********************** -->
-            <%
-                if (!videos.isEmpty() || !audios.isEmpty()){              
-            %>
-                    <div class="col-sm-6" id="columnCenter">
-            <%
-                } else {              
-            %>
-                    <div class="col-sm-10" id="columnCenter">
-            <%
-                }             
-            %>
+            <div class="col d-flex flex-column" id="columnCenter" style="height: 100vh;">
                 
                 <!-- *** EXPAND BEFORE *** -->
                 <% if (startAnnotationBlockID!=null && startAnnotationBlockID.length()>0) { %>
@@ -517,19 +461,22 @@
                     </div>
                 </div>
                 <% } %>
+
                 <!-- *******************************  -->
                 <!-- *******************************  -->
                 <!-- *******************************  -->
                 
-                <div class="container" id="transcript-container">
-
-                    <%//= transcriptHTML %>
+                <div class="container flex-grow-1 overflow-auto" id="transcript-container">
                     <p style="color:gray; font-size:14pt; padding-top:20px;">
                         <i class="fas fa-spinner fa-spin"></i>
                         <%=myResources.getString("WaitTranscriptLoading")%>
                     </p>
                 </div>
 
+                <!-- *******************************  -->
+                <!-- *******************************  -->
+                <!-- *******************************  -->
+                    
                 <!-- *** EXPAND AFTER *** -->                    
                 <% if (endAnnotationBlockID!=null && endAnnotationBlockID.length()>0) { %>
                     <button type="button" 
@@ -542,13 +489,15 @@
             </div>
             
                 
+            
+                
                 
             <!-- *********************** -->
             <!-- *********************** -->
             <!-- *********************** -->
             <!-- right column --> 
             <% if (!videos.isEmpty() || !audios.isEmpty()){ %>
-            <div class="col-sm-4" id="columnRight">
+            <div class="col-auto" id="columnRight" style="min-width: 540px;">
                 <div style="position: fixed;">                    
                     <%@include file="../WEB-INF/jspf/zuVielDensityNav.jspf" %> 
                     <%@include file="../WEB-INF/jspf/zuVielMediaPlayers.jspf" %> 
@@ -570,12 +519,10 @@
 
         <%@include file="../WEB-INF/jspf/annotationsModal.jspf" %>                                                
         <%@include file="../WEB-INF/jspf/partiturModal.jspf" %>                                                
-        <%@include file="../WEB-INF/jspf/protocolModal.jspf" %>                                                
         <%@include file="../WEB-INF/jspf/svgModal.jspf" %>                                                
         <%@include file="../WEB-INF/jspf/metadataModal.jspf" %>                                                
         <%@include file="../WEB-INF/jspf/parametersModal.jspf" %>                                                
         <%@include file="../WEB-INF/jspf/downloadModal.jspf" %>                                                
-        <%@include file="../WEB-INF/jspf/downloadStopperModal.jspf" %>                                                
         <!-- issue #53 -->
         <%@include file="../WEB-INF/jspf/POSHelperModal.jspf" %>                                                
         <!-- issue #55 -->

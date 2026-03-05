@@ -35,6 +35,13 @@ function jump(time){
     player.play();
 }	
 
+function wind(amountInSeconds){
+    var player = getMasterMediaPlayer();
+    player.pause();
+    player.currentTime = player.currentTime + amountInSeconds;    
+}
+
+
 function frameForward(){
     var player = getMasterMediaPlayer();
     player.pause();
@@ -241,7 +248,7 @@ function updateSVGCursor(time){
 
 
 
-function moveSVGCursor(evt){
+function moveSVGCursor(amountInSeconds){
     /*var cursor = document.getElementById('svg_cursor')    
     pt.x = evt.clientX;
 
@@ -249,8 +256,8 @@ function moveSVGCursor(evt){
     var cursorpt =  pt.matrixTransform(svg.getScreenCTM().inverse());
     cursor.setAttribute('x1', cursorpt.x);
     cursor.setAttribute('x2', cursorpt.x);*/
-    
 }
+
 
 function setSVGCursor(evt){
     var cursor = document.getElementById('svg_cursor')    
@@ -258,7 +265,7 @@ function setSVGCursor(evt){
     var cursorpt =  pt.matrixTransform(svg.getScreenCTM().inverse());
 
     skipUpdate = true;
-    var player = getMasterMediaPlayer();
+    const player = getMasterMediaPlayer();
     let newTime = startTime + (cursorpt.x / xPerSecond );
     player.currentTime=newTime;
 
