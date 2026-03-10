@@ -36,8 +36,15 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>                
 
         <link rel="stylesheet" href="../css/overview.css"/>       
+        <style type="text/css">
+            .modal-dialog {
+              max-width: 90%;
+            }            
+        </style>
         
         <script>
+            var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';
+           
             $(document).ready(function(){
         
                 $("#selectLang").on("change", function(){
@@ -47,6 +54,23 @@
                     window.location = urlTest;
                 });
             });
+            
+            function openMetadata(corpusID){
+                $.post(
+                    BASE_URL + "/ZumultDataServlet",
+                    { 
+                        command: 'getCorpusMetadata',
+                        format: 'html',
+                        corpusID : corpusID
+                    },
+                    function( data ) {
+                        $("#metadata-body").html(data);
+                        $("#metadata-title").html(corpusID);
+                        $('#metadataModal').modal("toggle");
+                    }
+                );                                    
+            }
+            
             
         </script>
         
@@ -111,27 +135,38 @@
                     </div>
                     <div class="col-md-10">                  
                         <div class="card-body">
-                            <h5 class="card-title"><%=acronym%></h5>
-                            <h6 class="card-subtitle mb-2 text-muted"><%=name%></h6>
-                            <p class="card-text"><%=description%></p>
-                            <a class="card-link"  target="_blank" href="speecheventstable.jsp?corpusID=<%=cID%>">
-                                <%= backendInterface.getSpeechEvents4Corpus(cID).size() %>
-                                <% if ("en".equals(language)) { %>
-                                    Speech events
-                                <% } else { %>
-                                    Sprechereignisse
-                                <% } %>
-                                
-                            </a>
-                            <a class="card-link"  target="_blank" href="speakerstable.jsp?corpusID=<%=cID%>">
-                                <%= backendInterface.getSpeakers4Corpus(cID).size() %> 
-                                <% if ("en".equals(language)) { %>
-                                    Speakers
-                                <% } else { %>
-                                    Sprecher
-                                <% } %>
-                                
-                            </a>
+                            <div class="row">
+                                <div class="col-8">
+                                    <h5 class="card-title"><%=acronym%></h5>
+                                    <h6 class="card-subtitle mb-2 text-muted"><%=name%></h6>
+                                    <p class="card-text"><%=description%></p>
+                                </div>
+                                <div class="col-4">
+                                    <a class="card-link" href="#"
+                                       onclick="event.preventDefault(); openMetadata('<%= cID %>')"
+                                    >Corpus metadata</a><br/>
+                                    <a class="card-link" target="_blank" href="statistics.jsp?corpusID=<%= cID %>"
+                                    >Corpus statistics</a><br/>                                    
+                                    <a class="card-link"  target="_blank" href="speecheventstable.jsp?corpusID=<%=cID%>">
+                                        <%= backendInterface.getSpeechEvents4Corpus(cID).size() %>
+                                        <% if ("en".equals(language)) { %>
+                                            Speech events
+                                        <% } else { %>
+                                            Sprechereignisse
+                                        <% } %>
+
+                                    </a><br/>
+                                    <a class="card-link"  target="_blank" href="speakerstable.jsp?corpusID=<%=cID%>">
+                                        <%= backendInterface.getSpeakers4Corpus(cID).size() %> 
+                                        <% if ("en".equals(language)) { %>
+                                            Speakers
+                                        <% } else { %>
+                                            Sprecher
+                                        <% } %>
+
+                                    </a>
+                                </div>
+                            </div>
                       </div>
                     </div>
                 </div>
@@ -145,6 +180,6 @@
             
 
         </div>
-        
+        <%@include file="../WEB-INF/jspf/metadataModal.jspf" %>                
     </body>
 </html>

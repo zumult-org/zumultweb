@@ -73,7 +73,7 @@
         <% String pageName = "ZuMult"; %>
         <%@include file="../WEB-INF/jspf/zumultNav.jspf" %>   
         
-        <div class="container">
+        <div class="container ms-3 me-3">
             <div class="mb-1">
                 <a class="btn btn-success btn-lg" href="./jsp/diagnostics.jsp"><i class="fa-regular fa-display-medical"></i> Go to diagnostics</a>
             </div>
@@ -83,42 +83,23 @@
                     <b>ZuMult</b> is a corpus platform for audiovisual corpora. You can get further information and news about
                     ZuMult on <a target="_blank" href="https://zumult.org">zumult.org</a>
                 </p>
-                <!-- <hr class="my-4">
-                <p>
-                    This is a demo installation of ZuMult, provided by <a href="https://linguisticbits.de" target="_blank">linguisticbits.de</a>. 
-                    Other installations of ZuMult are:
-                    <ul>
-                        <li>
-                            <a href="https://tgdp-zumult.la.utexas.edu/" target="_blank">
-                                ZuMult at the Texas German Dialect Archive
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://zumult.ids-mannheim.de" target="_blank">
-                                ZuMult at the Archive for Spoken German
-                            </a>
-                        </li>
-                    </ul>                    
-                    Learn more about ZuMult by exploring the individual apps listed below. 
-                </p> -->
             </div>
+        </div>
+        <div class="container">
             <div class="row">
-                <div class="col-1"></div>
-                <div class="col-10">
+                <div class="col-6">
+                    <h3>Applications</h3>
                     <ul class="list-unstyled">
-                        
-                      
+
                       <!-- *************** -->
                       <!-- CORPUS OVERVIEW -->  
                       <!-- *************** -->
-                      <li class="media">
+                      <li class="media border border-secondary p-3">
                         <img src="./images/start-corpusoverview.png" class="mr-3 start" alt="..." 
-                             style="width:480px; border: 2px solid gray; border-radius: 5px;">
+                             style="width:240px; border: 2px solid gray; border-radius: 5px;">
                         <div class="media-body">
                           <h5 class="mt-0 mb-1">Corpora: Overview</h5>
                           <p>
-                              This ZuMult instance has <%= allCorpusIDs.size() %> corpora: <br/>
-                              <%= String.join(" / ", allCorpusIDs) %>. <br>
                               The corpus overview lists all corpora and has links to 
                               speech event and speaker overviews. 
                           </p>
@@ -127,27 +108,6 @@
                           </a>
                         </div>
                       </li>
-                      
-                      <!-- *************** -->
-                      <!-- CORPUS QUERY  -->  
-                      <!-- *************** -->
-                      <li class="media my-4">
-                        <img src="./images/query.png" class="mr-3 start" alt="..." 
-                             style="width:480px; border: 2px solid gray; border-radius: 5px;">
-                        <div class="media-body">
-                          <h5 class="mt-0 mb-1">Corpus: Query (ZuRecht)</h5>
-                          <p>
-                              Corpora in ZuMult can be queried on all annotation levels with 
-                              ZuRecht, using <b>CQP</b> as a query language. Query results will be
-                              displayed in a <b>KWIC</b> giving access to underlying audio or video
-                              and to the wider transcript context.
-                          </p>
-                          <a href="./jsp/zuRecht.jsp?lang=<%=currentLocale.getLanguage()%>" class="btn btn-primary float-right" target="_blank">
-                                   Corpus Query with ZuRecht
-                          </a>
-                        </div>
-                      </li>
-                      
 
 
                       <!-- *************** -->
@@ -155,19 +115,19 @@
                       <!-- *************** -->
                       <li class="media my-4">
                         <img src="./images/start-speechevents.png" class="mr-3 start" alt="..." 
-                             style="width:480px; border: 2px solid gray; border-radius: 5px;">
+                             style="width:240px; border: 2px solid gray; border-radius: 5px;">
                         <div class="media-body">
                           <h5 class="mt-0 mb-1">Speech events and speakers: Overview</h5>
                           <p>
                               Speech events and speakers of a corpus are displayed with their metadata in sortable and searchable tables.
                               <br/>
-                              The following corpus was chosen at random: <br/>
+                              The following corpus was chosen at random: 
                               <small class="text-muted ml-2"><%= randomCorpusID %></small> 
-                              <a href="./jsp/speecheventstable.jsp?corpusID=<%= randomCorpusID %>" class="btn btn-primary float-right mt-3" target="_blank">
-                                Speech events overview table
-                              </a><br/>
+                              <a href="./jsp/speecheventstable.jsp?corpusID=<%= randomCorpusID %>" class="btn btn-primary mt-3" target="_blank">
+                                Speech events overview
+                              </a>
                               <a href="./jsp/speakerstable.jsp?corpusID=<%= randomCorpusID %>" class="btn btn-primary float-right mt-3" target="_blank">
-                                Speakers overview table
+                                Speakers overview
                               </a>
                           </p>
                         </div>
@@ -178,7 +138,7 @@
                       <!-- *************** -->
                       <li class="media my-4">
                         <img src="./images/start-statistics.png" class="mr-3 start" alt="..." 
-                             style="width:480px; border: 2px solid gray; border-radius: 5px;">
+                             style="width:240px; border: 2px solid gray; border-radius: 5px;">
                         <div class="media-body">
                           <h5 class="mt-0 mb-1">Corpus Statistics</h5>
                           <p>
@@ -193,13 +153,32 @@
                         </div>
                       </li>
 
-                      
+                      <!-- *************** -->
+                      <!-- CORPUS QUERY  -->  
+                      <!-- *************** -->
+                      <li class="media my-4">
+                        <img src="./images/query.png" class="mr-3 start" alt="..." 
+                             style="width:240px; border: 2px solid gray; border-radius: 5px;">
+                        <div class="media-body">
+                          <h5 class="mt-0 mb-1">Corpus: Query (ZuRecht)</h5>
+                          <p>
+                              Corpora in ZuMult can be queried on all annotation levels with 
+                              ZuRecht, using <b>CQP</b> as a query language. Query results will be
+                              displayed in a <b>KWIC</b> giving access to underlying audio or video
+                              and to the wider transcript context.
+                          </p>
+                          <a href="./jsp/zuRecht.jsp?lang=<%=currentLocale.getLanguage()%>" class="btn btn-primary float-right" target="_blank">
+                                   Corpus Query with ZuRecht
+                          </a>
+                        </div>
+                      </li>
+
                       <!-- *************** -->
                       <!-- TRANSCRIPT DISPLAY  -->  
                       <!-- *************** -->
                       <li class="media my-4">
                         <img src="./images/transcript2.png" class="mr-3 start" alt="..."  
-                             style="width:480px; border: 2px solid gray; border-radius: 5px;">
+                             style="width:240px; border: 2px solid gray; border-radius: 5px;">
                         <div class="media-body">
                           <h5 class="mt-0 mb-1">Transcript: View and Explore (ZuViel)</h5>
                           <p>
@@ -221,7 +200,7 @@
                       <!-- *************** -->
                       <li class="media my-4">
                         <img src="./images/zumin.png" class="mr-3 start" alt="..."  
-                             style="width:480px; border: 2px solid gray; border-radius: 5px;">
+                             style="width:240px; border: 2px solid gray; border-radius: 5px;">
                         <div class="media-body">
                           <h5 class="mt-0 mb-1">Transcript: Details (ZuMin)</h5>
                           <p>
@@ -247,7 +226,7 @@
                       <!-- *************** -->
                       <li class="media my-4">
                         <img src="./images/zupass.png" class="mr-3 start" alt="..."  
-                             style="width:480px; border: 2px solid gray; border-radius: 5px;">
+                             style="width:240px; border: 2px solid gray; border-radius: 5px;">
                         <div class="media-body">
                           <h5 class="mt-0 mb-1">Transcript: Other views (ZuPass &amp; ZuAnn)</h5>
                           <p>
@@ -265,11 +244,17 @@
                           </p>
                         </div>
                       </li>
-                      
-                      
+
+
                     </ul>                    
                 </div>
-                <div class="col-1"></div>
+                                        
+                <!-- ***** -->   
+                <div class="col-6">
+                    <h3>Corpora</h3>
+
+                </div>
+                                        
             </div>
         </div>
                                    

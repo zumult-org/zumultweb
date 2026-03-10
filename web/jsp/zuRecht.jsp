@@ -76,6 +76,10 @@
     String imgSrc2 = "";
     
     String corpusID = null; // for completeness sake
+    
+    String zumultQueryXML = "/org/zumult/io/ZuMultQueryExamples.xml";
+    String zumultQueryXSL = "/org/zumult/io/ZuMultQueryExamples2HTML.xsl";
+    String zumultQueryHTML = new IOHelper().applyInternalStylesheetToInternalFile(zumultQueryXSL, zumultQueryXML, new String[][]{});
 
 
 %>
@@ -104,6 +108,7 @@
         <script src="../js/xslTransformation.js" type="text/javascript"></script>
         <link rel="stylesheet" type="text/css" href="../css/query.css" />
         <link rel="stylesheet" type="text/css" href="../css/transcript.css" />
+        <link rel="stylesheet" type="text/css" href="../css/query_examples.css" />
         
 
     </head>
@@ -161,9 +166,9 @@
                                 </div>
                             </div>
                         </div>
+                                
+                        <%= zumultQueryHTML %>        
 
-                        <!-- include start explanations -->        
-                        <%@include file="../WEB-INF/jspf/startexplanation.jspf" %>
                     </div>
                 </div>
 

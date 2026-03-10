@@ -27,9 +27,31 @@
     Corpus corpus = backendInterface.getCorpus(corpusID);
     Set<MetadataKey> metadataKeys = corpus.getMetadataKeys(ObjectTypesEnum.SPEECH_EVENT);     
 
-    Set<String> selectionSet = new HashSet<>();
+    List<String> selectionSet = new ArrayList<>();
     for (MetadataKey mk : metadataKeys){
         selectionSet.add(mk.getName("en"));
+    }
+    
+    // this is new for #270, 07-03-2026
+    // I am going out of may way here to make this robust
+    // I will hopefully be given an award for this
+    // the FIFA Peace Prize will do for now
+    MetadataKey selectionKey = backendInterface.findMetadataKeyByID("Corpus_zumult:speechEventMetadataTableSelection");
+    if (selectionKey!=null){
+        String allMetadataNames = corpus.getMetadataValue(selectionKey);
+        if (allMetadataNames!=null && allMetadataNames.length()>0){
+            List<String> configuredSelectionSet = new ArrayList<>();
+            String[] tokenizedMetadataNames = allMetadataNames.split(";");
+            for (String mn : tokenizedMetadataNames){
+                MetadataKey mk = backendInterface.findMetadataKeyByID("SpeechEvent_" + mn);
+                if (mk!=null){
+                    configuredSelectionSet.add(mk.getName("en"));
+                }
+            }
+            if (!(configuredSelectionSet.isEmpty())){
+                selectionSet = configuredSelectionSet;
+            }
+        }
     }
     
 

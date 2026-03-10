@@ -27,11 +27,12 @@
 <%
     BackendInterface backend = BackendInterfaceFactory.newBackendInterface(); 
     String transcriptID = request.getParameter("transcriptID");
+    
     String annotationBlockID = request.getParameter("annotationBlockID");
     if (transcriptID==null || annotationBlockID==null){
         // redirect to error page
     }
-    
+
     String pageName = "ZuMin";
     String pageTitle = transcriptID + " - " + annotationBlockID;
     
@@ -60,6 +61,10 @@
     
     Transcript transcript = backend.getTranscript(transcriptID);
     double startTime = transcript.getTimeForID(annotationBlockID);
+    String annotationBlockEndID = backend.getAnnotationBlock(transcriptID, annotationBlockID).getEnd();
+    double stopTime = transcript.getTimeForID(annotationBlockEndID);
+    
+    
     String[][] transcriptParameters = {
         {"FORM", "trans"},
         {"SHOW_NORM_DEV", "FALSE"},
@@ -102,6 +107,7 @@
                     var vttURL = '<%= vttURL %>';
                     var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';   
                     var startTime = <%= startTime %>
+                    var stopTime = <%= stopTime %>                    
                     var xPerSecond = 600;
                     
                     var svg;                    

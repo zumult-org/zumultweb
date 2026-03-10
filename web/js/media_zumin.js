@@ -59,6 +59,22 @@ function stop(){
     getMasterMediaPlayer().pause();
 }
 
+function playSelection(){
+    let player = getMasterMediaPlayer();
+    player.currentTime = startTime;
+    player.play();
+
+    const stopAt = () => {
+      if (player.currentTime >= stopTime) {
+        player.pause();
+        player.removeEventListener("timeupdate", stopAt);
+      }
+    };
+
+    player.addEventListener("timeupdate", stopAt);    
+}
+
+
 function preventMediaContextMenu() {
      var player = getMasterMediaPlayer();
      player.addEventListener('contextmenu', function(e) {
