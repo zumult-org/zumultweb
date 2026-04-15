@@ -1,20 +1,20 @@
 <%-- any content can be specified here e.g.: --%>
 <%@page import="org.zumult.io.IOHelper"%>
 <%@ page pageEncoding="UTF-8" %>
-    <div class="modal" tabindex="-1" role="dialog" id="metadataModal">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="metadata-title"></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&#x00D7;</span>
-                    </button>
-                </div>
-                <div class="modal-body" id="metadata-body">
-                </div>
-                <div class="modal-footer">
-                </div>
+<div class="modal" tabindex="-1" role="dialog" id="metadataModal">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: rgb(53, 104, 17); color:white">
+                <h5 class="modal-title" id="metadata-title"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&#x00D7;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="metadata-body">
+            </div>
+            <div class="modal-footer">
             </div>
         </div>
-    </div>                
+    </div>
+</div>                
 

@@ -52,7 +52,9 @@
                     $("#annotations-title").html("<%=myResources.getString("AnnotationsFor")%> " + transcriptID + " / " + id);
                     
                     // show the modal!
-                    $('#annotations-modal').modal();
+                    //$('#annotations-modal').modal();
+                    // this seems to be the way to do it in BS5...
+                    bootstrap.Modal.getOrCreateInstance($('#annotations-modal')).toggle();
 
                     $('#waitSpinner').toggle();
                 }
@@ -75,7 +77,9 @@
                     $("#partitur-title").html("Partitur: " + transcriptID + " / " + id);
                     
                     // show the modal!
-                    $('#partitur-modal').modal();
+                    //$('#partitur-modal').modal();
+                    // this seems to be the way to do it in BS5...
+                    bootstrap.Modal.getOrCreateInstance($('#partitur-modal')).toggle();
 
                     $('#waitSpinner').toggle();
                 }
@@ -90,25 +94,6 @@
         
     }
     
-    function showProtocol(){
-        $.post(
-            BASE_URL + "/ZumultDataServlet",
-            { 
-                command: 'getProtocol',
-                transcriptID: transcriptID, 
-            },
-            function( data ) {
-                $("#protocol-container").html(data);
-                //$("#annotations-title").html("Annotations for " + transcriptID + " / " + id);
-
-                // show the modal!
-                $('#protocol-modal').modal();
-
-                $('#waitSpinner').toggle();
-            }
-        );                
-    }
-
     function reduceToSelection(){
         if (startSelection==="" || endSelection===""){
             alert("<%=myResources.getString("SelectStartEndFirst")%>");

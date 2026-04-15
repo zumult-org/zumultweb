@@ -48,7 +48,7 @@
                     <!-- ******************* -->
                     <ul class="navbar-nav ml-auto">
                        <li class="nav-item dropdown">
-                         <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false" style="color:white;">Navigation</a>
+                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" data-toggle="dropdown" aria-expanded="false" style="color:white;">Navigation</a>
                          <div class="dropdown-menu">
                             <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL()%>"><%=myResources.getString("Home")%></a>                             
                             <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/corpusoverview.jsp"%>"><%=myResources.getString("CorpusOverview")%></a>                             
@@ -62,14 +62,17 @@
                          </div>
                        </li>                      
                       <li class="nav-item">
-                          <a class="nav-link" target="_blank"  style="color:white;" href="<%= Configuration.getHelpURL() %>">Help</a>
+                          <a class="nav-link" target="_blank"  style="color:white;" href="<%= Configuration.getHelpURL() %>">
+                              <%=myResources.getString("Help")%>
+                          </a>
                       </li>
                       <!-- *********************** -->
                       <!-- * LANGUAGE SELECTOR  ** -->
                       <!-- *********************** -->
-                      <select id="selectLang" class="ml-3" style="width: 100px;">
+                      <select id="selectLang" class="ml-3 ms-3" style="width: 100px;">
                           <option value="de"<%if (currentLocale.getLanguage().equals(Locale.GERMAN.toLanguageTag())){%> selected <%}%>><%=myResources.getString("ChangeLanguageBtnGerman")%></option>
                           <option value="en"<%if (currentLocale.getLanguage().equals(Locale.ENGLISH.toLanguageTag())){%> selected <%}%>><%=myResources.getString("ChangeLanguageBtnEnglish")%></option>
+                          <option value="fr"<%if (currentLocale.getLanguage().equals(Locale.FRENCH.toLanguageTag())){%> selected <%}%>><%=myResources.getString("ChangeLanguageBtnFrench")%></option>
                       </select>                          
                     </ul>
 

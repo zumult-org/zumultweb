@@ -65,6 +65,12 @@
         <title>ZuMult - Speech events overview</title>
         <style type="text/css">
             .id-column {font-weight: bold;}
+            .actions-column {white-space: nowrap;}
+            td {
+                /*max-width: 200px;*/
+                white-space: normal;
+                word-wrap: break-word;
+            }            
         </style>
         <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="crossorigin="anonymous"></script>        
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
@@ -88,6 +94,7 @@
             $(document).ready( function () {
                 //$('#myTable').DataTable();
                 $('#myTable').DataTable( {
+                    autoWidth: false,
                     serverSide: true,
                     processing : true,
                     language: {
@@ -102,6 +109,7 @@
                         }
                     },  
                     columnDefs : [
+                        { targets: 0, className: 'actions-column'},
                         { targets: 1, className: 'id-column'}
                     ],    
                     columns: [
@@ -139,6 +147,11 @@
                 window.open(url, '_blank');    
             }
             
+            function openZupass(transcriptID){
+                let url = "./zuPass.jsp?transcriptID=" + transcriptID;
+                window.open(url, '_blank');    
+            }
+
             function playAudio(audioID, element){
                 let randomID = 'id-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
                 $.post(

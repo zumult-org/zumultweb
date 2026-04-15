@@ -23,8 +23,7 @@
         String corpusID = request.getParameter("corpusID");
 
         String pageName = "ZuMult";
-        String pageTitle = "Corpus statistics";
-        //String imgSrc = "../images/eslo_bandeau.jpg";
+        String pageTitle = myResources.getString("CorpusStatistics");
 
         BackendInterface backendInterface = BackendInterfaceFactory.newBackendInterface();
         Corpus corpus = backendInterface.getCorpus(corpusID);
@@ -32,10 +31,13 @@
         String statsXML = stats.toXML();
         // where default = "/org/zumult/io/statistics2HTML.xsl"
         String xsl = Configuration.getStatistics2HTMLStylesheet();
+        
+        String lang = request.getParameter("lang");
+        if (lang==null) lang = "en";
 
         
         String[][] param = {
-            {"x", "y"}
+            {"lang", lang}
         };
         String html = new IOHelper().applyInternalStylesheetToString(xsl, statsXML, param);
     
@@ -47,16 +49,28 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">        
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="css/query.css">
         
         <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="crossorigin="anonymous"></script>        
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>                
-        <script src="js/tgdp.js"></script>
         <title>Corpus Statistics : <%= corpusID %> </title>
         <link rel="stylesheet" href="../css/overview.css"/>       
         <style type="text/css">
         </style>
+        <script>
+            var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';
+           
+            $(document).ready(function(){
+        
+                $("#selectLang").on("change", function(){
+                    var value = $(this).val();
+                    var urlTest = new URL(window.location.href);
+                    urlTest.searchParams.set('lang',value);
+                    window.location = urlTest;
+                });
+            });
+            
+        </script>
         
         <!-- <link rel="stylesheet" href="css/overview.css"/> -->
         
@@ -69,7 +83,7 @@
             <div class="col-sm-1">
             </div>
             <div class="col-sm-10">
-                <h3>Corpus statistics for <%= corpusID %> </h3>
+                <h3 class="my-5"><%=myResources.getString("CorpusStatistics")%>: <%= corpusID %> </h3>
                 <%= html %>
             </div>
             <div class="col-sm-1">

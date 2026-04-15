@@ -89,7 +89,20 @@
             var speechEventID = '<%= speechEventID %>';
             var transcriptID = '<%= transcriptID %>';
             var vttURL = '<%= vttURL %>';
-            var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';                    
+            var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';          
+            
+           
+            $(document).ready(function(){
+        
+                $("#selectLang").on("change", function(){
+                    var value = $(this).val();
+                    var urlTest = new URL(window.location.href);
+                    urlTest.searchParams.set('lang',value);
+                    window.location = urlTest;
+                });
+            });
+            
+            
         </script>
 
 
@@ -99,7 +112,7 @@
                
         <div id="video-form" class="row justify-content-center" style="margin-top:80px;">
             <div class="col-auto">        
-                <table>
+                <table class="my-4 zupass-media-table">
                     <%
                         if (!audioIDs.isEmpty() && videoIDs.isEmpty()){
                     %>

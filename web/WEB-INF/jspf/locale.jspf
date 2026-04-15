@@ -5,18 +5,21 @@
     Description: These file contains java code for setting Locale for jsp. pages
 --%>
 
+<%@page import="java.util.ResourceBundle"%>
 <%
-Locale currentLocale = request.getLocale();
-String pageParam_lang = request.getParameter("lang");
-if (pageParam_lang!=null && !pageParam_lang.isEmpty()){
-    if(pageParam_lang.equals(Locale.GERMAN.toLanguageTag())){
-        currentLocale = new Locale.Builder().setLanguage("de").setRegion("DE").build();
-    }else{
+    Locale currentLocale = request.getLocale();
+    String pageParam_lang = request.getParameter("lang");
+    if (pageParam_lang!=null && !pageParam_lang.isEmpty()){
+        if (pageParam_lang.equals(Locale.GERMAN.toLanguageTag())){
+            currentLocale = new Locale.Builder().setLanguage("de").setRegion("DE").build();
+        } else if (pageParam_lang.equals(Locale.FRENCH.toLanguageTag())) {
+            currentLocale = new Locale.Builder().setLanguage("fr").setRegion("FR").build();
+        } else {
+            currentLocale = new Locale.Builder().setLanguage("en").setRegion("US").build();
+        }
+    } else {
         currentLocale = new Locale.Builder().setLanguage("en").setRegion("US").build();
     }
-}else {
-    currentLocale = new Locale.Builder().setLanguage("de").setRegion("DE").build();
-}
 
-ResourceBundle myResources = ResourceBundle.getBundle("resources.MessageBundle", currentLocale);
+    ResourceBundle myResources = ResourceBundle.getBundle("resources.MessageBundle", currentLocale);
 %>

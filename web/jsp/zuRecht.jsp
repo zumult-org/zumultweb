@@ -127,6 +127,8 @@
 
         <br/>
         <div class="d-flex" id="wrapper">
+            
+            
             <!-- Sidebar -->
             <div class="bg-light border-right" id="sidebar-wrapper">
 
@@ -142,34 +144,46 @@
                 </div>
             </div>            
 
+            
+                
+            <!-- Center section -->
             <div class="container-fluid">
                 <div class="row">
-
-                    <!-- corpora -->
-
                     <!-- workspace -->
                     <div class="col-md-10">
 
-                        <!-- Nav tabs -->
+
+                        <!-- Nav tabs (there is only one!) -->
                         <ul class="nav nav-tabs small" role="tablist">
-                            <li class="nav-item"><a class="nav-link active" data-toggle="tab" id="query-tab" href="#query-tab-content" role="tab"><%=myResources.getString("Query")%></a></li>
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" id="query-tab" href="#query-tab-content" role="tab"><%=myResources.getString("Query")%></a>
+                            </li>
                         </ul>
 
-                        <!-- Tab panes -->
+                        <!-- Tab panes (there is only one!) -->
                         <div class="tab-content">
-
                             <!-- Query tab -->
                             <div class="tab-pane mt-3 active" id="query-tab-content">
                                 <%@include file="../WEB-INF/jspf/zuRechtKWICSearchForm.jspf" %>
                                 <%@include file="../WEB-INF/jspf/zuRechtKWICSearchOptionsModal.jspf" %>
-                                <div id="kwic-search-result-area" class="searchResultArea">
-                                </div>
+                                <div id="kwic-search-result-area" class="searchResultArea"></div>
                             </div>
                         </div>
                                 
-                        <%= zumultQueryHTML %>        
-
+                        <div>
+                            <!-- Initial help -->
+                            <a class="collapse-toggle" data-toggle="collapse" href="#query_intro"
+                               role="button" aria-expanded="true" aria-controls="query_intro">
+                              Query intro <span class="caret"></span>
+                            </a>                                    
+                            <div class="px-4 collapse show" id="query_intro" style="border: 1px solid rgb(220,220,220); background: rgb(250,250,250); padding: 5px;">
+                                <%= zumultQueryHTML %>        
+                            </div>
+                        </div>
+                                
                     </div>
+
+
                 </div>
 
 
@@ -316,6 +330,22 @@
                 let queryString = element.textContent;
                 let qif = document.getElementById("queryInputField");
                 qif.value = queryString;
+                
+                let corpus = element.dataset.corpus;
+                if (corpus){
+                    selectCorpus(corpus);
+                }
+            }
+            
+            function selectCorpus(corpus){
+                let corpuscheckBoxes = document.getElementsByName("corpus");
+                corpuscheckBoxes.forEach(el => {
+                    el.checked = false;
+                });
+                let theCheckBox = document.getElementById(corpus);
+                if (theCheckBox){
+                    theCheckBox.checked = true;
+                }
             }
             
             
@@ -417,16 +447,16 @@
 
                     // add results
                     displayKWIC(selector, xml);
-                }else {
+                } else {
                     $(selector).find('.KWICSearch-result h4').prepend('<%=myResources.getString("No")%>' + " ");
                     $(selector).find('.KWICSearch-result').find("a").remove();
                 }
             }
             
             function displayKWIC(selector, xml){
-                $('#start-explanation').remove();
+                $('#query_intro').collapse('hide'); 
             
-                $(selector).find(".openXML-KWICSearch-area").css("display", "block");
+                // $(selector).find(".openXML-KWICSearch-area").css("display", "block");
                 $(selector).find('.rowData-KWICSearch').text(xml);
                 
                 var data = new FormData();
@@ -450,8 +480,7 @@
                 //display summary
 
                 // display buttons for opening metadata view, grouping hits and download
-                $(selector).find('.KWICSearch-result').append("<h4><%=myResources.getString("Results")%></h4><div class='clearfix'>\n\
-                        <div class='float-left'><%=myResources.getString("ForSearching")%> " + query +"</div>");
+                $(selector).find('.KWICSearch-result').append("<div><%=myResources.getString("Results")%> <%=myResources.getString("ForSearching")%> " + query +"</div>");
                 
                 $("#showMoreQuery").on('click', function(){
                     addResultsHead(selector, longQuery, queryStr, corpusQueryStr, longQuery, shortQuery);
@@ -654,10 +683,7 @@
             }
             
             function insertVideoPlayer(parent, videoURL, time){
-                //let randomID = 'id-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
                 let videoHTML = "<video id=\"modal-video\" controls=\"controls\" type=\"video/mp4\" src=\"" + videoURL +  "\"></video>";
-                //let pauseHTML = "<i class=\"fa-solid fa-pause\"></i>";
-                //$(parent).html(pauseHTML);
                 $('#video-div').html(videoHTML);                
                 const video = $('#modal-video')[0];
                 // Check if the video is ready to play
@@ -673,9 +699,6 @@
                     });
                 }  
                 $('#videoModal').modal("toggle");
-                //parent.onclick = function(){
-                    //stopVideo(this, randomID);
-                //};                
             }
             
             function stopVideo(){
@@ -803,52 +826,8 @@
                     // do nothing here
             }
   
-            /* This function is used in addSampleQueries() */
-            function addQuery(corpusStr, queryString, queryValue, description){
-
-                var test = false;
-
-                if(corpusStr === ""){
-                    test=true;
-                }else{
-
-                    var checkedCorpora = [];
-
-                    $.each($("input[name='corpus']:checked"), function(){
-                        checkedCorpora.push($(this).val());
-                    });
-
-
-                    var corpora = corpusStr.split("|");
-                    for (i = 0; i < corpora.length; i++) {
-
-                        if(checkedCorpora.indexOf(corpora[i])>=0){
-                            test=true;
-                        }
-                    }
-                }
-
-
-                if(test===true){                         
-                    title = description.replace(/%22/g, "\'");
-
-                    $('#sampleQueries').append($('<option>', {
-                        value: queryValue,
-                        text: queryString,
-                        title: title    
-                    }));
-                }
-
-            }
-
-            /* This function updates sample queries depending on the selected corpus and search mode */
-            function updateSampleQueries(){
-                $('#sampleQueries').empty();
-                addSampleQueries();
-            }
-     
             function emptyPage(selector){
-               $(selector).find(".openXML-KWICSearch-area").css("display", "none");
+               // $(selector).find(".openXML-KWICSearch-area").css("display", "none");
                $(selector).find(".kwic-tab").css("display", "none"); 
                $("#wait-audio").css("display", "none");
                $(selector).find(".rowData-KWICSearch").empty();

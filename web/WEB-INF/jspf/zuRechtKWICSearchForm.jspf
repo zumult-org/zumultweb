@@ -1,13 +1,18 @@
 <!-- CHANGE 03-03-2026: This was too modular for my taste, I removed some includes -->
 
 <form id="kwic-search-form" autocomplete="off">
-    <p><%=myResources.getString("EnterYourCQP")%></p>
     <div class="input-group mb-3">
         
+        <div class="input-group-prepend">
+            <label type="button" class="btn btn-lg btn-success px-3 mb-1 btn-open-search-options" title="<%=myResources.getString("OpenPanelWithSearchOptions")%>">
+                <span>Query </span>
+            </label>            
+        </div>
 
 
         <!-- cqp input field -->
-        <input type="text" id="queryInputField" class="form-control border-success inputFieldWithAutocomplete" required="required" placeholder="<%=myResources.getString("SearchInputFieldPlaceholder")%> ">
+        <input type="text" id="queryInputField" class="form-control form-control-lg border-success inputFieldWithAutocomplete" 
+               required="required" placeholder="<%=myResources.getString("SearchInputFieldPlaceholder")%> ">
         
         <!-- hidden search options -->
         <input type="hidden" name="pageIndex" class="pageIndex" value="0"/>
@@ -15,15 +20,16 @@
         <input type="hidden" name="leftContext" class="leftContext" value="3"/>
         <input type="hidden" name="rightContext" class="rightContext" value="3"/>
         <!-- changed 16-07-2025: issue #27 -->
-        <input type="hidden" name="simpleQuerySyntaxLevel" class="simpleQuerySyntaxLevel" value="word"/>        <input type="hidden" id="searchType" value="">
+        <input type="hidden" name="simpleQuerySyntaxLevel" class="simpleQuerySyntaxLevel" value="word"/>        
+        <input type="hidden" id="searchType" value="">
         <input type="hidden" name="customWordLists" class="customWordLists" value=""/>
         
         <!-- input group append with buttons for search, search options and search help -->
         <div class="input-group-append">
-            <button type="submit" class="btn btn-success border-success mb-1" title="<%=myResources.getString("SearchBtn")%>">
+            <button type="submit" class="btn btn-lg btn-success border-success mb-1" title="<%=myResources.getString("SearchBtn")%>">
                 <span><i class="fa fa-search"></i></span>
             </button>
-            <button type="button" class="btn border-success px-3 mb-1 btn-open-search-options" title="<%=myResources.getString("OpenPanelWithSearchOptions")%>">
+            <button type="button" class="btn btn-lg border-success px-3 mb-1 btn-open-search-options" title="<%=myResources.getString("OpenPanelWithSearchOptions")%>">
                 <span><i class="fa fa-ellipsis-v"></i></span>
             </button>
         </div>

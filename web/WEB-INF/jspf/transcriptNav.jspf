@@ -185,7 +185,7 @@
       <select id="selectLang" class="me-5" style="width: 100px;">
           <option value="de"<%if (currentLocale.getLanguage().equals(Locale.GERMAN.toLanguageTag())){%> selected <%}%>><%=myResources.getString("ChangeLanguageBtnGerman")%></option>
           <option value="en"<%if (currentLocale.getLanguage().equals(Locale.ENGLISH.toLanguageTag())){%> selected <%}%>><%=myResources.getString("ChangeLanguageBtnEnglish")%></option>
-          <option value="fr"<%if (currentLocale.getLanguage().equals(Locale.FRENCH.toLanguageTag())){%> selected <%}%>><%=myResources.getString("ChangeLanguageBtnEnglish")%></option>
+          <option value="fr"<%if (currentLocale.getLanguage().equals(Locale.FRENCH.toLanguageTag())){%> selected <%}%>><%=myResources.getString("ChangeLanguageBtnFrench")%></option>
       </select>
                 
     </nav>                

@@ -74,9 +74,6 @@
         <%@include file="../WEB-INF/jspf/zumultNav.jspf" %>   
         
         <div class="container">
-            <div class="mb-1">
-                <a class="btn btn-success btn-lg" href="./jsp/diagnostics.jsp"><i class="fa-regular fa-display-medical"></i> Go to diagnostics</a>
-            </div>
             <div class="jumbotron py-4" style="border-radius:10px;">
                 <!-- <h4 class="display-4">Hello, world!</h4> -->
                 <p class="lead">
@@ -281,6 +278,9 @@
                 <span class="text-muted">See</span>
                 <a target="_blank" href="https://zumult.org">zumult.org</a>
                 <span class="text-muted">for more info and news about ZuMult.</span>
+                <div class="mt-3">
+                    <a class="btn btn-secondary btn-sm" href="./jsp/diagnostics.jsp"><i class="fa-regular fa-display-medical"></i> Go to diagnostics</a>
+                </div>
                 
             </div>
         </footer>                                   

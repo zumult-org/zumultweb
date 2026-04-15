@@ -76,32 +76,12 @@
         
     </head>
     <body style="margin-top: 80px;">
-        <% String pageTitle = "Korpusübersicht"; 
-           if ("en".equals(language)) {
-               pageTitle = "Corpus overview";
-           }
+        <%
+           String pageTitle = myResources.getString("CorpusOverview");
            String pageName = "ZuMult";
         %>
             
         <%@include file="../WEB-INF/jspf/zumultNav.jspf" %>                                                
-        <div class="row">
-            <div class="col-sm-2">
-            </div>
-            <div class="col-sm-8">
-                <p class="text-justify">
-                <% if ("en".equals(language)) { %>
-                    This page gives an overview of the <%= corpora.size() %> corpora available in this 
-                    <a href="http://zumult.org" target="_blank">ZuMult</a> instance.
-                <% } else { %>
-                    Diese Seite gibt einen Überblick über die <%= corpora.size() %> Korpora, die in dieser
-                    <a href="http://zumult.org" target="_blank">ZuMult</a>-Instanz
-                    zugänglich sind. 
-                <% } %>
-                </p>
-            </div>
-            <div class="col-sm-2">
-            </div>
-        </div>
         <div class="row">
             <div class="col-sm-2">
             </div>

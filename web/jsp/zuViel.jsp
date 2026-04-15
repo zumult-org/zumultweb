@@ -75,8 +75,6 @@
     
     Transcript transcript = backend.getTranscript(transcriptID);
     
-    String transcriptLanguage = transcript.getLanguage();
-    boolean isGerman = "de".equals(transcriptLanguage);
     
     /**** END: for user defined vocabulary lists ****/
     
