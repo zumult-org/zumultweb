@@ -59,7 +59,7 @@
         <dependency>
             <groupId>org.zumult</groupId>
             <artifactId>zumultapi</artifactId>
-            <version>0.1.8</version>
+            <version>0.1.19</version>
         </dependency>             
     </dependencies>
     <reporting>
