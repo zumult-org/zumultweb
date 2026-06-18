@@ -10,7 +10,6 @@ on:
 jobs:
   docker:
     name: build the Docker image
-    needs: build
     runs-on: ubuntu-latest
     #don't run docker build on pull request at all
     if: ${{ github.event_name != 'pull_request' }}
