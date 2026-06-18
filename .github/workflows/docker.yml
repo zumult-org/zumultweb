@@ -47,8 +47,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            GITHUB_PAT=${{ github.actor }}
-            GITHUB_USERNAME=${{ secrets.GITHUB_TOKEN }}
+            GITHUB_PAT=${{ secrets.GITHUB_TOKEN }}
+            GITHUB_USERNAME=${{ github.actor }}
 
   clean:
     name: remove untagged images from Github package registry
