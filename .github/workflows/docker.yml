@@ -1,0 +1,67 @@
+# This workflow will build a Docker image
+
+name: docker
+on:
+  push:
+    branches: [ main ]
+    tags:     [ v* ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  docker:
+    name: build the Docker image
+    needs: build
+    runs-on: ubuntu-latest
+    #don't run docker build on pull request at all
+    if: ${{ github.event_name != 'pull_request' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # use the current user to log into the 
+      # GitHub container registry 
+      - name: Log in to GitHub Container registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: |
+            ghcr.io/zumult-org/zumult
+          flavor: |
+            latest=${{ github.ref == 'refs/heads/main' }}
+            
+      # Build and push Docker image with Buildx (don't push on PR)
+      # https://github.com/docker/build-push-action
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GITHUB_PAT=${{ github.actor }}
+            GITHUB_USERNAME=${{ secrets.GITHUB_TOKEN }}
+
+  clean:
+    name: remove untagged images from Github package registry
+    runs-on: ubuntu-latest
+    needs: docker
+    steps:
+      - name: ghcr.io cleanup action
+        uses: dataaxiom/ghcr-cleanup-action@v1
+        with:
+          package: zumult
+          delete-untagged: true
+          dry-run: false
+          validate: true
+          older-than: 2 weeks
+          token: ${{ secrets.GITHUB_TOKEN }}
