@@ -16,7 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-
+      - name: clear-cache
+        run: docker system prune
       # use the current user to log into the 
       # GitHub container registry 
       - name: Log in to GitHub Container registry
