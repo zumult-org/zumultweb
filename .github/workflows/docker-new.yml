@@ -36,7 +36,9 @@ jobs:
           flavor: |
             latest=${{ github.ref == 'refs/heads/main' }}
       - name: clear-cache
-        run: docker builder prune --all -f 
+        run: |
+            docker builder prune --all -f 
+            rm -rf ${{ runner.temp }}/.buildx-cache
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
       - name: Build and push Docker image
