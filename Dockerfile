@@ -21,7 +21,7 @@ ADD . $HOME
 WORKDIR $HOME
 RUN mvn package -s docker-config/settings.xml "-Dproject.packaging=war" "-Dgithub.token=${GITHUB_PAT}" "-Dgithub.username=${GITHUB_USERNAME}"
 #RUN mvn clean package -s docker-config/settings.xml "-Dproject.packaging=war" "-Dgithub.token=${GITHUB_PAT}" "-Dgithub.username=${GITHUB_USERNAME}"
-#COPY target/zumultweb.war /usr/app/target/zumultapi.war
+COPY target/zumultweb.war /usr/app/target/zumultapi.war
 #
 # Deploy stage
 #
