@@ -8,7 +8,7 @@ on:
   pull_request:
     branches: [ main ]
 jobs:
-  docker:
+  dockerbuild:
     name: build the Docker image
     runs-on: ubuntu-latest
     #don't run docker build on pull request at all
@@ -45,7 +45,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
         with:
-          context: ..
+          context: .
           no-cache: true
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
