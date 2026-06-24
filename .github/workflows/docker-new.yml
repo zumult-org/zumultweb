@@ -57,7 +57,7 @@ jobs:
   clean:
     name: remove untagged images from Github package registry
     runs-on: ubuntu-latest
-    needs: docker
+    needs: dockerbuild
     steps:
       - name: ghcr.io cleanup action
         uses: dataaxiom/ghcr-cleanup-action@v1
