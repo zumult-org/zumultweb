@@ -21,8 +21,8 @@ ADD . $HOME
 WORKDIR $HOME
 RUN mvn clean package -X -s docker-config/settings.xml "-Dproject.packaging=war" "-Dgithub.token=${GITHUB_PAT}" "-Dgithub.username=${GITHUB_USERNAME}"
 #need to use strange hack for this conditional copy
-COPY /usr/app/target/zumultweb.war /usr/app/target/zumultapi.war
-#
+COPY /usr/app/target/zumultweb.wa[r] /usr/app/target/zumultapi.war
+
 # Deploy stage
 #
 FROM tomcat:9-jdk17
