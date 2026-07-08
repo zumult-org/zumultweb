@@ -15,20 +15,20 @@ LABEL org.opencontainers.image.authors="Anne Ferger"
 
 ARG GITHUB_PAT
 ARG GITHUB_USERNAME
-ENV HOME=/usr/app
-RUN mkdir -p $HOME
-ADD . $HOME
-WORKDIR $HOME
-RUN mkdir -p $HOME/target
+#ENV HOME=/usr/app
+#RUN mkdir -p $HOME
+#ADD . $HOME
+WORKDIR /usr/app
+COPY . .
 RUN mvn clean package -X -s docker-config/settings.xml "-Dproject.packaging=war" "-Dgithub.token=${GITHUB_PAT}" "-Dgithub.username=${GITHUB_USERNAME}"
 #need to use strange hack for this conditional copy
 
-COPY /usr/app/target/zumultweb.wa[r] /usr/app/target/zumultapi.war
+#COPY /usr/app/target/zumultweb.wa[r] /usr/app/target/zumultapi.war
 
 # Deploy stage
 #
 FROM tomcat:9-jdk17
-ARG WAR_FILE=/usr/app/target/zumultapi.war
+ARG WAR_FILE=/usr/app/target/zumultweb.war
 ARG PRAAT_URL=https://github.com/praat/praat/releases/download/v6.4.44a/praat6444_linux-intel64.tar.gz
 LABEL org.opencontainers.image.source=https://github.com/zumult-org/zumultapi
 
@@ -38,29 +38,30 @@ USER root:root
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y unzip ffmpeg git git-lfs libc++1 nano
-ENV HOME=/usr/app
+#ENV HOME=/usr/app
+WORKDIR /usr/app
 ENV ZUMULT_CONFIG_PATH=/usr/app/Configuration.xml
 ENV CORPUSDATA=/home/corpusdata
 ARG GITHUB_PAT
 ENV JAVA_TOOL_OPTIONS=-Djavax.xml.transform.TransformerFactory="net.sf.saxon.TransformerFactoryImpl"
-ENV PATH=$PATH:$HOME/praat
+ENV PATH=$PATH:praat
 ENV PRAAT_PATH=/home
 
 VOLUME ["/home/corpusdata"]
 
-RUN mkdir -p $HOME
-WORKDIR $HOME
+#RUN mkdir -p $HOME
+#WORKDIR $HOME
 COPY --from=build $WAR_FILE /usr/app/zumultapi.war
-COPY --from=build $HOME/docker-entrypoint.sh /usr/app/docker-entrypoint.sh
-COPY --from=build $HOME/docker-config/server.xml /usr/app/server.xml
-COPY --from=build $HOME/docker-config/Configuration.xml /usr/app/Configuration.xml
-COPY --from=build $HOME/docker-config/web.xml /usr/app/web.xml
+COPY docker-entrypoint.sh /usr/app/docker-entrypoint.sh
+COPY docker-config/server.xml /usr/app/server.xml
+COPY docker-config/Configuration.xml /usr/app/Configuration.xml
+COPY docker-config/web.xml /usr/app/web.xml
 RUN mkdir -p $CORPUSDATA
 RUN git clone --depth 1 https://$GITHUB_PAT@github.com/zumult-org/exmaraldademocorpus.git
 WORKDIR exmaraldademocorpus
 RUN git lfs install && git lfs pull
 RUN git status
-WORKDIR $HOME
+WORKDIR ..
 #RUN mv exmaraldademocorpus/src/main/java/data/corpora/EXMARaLDA-DemoKorpus $CORPUSDATA/corpora
 RUN mv exmaraldademocorpus/src/main/java/data/* $CORPUSDATA
 
