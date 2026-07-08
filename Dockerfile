@@ -15,13 +15,14 @@ LABEL org.opencontainers.image.authors="Anne Ferger"
 
 ARG GITHUB_PAT
 ARG GITHUB_USERNAME
-ENV HOME=/usr/app
+ENV HOME=/usr/app/target
 RUN mkdir -p $HOME
-ADD . $HOME
-WORKDIR $HOME
+#ADD . $HOME
+#WORKDIR $HOME
 RUN mvn clean package -X -s docker-config/settings.xml "-Dproject.packaging=war" "-Dgithub.token=${GITHUB_PAT}" "-Dgithub.username=${GITHUB_USERNAME}"
 #need to use strange hack for this conditional copy
-COPY /usr/app/target/zumultweb.wa[r] /usr/app/target/zumultapi.war
+
+COPY target/zumultweb.wa[r] /usr/app/target/zumultapi.war
 
 # Deploy stage
 #
