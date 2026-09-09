@@ -6,6 +6,7 @@
 
 
 
+<%@page import="java.util.Objects"%>
 <%@page import="org.zumult.objects.ObjectTypesEnum"%>
 <%@page import="org.zumult.backend.BackendInterfaceFactory"%>
 <%@page import="org.zumult.backend.BackendInterface"%>
@@ -41,27 +42,30 @@
     }
 
     String pageParam_form = request.getParameter("form");
-    String pageParam_context = request.getParameter("context");
+
+    String pageParam_context =
+            Objects.requireNonNullElse(request.getParameter("context"), "8-t,8-t");
+
     String pageParam_leftContext = null;
     String pageParam_rightContext = null;
-    if (pageParam_context!=null && Pattern.matches("\\d{1,2}-t,\\d{1,2}-t", pageParam_context)){
-        String[] ct = pageParam_context.split(Constants.KWIC_LEFT_RIGHT_CONTEXT_DELIMITER);
-        String[] lc = ct[0].split(Constants.KWIC_CONTEXT_DELIMITER);
 
-        if (Integer.valueOf(lc[0]) > Constants.KWIC_TOKEN_LEFT_CONTEXT_LENGTH_MAX){
-            pageParam_leftContext = String.valueOf(Constants.KWIC_TOKEN_LEFT_CONTEXT_LENGTH_MAX);
-        }else if (Integer.valueOf(lc[0]) >= 0){
-            pageParam_leftContext = lc[0];
-        }
+    if (Pattern.matches("\\d{1,2}-t,\\d{1,2}-t", pageParam_context)) {
 
-        String[] rc = ct[1].split(Constants.KWIC_CONTEXT_DELIMITER);
-        if (Integer.valueOf(rc[0]) > Constants.KWIC_TOKEN_RIGHT_CONTEXT_LENGTH_MAX){
-            pageParam_rightContext = String.valueOf(Constants.KWIC_TOKEN_RIGHT_CONTEXT_LENGTH_MAX);
-        }else if (Integer.valueOf(rc[0]) >= 0){
-            pageParam_rightContext = rc[0];
-        }    
+        String[] contexts =
+                pageParam_context.split(Constants.KWIC_LEFT_RIGHT_CONTEXT_DELIMITER);
+
+        int leftContext = Integer.parseInt(
+                contexts[0].split(Constants.KWIC_CONTEXT_DELIMITER)[0]);
+
+        int rightContext = Integer.parseInt(
+                contexts[1].split(Constants.KWIC_CONTEXT_DELIMITER)[0]);
+
+        pageParam_leftContext = String.valueOf(
+                Math.min(leftContext, Constants.KWIC_TOKEN_LEFT_CONTEXT_LENGTH_MAX));
+
+        pageParam_rightContext = String.valueOf(
+                Math.min(rightContext, Constants.KWIC_TOKEN_RIGHT_CONTEXT_LENGTH_MAX));
     }
-
     String pageParam_mode = request.getParameter("mode"); // e.g. &mode=SPEAKER_BASED_INDEX
 
     // get part-of-speech tagset
@@ -77,10 +81,13 @@
     
     String corpusID = null; // for completeness sake
     String transcriptID = null; // for completeness sake
-    
+    String allCorpora = String.join(";", backend.getCorpora()) + ";Generic";
+    String[][] params = {
+        {"SELECTION", allCorpora}
+    };
     String zumultQueryXML = "/org/zumult/io/ZuMultQueryExamples.xml";
     String zumultQueryXSL = "/org/zumult/io/ZuMultQueryExamples2HTML.xsl";
-    String zumultQueryHTML = new IOHelper().applyInternalStylesheetToInternalFile(zumultQueryXSL, zumultQueryXML, new String[][]{});
+    String zumultQueryHTML = new IOHelper().applyInternalStylesheetToInternalFile(zumultQueryXSL, zumultQueryXML, params);
 
 
 %>
@@ -754,7 +761,7 @@
             
             
             function configureContext(selectorModal, selectorForm){
-                var defaultContextLength = 5; // changed that from 3
+                var defaultContextLength = 8; // changed that from 3
                 var regex = /^(0?\d|1\d|2[0-5])$/;
                 var left = $(selectorModal).find(":text.customLeftContextLength").val();
                 if (!left.match(regex)) {                        
