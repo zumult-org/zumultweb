@@ -3,6 +3,8 @@
     Created on : 10.12.2024, 16:31:06
     Author     : bernd
 --%>
+<%@page import="java.net.URLEncoder"%>
+<%@page import="java.util.HashSet"%>
 <%@page import="org.zumult.io.MausConnection"%>
 <%@page import="java.util.Locale"%>
 <%@page import="java.util.ResourceBundle"%>
@@ -27,11 +29,32 @@
 <%
     BackendInterface backend = BackendInterfaceFactory.newBackendInterface(); 
     String transcriptID = request.getParameter("transcriptID");
+    Transcript transcript = backend.getTranscript(transcriptID);
+    
     
     String annotationBlockID = request.getParameter("annotationBlockID");
     if (transcriptID==null || annotationBlockID==null){
         // redirect to error page
+        String message = "Missing parameter 'transcriptID' or 'annotationBlockID' in " + request.getRequestURL().toString();
+        response.sendRedirect("messagePage.jsp?message=" + URLEncoder.encode(message, "UTF-8"));
     }
+    
+    String[] MAUS_SUPPORTED_LANGUAGES = {"aus-AU", "afr-ZA", "sqi-AL", "arb", "eus-ES", "eus-FR", "cat-ES", "nld-BE", "nld-NL",
+                                         "eng-AU", "eng-US", "eng-GB", "eng-SC", "eng-NZ", "ekk-EE", "fin-FI", "fra-FR", "kat-GE",
+                                         "deu-AT", "deu-CH", "deu-DE", "gsw-CH", "gsw-CH-BE", "gsw-CH-BS", "gsw-CH-GR", "gsw-CH-SG",
+                                         "gsw-CH-ZH", "hun-HU", "isl-IS", "ita-IT", "jpn-JP", "gup-AU", "ltz-LU", "mlt-MT", "nor-NO",
+                                         "fas-IR", "pol-PL", "ron-RO", "rus-RU", "spa-ES", "swe-SE", "tha-TH", "guf-AU", "cat", "deu",
+                                         "eng", "fra", "hun", "ita", "mlt", "nld", "pol", "nze", "fin", "ron", "spa"};
+    
+    Set<String> MAUS_SUPPORTED_LANGUAGES_SET = new HashSet<>();
+    MAUS_SUPPORTED_LANGUAGES_SET.addAll(Arrays.asList(MAUS_SUPPORTED_LANGUAGES));
+    String annotationBlockLanguage = transcript.getLanguage(annotationBlockID);
+    String mausLanguage = MausConnection.mapLanguageCode2ToMAUS(annotationBlockLanguage);
+    if (!(MAUS_SUPPORTED_LANGUAGES_SET.contains(mausLanguage))){
+        String message = "Language " + annotationBlockLanguage + " is not supported by MAUS. Sorry. ";
+        response.sendRedirect("messagePage.jsp?message=" + URLEncoder.encode(message, "UTF-8"));    
+    }
+    
 
     String pageName = "ZuMin";
     String pageTitle = transcriptID + " - " + annotationBlockID;
@@ -59,11 +82,9 @@
 
     String vttURL = Configuration.getWebAppBaseURL() + "/ZumultDataServlet?command=getVTT&transcriptID=" + transcriptID;
     
-    Transcript transcript = backend.getTranscript(transcriptID);
     double startTime = transcript.getTimeForID(annotationBlockID);
     String annotationBlockEndID = backend.getAnnotationBlock(transcriptID, annotationBlockID).getEnd();
     double stopTime = transcript.getTimeForID(annotationBlockEndID);
-    
     
     String[][] transcriptParameters = {
         {"FORM", "trans"},
@@ -83,7 +104,6 @@
             transcriptParameters); 
 
 
-
 %>
 
 <%@include file="../WEB-INF/jspf/locale.jspf" %> 
@@ -96,7 +116,6 @@
                 <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>        
                 <script src="https://kit.fontawesome.com/ed5adda70b.js" crossorigin="anonymous"></script>
                 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/>
-                <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="crossorigin="anonymous"></script>        
                 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>                
 
                 <script>

@@ -10,6 +10,7 @@
 <%@page import="org.zumult.backend.BackendInterfaceFactory"%>
 <%@page import="org.zumult.backend.BackendInterface"%>
 <%@page import="java.util.ResourceBundle"%>
+<%@page import="org.zumult.backend.Configuration"%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -66,6 +67,7 @@
        String randomTranscriptID = allTranscriptIDs.get(random.nextInt(allTranscriptIDs.size()));
        Transcript transcript = bi.getTranscript(randomTranscriptID);
        String randomAnnotationBlockID = transcript.getFirstAnnotationBlockIDForTime(10.0);
+       String transcriptID = null; // needed to inform menu bar
     %>
 
     <body style="margin-top: 80px;">
@@ -77,27 +79,20 @@
             <div class="jumbotron py-4" style="border-radius:10px;">
                 <!-- <h4 class="display-4">Hello, world!</h4> -->
                 <p class="lead">
-                    <b>ZuMult</b> is a corpus platform for audiovisual corpora. You can get further information and news about
-                    ZuMult on <a target="_blank" href="https://zumult.org">zumult.org</a>
-                </p>
-                <!-- <hr class="my-4">
-                <p>
-                    This is a demo installation of ZuMult, provided by <a href="https://linguisticbits.de" target="_blank">linguisticbits.de</a>. 
-                    Other installations of ZuMult are:
-                    <ul>
-                        <li>
-                            <a href="https://tgdp-zumult.la.utexas.edu/" target="_blank">
-                                ZuMult at the Texas German Dialect Archive
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://zumult.ids-mannheim.de" target="_blank">
-                                ZuMult at the Archive for Spoken German
-                            </a>
-                        </li>
-                    </ul>                    
-                    Learn more about ZuMult by exploring the individual apps listed below. 
-                </p> -->
+                  <img src="<%= Configuration.getWebAppBaseURL() %>/images/cropped-ZuMult.png"
+                       class="float-start float-left mx-3 mb-2"
+                       style="width:60px"
+                       alt="ZuMult Logo">
+
+                  <b>ZuMult</b>
+                  <%=myResources.getString("STARTIntro")%>:
+                  <a target="_blank" href="https://zumult.org">zumult.org</a>
+                  <span> • </span>
+                  <a target="_blank" href="https://zenodo.org/communities/zumult/">ZuMult@Zenodo</a>
+                  <span> • </span>
+                  <a target="_blank" href="https://github.com/zumult-org">ZuMult@GitHub</a>                  
+                  .
+               </p>
             </div>
             <div class="row">
                 <div class="col-1"></div>
@@ -112,15 +107,16 @@
                         <img src="./images/start-corpusoverview.png" class="mr-3 start" alt="..." 
                              style="width:480px; border: 2px solid gray; border-radius: 5px;">
                         <div class="media-body">
-                          <h5 class="mt-0 mb-1">Corpora: Overview</h5>
+                          <h5 class="mt-0 mb-1"><%=myResources.getString("CorpusOverview")%></h5>
                           <p>
-                              This ZuMult instance has <%= allCorpusIDs.size() %> corpora: <br/>
-                              <%= String.join(" / ", allCorpusIDs) %>. <br>
-                              The corpus overview lists all corpora and has links to 
-                              speech event and speaker overviews. 
+                              <%=myResources.getString("STARTZumultHas")%> <%= allCorpusIDs.size() %> 
+                                <%=myResources.getString("CorpusPL")%>: 
+                              <br/>
+                              <%= String.join(" • ", allCorpusIDs) %>. <br>
+                              <%=myResources.getString("STARTCorpusOverview")%>
                           </p>
                           <a href="./jsp/corpusoverview.jsp?lang=<%=currentLocale.getLanguage()%>" class="btn btn-primary float-right" target="_blank">
-                                   Corpus Overview
+                                   <%=myResources.getString("CorpusOverview")%>
                           </a>
                         </div>
                       </li>
@@ -132,15 +128,13 @@
                         <img src="./images/query.png" class="mr-3 start" alt="..." 
                              style="width:480px; border: 2px solid gray; border-radius: 5px;">
                         <div class="media-body">
-                          <h5 class="mt-0 mb-1">Corpus: Query (ZuRecht)</h5>
+                          <h5 class="mt-0 mb-1"><%=myResources.getString("Query")%> (ZuRecht)</h5>
                           <p>
-                              Corpora in ZuMult can be queried on all annotation levels with 
-                              ZuRecht, using <b>CQP</b> as a query language. Query results will be
-                              displayed in a <b>KWIC</b> giving access to underlying audio or video
-                              and to the wider transcript context.
+                              <%=myResources.getString("STARTZurecht1")%> <b>CQP</b>. 
+                              <%=myResources.getString("STARTZurecht2")%>
                           </p>
                           <a href="./jsp/zuRecht.jsp?lang=<%=currentLocale.getLanguage()%>" class="btn btn-primary float-right" target="_blank">
-                                   Corpus Query with ZuRecht
+                                   <%=myResources.getString("Query")%> (ZuRecht)
                           </a>
                         </div>
                       </li>
@@ -154,18 +148,21 @@
                         <img src="./images/start-speechevents.png" class="mr-3 start" alt="..." 
                              style="width:480px; border: 2px solid gray; border-radius: 5px;">
                         <div class="media-body">
-                          <h5 class="mt-0 mb-1">Speech events and speakers: Overview</h5>
+                          <h5 class="mt-0 mb-1"><%=myResources.getString("SpeechEventsPL")%> • <%=myResources.getString("SpeakersPL")%></h5>
                           <p>
-                              Speech events and speakers of a corpus are displayed with their metadata in sortable and searchable tables.
+                              <%=myResources.getString("STARTOverviewTables")%>
                               <br/>
-                              The following corpus was chosen at random: <br/>
+                              <%=myResources.getString("STARTRandomCorpus")%>                              
+                              <br/>
                               <small class="text-muted ml-2"><%= randomCorpusID %></small> 
-                              <a href="./jsp/speecheventstable.jsp?corpusID=<%= randomCorpusID %>" class="btn btn-primary float-right mt-3" target="_blank">
-                                Speech events overview table
-                              </a><br/>
-                              <a href="./jsp/speakerstable.jsp?corpusID=<%= randomCorpusID %>" class="btn btn-primary float-right mt-3" target="_blank">
-                                Speakers overview table
+                              <div class="float-right">
+                              <a href="./jsp/speecheventstable.jsp?corpusID=<%= randomCorpusID %>" class="btn btn-primary mt-3 mr-3" target="_blank">
+                                <%=myResources.getString("SpeechEventsPL")%>
                               </a>
+                              <a href="./jsp/speakerstable.jsp?corpusID=<%= randomCorpusID %>" class="btn btn-primary mt-3" target="_blank">
+                                <%=myResources.getString("SpeakersPL")%>
+                              </a>
+                              </div>
                           </p>
                         </div>
                       </li>
@@ -177,11 +174,12 @@
                         <img src="./images/start-statistics.png" class="mr-3 start" alt="..." 
                              style="width:480px; border: 2px solid gray; border-radius: 5px;">
                         <div class="media-body">
-                          <h5 class="mt-0 mb-1">Corpus Statistics</h5>
+                          <h5 class="mt-0 mb-1"><%=myResources.getString("CorpusStatistics")%></h5>
                           <p>
-                              Basic statistics for a corpus
+                              <%=myResources.getString("STARTBasicStatistics")%>                              
                               <br/>
-                              The following corpus was chosen at random: <br/>
+                              <%=myResources.getString("STARTRandomCorpus")%>                              
+                              <br/>
                               <small class="text-muted ml-2"><%= randomCorpusID %></small> 
                               <a href="./jsp/statistics.jsp?corpusID=<%= randomCorpusID %>" class="btn btn-primary float-right mt-3" target="_blank">
                                 Corpus statistics
@@ -198,16 +196,15 @@
                         <img src="./images/transcript2.png" class="mr-3 start" alt="..."  
                              style="width:480px; border: 2px solid gray; border-radius: 5px;">
                         <div class="media-body">
-                          <h5 class="mt-0 mb-1">Transcript: View and Explore (ZuViel)</h5>
+                          <h5 class="mt-0 mb-1"><%=myResources.getString("STARTZuvielTitle")%> (ZuViel)</h5>
                           <p>
-                              Transcripts are visualised by ZuViel in an <b>interactive</b>, <b>configurable</b> view with
-                              <b>synchronisation</b> of audio/video and transcript text.
-                              A density viewer, a wordlist and a search field provide further 
-                              means of navigating the transcript. <br/>
-                              The following transcript was chosen at random: <br/>
+                              <%=myResources.getString("STARTZuviel")%>
+                              <br/>
+                              <%=myResources.getString("STARTRandomTranscript")%>
+                              <br/>
                               <small class="text-muted ml-2"><%= randomCorpusID %> / <%= randomTranscriptID %> </small> 
                               <a href="./jsp/zuViel.jsp?transcriptID=<%= randomTranscriptID %>" class="btn btn-primary float-right mt-3" target="_blank">
-                                Transcript Visualisation with ZuViel
+                                 <%=myResources.getString("STARTZuvielTitle")%> (ZuViel)
                               </a>
                           </p>
                         </div>
@@ -220,20 +217,18 @@
                         <img src="./images/zumin.png" class="mr-3 start" alt="..."  
                              style="width:480px; border: 2px solid gray; border-radius: 5px;">
                         <div class="media-body">
-                          <h5 class="mt-0 mb-1">Transcript: Details (ZuMin)</h5>
+                          <h5 class="mt-0 mb-1"><%=myResources.getString("STARTZuminTitle")%> (ZuMin)</h5>
                           <p>
-                              For any contribution in a transcript, details can be explored 
-                              by zooming in with ZuMin. The view provides
-                              a <b>phoneme level alignment</b> (using MAUS),
-                              a visualisation of the <b>pitch contour</b> (using Praat),
-                              and <b>video stills</b> extracted each 0.5 seconds.
-                              The following contribution was chosen at random: <br/>
+                              <%=myResources.getString("STARTZumin")%>
+                              <br/>
+                              <%=myResources.getString("STARTRandomContribution")%>
+                              <br/>
                               <small class="text-muted ml-2">
                                   <%= randomCorpusID %> / <%= randomTranscriptID %> / <%= randomAnnotationBlockID %> 
                               </small> 
                               <a href="./jsp/zuMin.jsp?transcriptID=<%= randomTranscriptID %>&annotationBlockID=<%= randomAnnotationBlockID %>" 
                                  class="btn btn-primary float-right mt-3" target="_blank">
-                                Transcript Details with ZuMin
+                                <%=myResources.getString("STARTZuminTitle")%> (ZuMin)
                               </a>
                           </p>
                         </div>

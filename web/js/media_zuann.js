@@ -27,6 +27,16 @@ function getVideoImage(videoID){
     );       
 }
 
+function playFromButton(element){
+    jump(element.dataset.start);    
+}
+
+function pauseFromButton(element){
+    var player = getMasterMediaPlayer();
+    player.pause();
+}
+
+
 function jump(time){
     var player = getMasterMediaPlayer();
     player.currentTime=time;

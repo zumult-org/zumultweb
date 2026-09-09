@@ -120,8 +120,8 @@
                 highlightIDs1 : highlightIDs1,
                 highlightIDs2 : highlightIDs2,
                 highlightIDs3 : highlightIDs3,
-
-                tokenList : tokenList                
+                speakerSelection: speakerSelection,
+                tokenList : 'NONE'
             },
             function (data) {
                 var w = window.open('about:blank');
@@ -368,7 +368,7 @@
                     highlightIDs2 : highlightIDs2,
                     highlightIDs3 : highlightIDs3,
                     
-                    tokenList : tokenList
+                    tokenList : 'NONE'
                 },
                 function( data ) {
                     $("#preview-container").empty();
@@ -420,7 +420,7 @@
                 wordlistID: 'NONE',
                 startAnnotationBlockID: startAnnotationBlockID,
                 endAnnotationBlockID: endAnnotationBlockID,
-                tokenList : tokenList
+                tokenList : 'NONE'
             },
             function( data ) {
                 $("#wordlist-container").html(data);
@@ -487,7 +487,7 @@
                 highlightIDs3 : highlightIDs3,
                 makeVisibleID : gotoID,
 
-                tokenList : tokenList                
+                tokenList : 'NONE'
             },
             function (data) {
                 var w = window.open('about:blank');

@@ -19,6 +19,7 @@
         }
     } else {
         currentLocale = new Locale.Builder().setLanguage("en").setRegion("US").build();
+        pageParam_lang = "en";
     }
 
     ResourceBundle myResources = ResourceBundle.getBundle("resources.MessageBundle", currentLocale);

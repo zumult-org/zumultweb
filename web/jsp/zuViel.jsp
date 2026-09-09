@@ -4,6 +4,7 @@
     Author     : thomas.schmidt
 --%>
 
+<%@page import="java.util.Objects"%>
 <%@page import="java.util.Locale"%>
 <%@page import="java.util.ResourceBundle"%>
 <%@page import="java.util.ArrayList"%>
@@ -78,46 +79,21 @@
     
     /**** END: for user defined vocabulary lists ****/
     
-    String form = request.getParameter("form");
-    if (form==null){
-        form="trans";
-    }
+    
+    String form = Objects.requireNonNullElse(request.getParameter("form"), "trans");
+    String showNormDev = Objects.requireNonNullElse(request.getParameter("showNormDev"), "FALSE");
+    String visSpeechRate = Objects.requireNonNullElse(request.getParameter("visSpeechRate"), "FALSE");
 
-    String showNormDev = request.getParameter("showNormDev");
-    if (showNormDev==null){
-        showNormDev="FALSE";
-    }
-    
-    String visSpeechRate = request.getParameter("visSpeechRate");
-    if (visSpeechRate==null){
-        visSpeechRate="FALSE";
-    }
-    
-    String visIncidentNotTypes = request.getParameter("visIncidentNotTypes");
-    if (visIncidentNotTypes==null){
-        // this is MANV specific, should not stay here
-        visIncidentNotTypes="gaz;tri-sit;post;act;tri-kat";
-    }
+    String visIncidentNotTypes = Objects.requireNonNullElse(request.getParameter("visIncidentNotTypes"), "");
+    String flattenSeg = Objects.requireNonNullElse(request.getParameter("flattenSeg"), "TRUE");
 
-    String flattenSeg = request.getParameter("flattenSeg");
-    if (flattenSeg==null){
-        flattenSeg = "TRUE";
-    }
+    String startAnnotationBlockID = Objects.requireNonNullElse(request.getParameter("startAnnotationBlockID"), "");
+    String endAnnotationBlockID = Objects.requireNonNullElse(request.getParameter("endAnnotationBlockID"), "");
+    String aroundAnnotationBlockID = Objects.requireNonNullElse(request.getParameter("aroundAnnotationBlockID"), "");
+
+    // new for #272 / #12
+    String speakerSelection = Objects.requireNonNullElse(request.getParameter("speakerSelection"), "");
     
-    String startAnnotationBlockID = request.getParameter("startAnnotationBlockID");
-    if (startAnnotationBlockID==null){
-        startAnnotationBlockID = "";
-    }
-    
-    String endAnnotationBlockID = request.getParameter("endAnnotationBlockID");
-    if (endAnnotationBlockID==null){
-        endAnnotationBlockID = "";
-    }
-    
-    String aroundAnnotationBlockID = request.getParameter("aroundAnnotationBlockID");
-    if (aroundAnnotationBlockID==null){
-        aroundAnnotationBlockID = "";
-    }
     
     // issue #4
     String aroundTokenID = request.getParameter("aroundTokenID");   
@@ -128,10 +104,7 @@
     }
     
     
-    String howMuchAround = request.getParameter("howMuchAround");
-    if (howMuchAround==null){
-        howMuchAround = "";
-    }
+    String howMuchAround = Objects.requireNonNullElse(request.getParameter("howMuchAround"), "");
     
     String wordlistID = request.getParameter("wordlistID");    
     String pathToWordList = "";
@@ -175,45 +148,27 @@
         tokenList="";
     }
     
-    //String extraHighlightIDs = request.getParameter("extraHighlightIDs");
-    //if (extraHighlightIDs==null){   
-    //    extraHighlightIDs = "";
-    //}
     
     String startTokenID = request.getParameter("startTokenID");
     String endTokenID = request.getParameter("endTokenID");    
     
     String makeVisibleID = request.getParameter("makeVisibleID");    
   
-    //String extraHighlightIDsForCurrentTranscript= "";
-    //String highlightIDsForCurrentTranscript = "";  
-    //String tokenListForCurrentTranscript = "";
-    
-    // still don't understand what this is good for
-    // what exactly happens if I take all the ... currentTranscript away? Let's see
-    //if (transcriptIDWithHighlights!=null && transcriptIDWithHighlights.equals(transcriptID)){     
-    //    extraHighlightIDsForCurrentTranscript = extraHighlightIDs;
-    //    highlightIDsForCurrentTranscript = highlightIDs;
-    //    if (tokenList!=null){
-    //        tokenListForCurrentTranscript = tokenList;
-    //    }
         
-        if (startTokenID!=null && endTokenID!=null){
-            //highlightIDstart = firstTokenId;
-            //highlightIDend = lastTokenId;
+    if (startTokenID!=null && endTokenID!=null){
 
-            /* if firstTokenId and lastTokenId are specified, than aroundAnnotationBlockID and aroundTokenID should be ignored; */
-            aroundAnnotationBlockID = "";
-            aroundTokenID = "";
-            startAnnotationBlockID = backend.getNearestAnnotationBlockID4TokenID(transcriptID, startTokenID);;
-            endAnnotationBlockID = backend.getNearestAnnotationBlockID4TokenID(transcriptID, endTokenID);;
-            
-            if(howMuchAround.length()>0){
-                startAnnotationBlockID = transcript.getAnnotationBlockID(startAnnotationBlockID, -Integer.parseInt(howMuchAround));
-                endAnnotationBlockID = transcript.getAnnotationBlockID(endAnnotationBlockID, Integer.parseInt(howMuchAround));
-                
-            }
+        /* if firstTokenId and lastTokenId are specified, than aroundAnnotationBlockID and aroundTokenID should be ignored; */
+        aroundAnnotationBlockID = "";
+        aroundTokenID = "";
+        startAnnotationBlockID = backend.getNearestAnnotationBlockID4TokenID(transcriptID, startTokenID);;
+        endAnnotationBlockID = backend.getNearestAnnotationBlockID4TokenID(transcriptID, endTokenID);;
+
+        if(howMuchAround.length()>0){
+            startAnnotationBlockID = transcript.getAnnotationBlockID(startAnnotationBlockID, -Integer.parseInt(howMuchAround));
+            endAnnotationBlockID = transcript.getAnnotationBlockID(endAnnotationBlockID, Integer.parseInt(howMuchAround));
+
         }
+    }
         
         
     //}
@@ -271,7 +226,8 @@
         {"HIGHLIGHT_IDS_1", highlightIDsArray[0]},
         {"HIGHLIGHT_IDS_2", highlightIDsArray[1]}, 
         //{"EXTRA_HIGHLIGHT_IDS", extraHighlightIDsForCurrentTranscript}, 
-        {"TOKEN_LIST_URL", pathToWordList}
+        //{"TOKEN_LIST_URL", pathToWordList}
+        {"SPEAKER_SELECTION", speakerSelection}         
     };
     
     //String transcriptHTML = new IOHelper().applyInternalStylesheetToString(Constants.ISOTEI2HTML_STYLESHEET2, transcript.toXML(), transcriptParameters); 
@@ -357,8 +313,9 @@
             var highlightIDs2 = '<%= highlightIDsArray[1] %>';
             var highlightIDs3 = '<%= highlightIDsArray[2] %>';
             var highlightIDs4 = '<%= highlightIDsArray[3] %>';
-
-            var tokenList = '<%= tokenList %>';
+            
+            var speakerSelection = '<%= speakerSelection %>';
+            
 
             function init(){
                 initialiseMedia();

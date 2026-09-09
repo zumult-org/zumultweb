@@ -18,9 +18,11 @@
 <%@include file="../WEB-INF/jspf/locale.jspf" %>     
 <%
     String corpusID = request.getParameter("corpusID");
+    String transcriptID = null; // needed to inform menu bar
+    
 
     String pageName = "ZuMult";
-    String pageTitle = "Speech events overview";
+    String pageTitle = myResources.getString("SpeechEventsPL") + " (" + corpusID + ")";
     //String imgSrc = "../images/eslo_bandeau.jpg";
    
     BackendInterface backendInterface = BackendInterfaceFactory.newBackendInterface();

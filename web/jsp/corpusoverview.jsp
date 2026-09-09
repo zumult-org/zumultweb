@@ -18,6 +18,8 @@
 <html>
     <%
        String corpusID = null; // needed to inform menu bar
+       String transcriptID = null; // needed to inform menu bar
+       
        BackendInterface backendInterface = BackendInterfaceFactory.newBackendInterface();
        String backendName = backendInterface.getName();
        String backendAcronym = backendInterface.getAcronym();
@@ -123,27 +125,20 @@
                                 </div>
                                 <div class="col-4">
                                     <a class="card-link" href="#"
-                                       onclick="event.preventDefault(); openMetadata('<%= cID %>')"
-                                    >Corpus metadata</a><br/>
-                                    <a class="card-link" target="_blank" href="statistics.jsp?corpusID=<%= cID %>"
-                                    >Corpus statistics</a><br/>                                    
+                                       onclick="event.preventDefault(); openMetadata('<%= cID %>')">
+                                        <%=myResources.getString("CorpusMetadata")%>
+                                    </a><br/>
+                                    <a class="card-link" target="_blank" href="statistics.jsp?corpusID=<%= cID %>">
+                                        <%=myResources.getString("CorpusStatistics")%>
+                                        </a>
+                                        <br/>                                    
                                     <a class="card-link"  target="_blank" href="speecheventstable.jsp?corpusID=<%=cID%>">
                                         <%= backendInterface.getSpeechEvents4Corpus(cID).size() %>
-                                        <% if ("en".equals(language)) { %>
-                                            Speech events
-                                        <% } else { %>
-                                            Sprechereignisse
-                                        <% } %>
-
+                                        <%=myResources.getString("SpeechEventsPL")%>
                                     </a><br/>
                                     <a class="card-link"  target="_blank" href="speakerstable.jsp?corpusID=<%=cID%>">
                                         <%= backendInterface.getSpeakers4Corpus(cID).size() %> 
-                                        <% if ("en".equals(language)) { %>
-                                            Speakers
-                                        <% } else { %>
-                                            Sprecher
-                                        <% } %>
-
+                                        <%=myResources.getString("SpeakersPL")%>
                                     </a>
                                 </div>
                             </div>
