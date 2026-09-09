@@ -21,6 +21,7 @@
 
 <%
         String corpusID = request.getParameter("corpusID");
+        String transcriptID = null; // needed to inform menu bar
 
         String pageName = "ZuMult";
         String pageTitle = myResources.getString("CorpusStatistics");

@@ -76,6 +76,7 @@
     String imgSrc2 = "";
     
     String corpusID = null; // for completeness sake
+    String transcriptID = null; // for completeness sake
     
     String zumultQueryXML = "/org/zumult/io/ZuMultQueryExamples.xml";
     String zumultQueryXSL = "/org/zumult/io/ZuMultQueryExamples2HTML.xsl";

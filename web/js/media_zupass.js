@@ -27,6 +27,12 @@ function getVideoImage(videoID){
     );       
 }
 
+function jumpInitial(time){
+    var player = getMasterMediaPlayer();
+    player.currentTime=time;
+}	
+
+
 function jump(time){
     var player = getMasterMediaPlayer();
     player.currentTime=time;
@@ -186,14 +192,27 @@ function updateTime(){
     // this is finding all the span elements (tokens) that are within the current time
     var spanElements = document.getElementsByTagName('td');
     for (var i = 0; i < spanElements.length; i++) {
-        spanElement = spanElements[i];
-        start = spanElement.getAttribute('data-start');
-        end = spanElement.getAttribute('data-end');
+        const spanElement = spanElements[i];
+        const start = parseFloat(spanElement.getAttribute('data-start'));
+        const end = parseFloat(spanElement.getAttribute('data-end'));
         if ((!player.paused) && (start < elapsedTime) && (end > elapsedTime)){
             spanElement.classList.add("highlight-playback");            
+        } else {
+            spanElement.classList.remove("highlight-playback");            
+        }
+    }     
+    
+    var tableCursorElements = document.getElementsByClassName('tli');
+    for (var i = 0; i < tableCursorElements.length; i++) {
+        const tableCursorElement = tableCursorElements[i];
+        const start = parseFloat(tableCursorElement.getAttribute('data-start'));
+        const end = parseFloat(tableCursorElement.getAttribute('data-end'));
+        if ((!player.paused) && (start < elapsedTime) && (end > elapsedTime)){
+            //tableCursorElement.style.border = "thick solid #0000FF";
+            tableCursorElement.classList.add("highlight-playback");            
             
             if (!scrollOnce){
-                spanElement.scrollIntoView(
+                tableCursorElement.scrollIntoView(
                     {
                         behavior: 'smooth',   // optional
                         block: 'center',
@@ -204,19 +223,6 @@ function updateTime(){
                 scrollOnce = true;
             }
             
-        } else {
-            spanElement.classList.remove("highlight-playback");            
-        }
-    }     
-    
-    var tableCursorElements = document.getElementsByClassName('tablerow_cursor');
-    for (var i = 0; i < tableCursorElements.length; i++) {
-        tableCursorElement = tableCursorElements[i];
-        start = tableCursorElement.getAttribute('data-start');
-        end = tableCursorElement.getAttribute('data-end');
-        if ((!player.paused) && (start < elapsedTime) && (end > elapsedTime)){
-            //tableCursorElement.style.border = "thick solid #0000FF";
-            tableCursorElement.classList.add("highlight-playback");            
         } else {
             tableCursorElement.classList.remove("highlight-playback");            
         }

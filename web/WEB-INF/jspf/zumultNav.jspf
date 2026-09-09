@@ -19,7 +19,7 @@
 
             <a class="navbar-brand" href="http://zumult.org">
                 <img 
-                    src="/zumult/images/cropped-ZuMult.png" 
+                    src="<%= Configuration.getWebAppBaseURL() %>/images/cropped-ZuMult.png" 
                     class="d-inline-block align-top ms-3" 
                     style="width:20%"
                     alt="ZuMult Logo"/>
@@ -50,14 +50,24 @@
                        <li class="nav-item dropdown">
                          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" data-toggle="dropdown" aria-expanded="false" style="color:white;">Navigation</a>
                          <div class="dropdown-menu">
-                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL()%>"><%=myResources.getString("Home")%></a>                             
-                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/corpusoverview.jsp"%>"><%=myResources.getString("CorpusOverview")%></a>                             
+                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL()%>/index.jsp?lang=<%= pageParam_lang %>"><%=myResources.getString("Home")%></a>                             
+                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/corpusoverview.jsp"%>?lang=<%= pageParam_lang %>"><%=myResources.getString("CorpusOverview")%></a>                             
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/zuRecht.jsp"%>"><%=myResources.getString("Query")%></a>                             
+                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/zuRecht.jsp"%>?lang=<%= pageParam_lang %>"><%=myResources.getString("Query")%></a>                             
                             <% if (corpusID!=null){ %>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/speecheventstable.jsp?corpusID=" + corpusID %>"><%=myResources.getString("SpeechEvent") + " (" + corpusID + ")"%></a>                             
-                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/speakerstable.jsp?corpusID=" + corpusID %>"><%=myResources.getString("Speaker") + " (" + corpusID + ")"%></a>                             
+                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/speecheventstable.jsp?corpusID=" + corpusID %>&lang=<%= pageParam_lang %>"><%=myResources.getString("SpeechEventsPL") + " (" + corpusID + ")"%></a>                             
+                            <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/speakerstable.jsp?corpusID=" + corpusID %>&lang=<%= pageParam_lang %>"><%=myResources.getString("SpeakersPL") + " (" + corpusID + ")"%></a>                             
+                            <% } %>
+                            <% if ("ZuPass".equals(request.getAttribute("application"))){ %>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/zuViel.jsp?transcriptID=" + transcriptID %>&lang=<%= pageParam_lang %>"><%="ZuViel (" + transcriptID + ")"%></a>                             
+                                <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/zuAnn.jsp?transcriptID=" + transcriptID %>&lang=<%= pageParam_lang %>"><%="ZuAnn  (" + transcriptID + ")"%></a>                             
+                            <% } %>
+                            <% if ("ZuAnn".equals(request.getAttribute("application"))){ %>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/zuViel.jsp?transcriptID=" + transcriptID %>&lang=<%= pageParam_lang %>"><%="ZuViel (" + transcriptID + ")"%></a>                             
+                                <a class="dropdown-item" href="<%= Configuration.getWebAppBaseURL() + "/jsp/zuPass.jsp?transcriptID=" + transcriptID %>&lang=<%= pageParam_lang %>"><%="ZuPass  (" + transcriptID + ")"%></a>                             
                             <% } %>
                          </div>
                        </li>                      

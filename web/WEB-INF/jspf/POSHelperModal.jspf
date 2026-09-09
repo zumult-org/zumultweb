@@ -7,10 +7,8 @@
                 
                 
                 <div class="modal-header">
-                    <h5 class="modal-title" id="posHelperModal-title"><%=myResources.getString("SearchFieldTooltip")%></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&#x00D7;</span>
-                    </button>
+                    <h5 class="modal-title" id="posHelperModal-title"><%=myResources.getString("SearchFieldTooltip")%>  </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                     <%

@@ -36,10 +36,8 @@
     String speechEventID = backend.getSpeechEvent4Transcript(transcriptID);
     String corpusID = backend.getCorpus4Event(backend.getEvent4SpeechEvent(speechEventID));
     
-    //String transcriptID = "ISO_robmus_2015_01_002";
-    //String transcriptID = "IDE57E5B6C-E67B-B454-E462-4E4868C79333";
-    Transcript exbTranscript = backend.getTranscript(transcriptID);
-    String xml = exbTranscript.toXML();
+    Transcript transcript = backend.getTranscript(transcriptID);
+    String xml = transcript.toXML();
     String[][] parameters = {
     };
     String html = new IOHelper().applyInternalStylesheetToString("/org/zumult/io/Transcript2AnnotationHTML.xsl", xml, parameters);  
@@ -47,7 +45,7 @@
     String videoIDsParameter = request.getParameter("videoIDs");
     List<String> videoIDs = new ArrayList<>();
     if (videoIDsParameter==null || videoIDsParameter.length()==0){
-        videoIDs = backend.getVideos4SpeechEvent(speechEventID);
+        videoIDs = backend.getVideos4SpeechEvent(speechEventID);        
     } else {
         String[] videoIDsSplit = videoIDsParameter.split("\\|");
         videoIDs.addAll(Arrays.asList(videoIDsSplit));
@@ -76,13 +74,14 @@
 <html>
         <html>
             <head>
-                <script src="../js/media_zuann.js"></script>
+                <title>ZuAnn: <%= transcriptID %></title>
                 <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>        
-                <script src="https://kit.fontawesome.com/e215b03c17.js" crossorigin="anonymous"></script>
-                <link rel="stylesheet" href="../css/annotation.css">
+                <script src="https://kit.fontawesome.com/ed5adda70b.js" crossorigin="anonymous"></script>
                 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/>
-                <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="crossorigin="anonymous"></script>        
                 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>                
+
+                <script src="../js/media_zuann.js"></script>
+                <link rel="stylesheet" href="../css/annotation.css">
 
                 <script>
                     // probably all variables from the URL should be mirrored in this way
@@ -92,90 +91,91 @@
                     var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';                    
                 </script>
                 
-                <style type="text/css">
-                </style>
             </head>
-    <body onload="initialiseMedia()">
-        <%@include file="../WEB-INF/jspf/zumultNav.jspf" %>                                                
-               
-        <div id="video-form" class="row justify-content-center" style="margin-top:80px;">
-            <div class="col-auto">        
-                <table>
-                    <%
-                        if (!audioIDs.isEmpty() && videoIDs.isEmpty()){
-                    %>
-                    <tr>
-                    <% for (int i=0; i<Math.min(audioIDs.size(),2); i++){
-                        String audioID = audioIDs.get(i);
-                        Media audio = backend.getMedia(audioID);
-                        String url = audio.getURL();
-                        String id = "master-audio";
-                        if (i>0){
-                            id = "audio-" + Integer.toString(i);
-                        }
-                    %>
-                    <td>
-                        <audio controls="controls" name="audio" id="<%= id %>" style="margin-right:30px">
-                            <source src="<%= url %>" type="audio/wav"/>
-                        </video>
-                    </td>
-                    <%
-                        }
-                    %>
-                    </tr>
-                    <%
-                        }
-                    %>
-                    <tr>
-                        <% 
-                            for (int i=0; i<Math.min(videoIDs.size(),2); i++){
-                                String videoID = videoIDs.get(i);
-                                Media video = backend.getMedia(videoID);
-                                String url = video.getURL();
-                                String id = "master-video";
+            <body onload="initialiseMedia()">
+                <% request.setAttribute("application", "ZuAnn"); %>
+                <%@include file="../WEB-INF/jspf/zumultNav.jspf" %>                                                
+
+                <div id="video-form" class="row justify-content-center" style="margin-top:80px;">
+                    <div class="col-auto">        
+                        <table>
+                            <%
+                                if (!audioIDs.isEmpty() && videoIDs.isEmpty()){
+                            %>
+                            <tr>
+                            <% for (int i=0; i<Math.min(audioIDs.size(),2); i++){
+                                String audioID = audioIDs.get(i);
+                                Media audio = backend.getMedia(audioID);
+                                String url = audio.getURL();
+                                String id = "master-audio";
                                 if (i>0){
-                                    id = "video-" + Integer.toString(i);
+                                    id = "audio-" + Integer.toString(i);
                                 }
-                        %>
-                        <td>
-                            <video width="480" height="320" controls="controls" name="video" id="<%= id %>" style="margin-right:30px">
-                                <source src="<%= url %>" type="video/mp4"/>
-                                <track label="trans" kind="subtitles" srclang="de" src="<%= vttURL %>" default="default">
-                                <track label="norm" kind="subtitles" srclang="de" src="<%= vttURL + "&subtitleType=norm"%>">                
-                            </video>
-                        </td>
-                        <td>
-                            <div style="background: #f8f9fa; height: 270px; border-radius: 3px; padding: 3px;">
-                                <a href="javascript:addVideoImageToCollection('<%= videoID %>')" 
-                                   title="<%=myResources.getString("AddVideoImageCollection")%>" style="color:black">
-                                    <i class="far fa-plus-square"></i>
-                                </a><br/>          
-                                <a href="javascript:getVideoImage('<%= videoID %>')" 
-                                   title="<%=myResources.getString("ExtractVideoImage")%>" style="color:black">
-                                    <i class="fas fa-camera-retro"></i>
-                                </a><br/>
-                                <a href="javascript:frameBackward()" title="<%=myResources.getString("PrecedingFrame")%>" style="color:black">
-                                    <i class="fas fa-step-backward"></i>
-                                </a><br/>
-                                <a href="javascript:frameForward()" title="<%=myResources.getString("NextFrame")%>" style="color:black">
-                                    <i class="fas fa-step-forward"></i>
-                                </a>
-                            </div>                        
-                        </td>
-                    <%
-                        }
-                    %>    
-                    </tr>
-                </table>
-            </div>
-        </div>
-        
-        <div id="partitur-form" class="row mt-2">
-            <div class="col-1"></div>
-            <div class="col-10 overflow-auto" style="height: <%= Integer.toString(height)%>px; width: 100%;">
-                    <%= html %>                
-            </div>
-            <div class="col-1"></div>
-        </div>
-    </body>
+                            %>
+                            <td>
+                                <audio controls="controls" name="audio" id="<%= id %>" style="margin-right:30px">
+                                    <source src="<%= url %>" type="audio/wav"/>
+                                </video>
+                            </td>
+                            <%
+                                }
+                            %>
+                            </tr>
+                            <%
+                                }
+                            %>
+                            <tr>
+                                <% 
+                                    for (int i=0; i<Math.min(videoIDs.size(),2); i++){
+                                        String videoID = videoIDs.get(i);
+                                        Media video = backend.getMedia(videoID);
+                                        String url = video.getURL();
+                                        String id = "master-video";
+                                        if (i>0){
+                                            id = "video-" + Integer.toString(i);
+                                        }
+                                %>
+                                <td>
+                                    <video width="480" height="320" controls="controls" name="video" id="<%= id %>" style="margin-right:30px">
+                                        <source src="<%= url %>" type="video/mp4"/>
+                                        <track label="trans" kind="subtitles" srclang="de" src="<%= vttURL %>" default="default">
+                                        <track label="norm" kind="subtitles" srclang="de" src="<%= vttURL + "&subtitleType=norm"%>">                
+                                    </video>
+                                </td>
+                                <td>
+                                    <div style="background: #f8f9fa; height: 270px; border-radius: 3px; padding: 3px;">
+                                        <a href="javascript:addVideoImageToCollection('<%= videoID %>')" 
+                                           title="<%=myResources.getString("AddVideoImageCollection")%>" style="color:black">
+                                            <i class="far fa-plus-square"></i>
+                                        </a><br/>          
+                                        <a href="javascript:getVideoImage('<%= videoID %>')" 
+                                           title="<%=myResources.getString("ExtractVideoImage")%>" style="color:black">
+                                            <i class="fas fa-camera-retro"></i>
+                                        </a><br/>
+                                        <a href="javascript:frameBackward()" title="<%=myResources.getString("PrecedingFrame")%>" style="color:black">
+                                            <i class="fas fa-step-backward"></i>
+                                        </a><br/>
+                                        <a href="javascript:frameForward()" title="<%=myResources.getString("NextFrame")%>" style="color:black">
+                                            <i class="fas fa-step-forward"></i>
+                                        </a>
+                                    </div>                        
+                                </td>
+                            <%
+                                }
+                            %>    
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row mt-4" id="body-row">
+                    <div class="col-1">&nbsp;</div>
+                    <div class="col-9" id="annotation-div">
+                        <%= html %>
+                    </div>
+                    <div class="col-1">&nbsp;</div>
+                </div>    
+
+
+            </body>
 </html>

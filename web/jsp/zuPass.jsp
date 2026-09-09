@@ -37,15 +37,28 @@
     String corpusID = backend.getCorpus4Event(backend.getEvent4SpeechEvent(speechEventID));
 
     
-    //String transcriptID = "ISO_robmus_2015_01_002";
-    //String transcriptID = "IDE57E5B6C-E67B-B454-E462-4E4868C79333";
     Transcript exbTranscript = backend.getTranscript(transcriptID, Transcript.TranscriptFormats.EXB);
+    String startTime = request.getParameter("startTime");
+    String endTime = request.getParameter("endTime");
+    if (startTime!=null && endTime!=null){
+        double time1 = Double.parseDouble(startTime);
+        double time2 = Double.parseDouble(endTime);
+        exbTranscript = exbTranscript.getPart(time1, time2, true);
+    }
+    
+    
+    
     String xml = exbTranscript.toXML();
     String[][] parameters = {
     };
     String html = new IOHelper().applyInternalStylesheetToString("/org/zumult/io/exb2Partitur.xsl", xml, parameters);  
     
-    String videoIDsParameter = request.getParameter("videoIDs");
+    IDList videoIDs = IOHelper.getVideosFromRequest(request, backend, speechEventID);
+    IDList audioIDs = IOHelper.getAudiosFromRequest(request, backend, speechEventID);
+    
+    String vttURL = Configuration.getWebAppBaseURL() + "/ZumultDataServlet?command=getVTT&transcriptID=" + transcriptID;
+    
+    /*String videoIDsParameter = request.getParameter("videoIDs");
     List<String> videoIDs = new ArrayList<>();
     if (videoIDsParameter==null || videoIDsParameter.length()==0){
         videoIDs = backend.getVideos4SpeechEvent(speechEventID);
@@ -57,13 +70,12 @@
     String audioIDsParameter = request.getParameter("audioIDs");
     List<String> audioIDs = new ArrayList<>();
     if (videoIDs.isEmpty() || (audioIDsParameter==null || audioIDsParameter.length()==0)){
-        audioIDs = backend.getAudios4SpeechEvent(speechEventID);
+        audioIDs = backend.getAudios4SpeechEvent(speechEventID);    
     } else {
         String[] audioIDsSplit = audioIDsParameter.split("\\|");
         audioIDs.addAll(Arrays.asList(audioIDsSplit));
-    } 
+    } */
 
-    String vttURL = Configuration.getWebAppBaseURL() + "/ZumultDataServlet?command=getVTT&transcriptID=" + transcriptID;
 
 %>
 
@@ -108,6 +120,7 @@
 
     </head>
     <body onload="initialiseMedia()">
+        <% request.setAttribute("application", "ZuPass"); %>
         <%@include file="../WEB-INF/jspf/zumultNav.jspf" %>                                                
                
         <div id="video-form" class="row justify-content-center" style="margin-top:80px;">
@@ -152,8 +165,10 @@
                         <td>
                             <video width="480" height="320" controls="controls" name="video" id="<%= id %>" style="margin-right:30px">
                                 <source src="<%= url %>" type="video/mp4"/>
-                                <track label="trans" kind="subtitles" srclang="de" src="<%= vttURL %>" default="default">
-                                <track label="norm" kind="subtitles" srclang="de" src="<%= vttURL + "&subtitleType=norm"%>">                
+                                <% if (i==0){ %>
+                                <track label="trans" kind="subtitles" src="<%= vttURL %>" default="default">
+                                <track label="norm" kind="subtitles" src="<%= vttURL + "&subtitleType=norm"%>">                
+                                <% } %>
                             </video>
                         </td>
                         <td>
