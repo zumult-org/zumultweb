@@ -71,7 +71,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>ZuMult: Media Overview</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous"/>
         <link href="../css/query.css" rel="stylesheet"/>
         
         <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="crossorigin="anonymous"></script>        
@@ -81,269 +81,58 @@
 
         <link rel="stylesheet" href="../css/overview.css"/>  
         
-            <script>
-    
-                var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';
-                
-                // **************************************
-                // put all metadata attributes with their values into a JS variable
-                // **************************************
-                var availableValues4Keys = {};
-                <% for (MetadataKey metadataKey : availableValues4Keys.keySet()){ 
-                    IDList avValues = availableValues4Keys.get(metadataKey);
-                    String joined = "";
-                    for (int i=0; i<avValues.size(); i++){
-                        joined+="\"" + StringEscapeUtils.escapeJavaScript(avValues.get(i)) + "\"";
-                        if (i<avValues.size()-1){
-                            joined+=",";
-                        }
-                    }
-                    String list = "[" + joined + "]";
-                %>
-                   availableValues4Keys["<%= metadataKey.getName("en") %>"] = <%= list %>;
-                <% } %>
-                    
-                // **************************************
-                // observe videos: load only if visible
-                // **************************************
-                document.addEventListener("DOMContentLoaded", function () {
+        <script src="../js/media_overview.js"></script>
+        
+        <script>
 
-                    let allMediaPlayers = $('[name="syncMediaPlayer"]');                 
-                    $.each(allMediaPlayers, function(){
-                        let video = $(this).get(0);
-                        const observer = new IntersectionObserver((entries, observer) => {
-                          entries.forEach(entry => {
-                            if (entry.isIntersecting) {
-                              // Load video by setting the src
-                              const src = video.getAttribute('data-src');
-                              if (src) {
-                                video.src = src;
-                                video.load(); // Trigger load
-                              }
-                              observer.unobserve(video); // Stop observing once loaded
-                            }
-                          });
-                        }, {
-                          rootMargin: '0px',
-                          threshold: 0.25 // Load when 25% visible (you can tweak this)
-                        });
-                        observer.observe(video);
+            var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';
+
+            // **************************************
+            // put all metadata attributes with their values into a JS variable
+            // **************************************
+            var availableValues4Keys = {};
+            <% for (MetadataKey metadataKey : availableValues4Keys.keySet()){ 
+                IDList avValues = availableValues4Keys.get(metadataKey);
+                String joined = "";
+                for (int i=0; i<avValues.size(); i++){
+                    joined+="\"" + StringEscapeUtils.escapeJavaScript(avValues.get(i)) + "\"";
+                    if (i<avValues.size()-1){
+                        joined+=",";
+                    }
+                }
+                String list = "[" + joined + "]";
+            %>
+               availableValues4Keys["<%= metadataKey.getName("en") %>"] = <%= list %>;
+            <% } %>
+
+            // **************************************
+            // observe videos: load only if visible
+            // **************************************
+            document.addEventListener("DOMContentLoaded", function () {
+
+                let allMediaPlayers = $('[name="syncMediaPlayer"]');                 
+                $.each(allMediaPlayers, function(){
+                    let video = $(this).get(0);
+                    const observer = new IntersectionObserver((entries, observer) => {
+                      entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                          // Load video by setting the src
+                          const src = video.getAttribute('data-src');
+                          if (src) {
+                            video.src = src;
+                            video.load(); // Trigger load
+                          }
+                          observer.unobserve(video); // Stop observing once loaded
+                        }
+                      });
+                    }, {
+                      rootMargin: '0px',
+                      threshold: 0.25 // Load when 25% visible (you can tweak this)
                     });
-                });                    
-                
-    
-    
-    
-                function setSelectMedia(mediaID, select){
-                    const mediaDiv = $('#media-div-' + mediaID);
-                    const titleDiv = $('#title-div-' + mediaID);
-                    const borderDiv = $('#border-div-' + mediaID);
-                    if (select){
-                        mediaDiv.attr('data-selected', 'true');
-                        titleDiv.css('background-color' , 'blue');
-                        titleDiv.css('color' , 'white');
-                        borderDiv.removeClass('border-secondary');
-                        borderDiv.addClass('border-primary');
-                        borderDiv.css('background-color', '#F1FFFF');
-                    } else {
-                        mediaDiv.attr('data-selected', 'false');
-                        titleDiv.css('background-color' , 'lightgray');
-                        titleDiv.css('color' , 'black');
-                        borderDiv.removeClass('border-primary');
-                        borderDiv.addClass('border-secondary');
-                        borderDiv.css('background-color', 'white');
-                    }                    
-                    updateCounts();                    
-                }
-
-                function toggleSelectMedia(mediaID){
-                    const mediaDiv = $('#media-div-' + mediaID);
-                    const isSelected = (mediaDiv.attr('data-selected') === 'true');
-                    setSelectMedia(mediaID, !isSelected);
-                }
-
-                // ************************
-                function setMuteMedia(mediaID, mute){
-                    const media = $('#mediaPlayer-' + mediaID);
-                    const button = $('#toggle-mute-btn-' + mediaID);
-                    if (mute){
-                        media.attr('data-muted', 'true');                        
-                        button.find('i').first().removeClass('fa-volume').addClass('fa-volume-slash');                        
-                    } else {
-                        media.attr('data-muted', 'false');
-                        button.find('i').first().removeClass('fa-volume-slash').addClass('fa-volume');                        
-                    }                    
-                    media.prop('muted', function(i, val) {
-                        return mute; // toggle the current muted state
-                    });            
-                    updateCounts();                                        
-                }
-                
-                function toggleMuteMedia(mediaID){
-                    const media = $('#mediaPlayer-' + mediaID);
-                    const isMute = (media.attr('data-muted') === 'true');
-                    setMuteMedia(mediaID, !isMute);
-                }
-    
-                // ************************
-                function setShowPlayer(mediaID, show){
-                    const button = $('#toggle-player-btn-' + mediaID);
-                    const playerDiv = $('#player-div-' + mediaID);
-                    if (show){
-                        playerDiv.css('display', 'block');
-                        button.find('i').first().removeClass('fa-eye').addClass('fa-eye-slash');                        
-                    } else {
-                        playerDiv.css('display', 'none');
-                        button.find('i').first().removeClass('fa-eye-slash').addClass('fa-eye');                                                
-                    }
-                    
-                }
-
-                function toggleShowPlayer(mediaID){
-                    const playerDiv = $('#player-div-' + mediaID);
-                    setShowPlayer(mediaID, playerDiv.css('display') === 'none');
-                }
-                
-                
-                // ************************
-                function moveUpDown(mediaID){
-                    const button = $('#move-up-down-btn-' + mediaID);
-                    const mediaDiv = $('#media-div-' + mediaID);
-                    const infoTable = $('#info-table-' + mediaID);
-                    if (mediaDiv.data('position') === 'down'){
-                        $('#up-row-div').append(mediaDiv)
-                        infoTable.css('display', 'none');
-                        button.find('i').first().removeClass('fa-up-to-line').addClass('fa-down-to-line');      
-                        mediaDiv.data('position', 'up');
-                        setShowPlayer(mediaID, true);
-                        setSelectMedia(mediaID, true);
-                        var count = $('#up-row-div > div').length;    
-                        if (count===1){
-                            setMuteMedia(mediaID, false);
-                        }
-                    } else {
-                        $('#down-row-div').append(mediaDiv)
-                        infoTable.css('display', 'table');
-                        button.find('i').first().removeClass('fa-down-to-line').addClass('fa-up-to-line');                        
-                        mediaDiv.data('position', 'down');
-                        setShowPlayer(mediaID, false);
-                        setSelectMedia(mediaID, false);
-                    }
-                    updateCounts();
-                }
-                
-                // ************************
-                function updateCounts(){
-                    const countSelected = $('[data-selected="true"]').length;
-                    const countUnmuted = $('[data-muted="false"]').length;
-                    $('#selectedCount').html(countSelected);
-                    $('#unmutedCount').html(countUnmuted);
-                    
-                }
-                
-                // ************************
-                function updateMetadataFilterValueSelect(){
-                    $('#metadataFilterValueSelect').empty();
-                    let selectedAttribute = $('#metadataFilterAttributeSelect').find(":selected").val();
-                    if (selectedAttribute!=="None"){
-                        let availableValues = availableValues4Keys[selectedAttribute];
-                        //alert(availableValues);
-                        $.each(availableValues, function(index, value){
-                            $('#metadataFilterValueSelect').append($('<option>', {
-                                value: value,
-                                text: value
-                            }));
-                        });                        
-                    }
-                }
-
-                // ************************
-                function showStillImages(videoID){
-                
-                    let button = $('#still-series-btn-' + videoID);
-                    button.find('i').first().removeClass('fa-images').addClass('fa-spinner').addClass('fa-spin'); 
-                    const randomDouble = Math.random() * 9 + 1;
-                    $.post(
-                        BASE_URL + "/ZumultDataServlet",
-                        { 
-                            command: 'getStillSeries',
-                            videoID: videoID,
-                            numberOfImages: 4,
-                            startTime: randomDouble
-                        },
-                        function( data ) {
-                            if ($(data).find("error").length > 0){
-                                alert('No video for ' + transcriptID);                            
-                                return;
-                            }
-                            $('#still-container-' + videoID).html(data);
-                            button.find('i').first().addClass('fa-images').removeClass('fa-spinner').removeClass('fa-spin'); 
-
-                        }
-                    );                    
-                    
-                }
-                // ************************
-                function largerImage(obj){                
-                    let imageURL = $(obj).attr('src');
-                    let imageHTML = "<img id=\"modal-video\" src=\"" + imageURL +  "\"/>";
-                    $('#image-div').html(imageHTML);                
-                    $('#imageModal').modal("toggle");
-                }
-                // ************************                
-                function filterMetadata(){
-                    let selectedAttribute = $('#metadataFilterAttributeSelect').find(":selected").val();
-                    let selectedValue = $('#metadataFilterValueSelect').find(":selected").val();
-                    //alert("Filter: " + selectedAttribute + " / " + selectedValue);
-                    let mediaDivs = $('div[name="main-media-div"]');
-                    let filteredAudio = 0;
-                    let filteredVideo = 0;
-                    $.each(mediaDivs, function(){
-                        if (selectedAttribute==="None" || $(this).data(selectedAttribute)===selectedValue){
-                            $(this).show();
-                            if ($(this).data("media-type")==="VIDEO"){
-                                filteredVideo++;
-                            } else {
-                                filteredAudio++;                                
-                            }
-                        } else {
-                            $(this).hide();                                
-                        }
-                    });  
-                    $('#filteredVideoCount').html(filteredVideo);
-                    $('#filteredAudioCount').html(filteredAudio);                    
-                }
-                
-                // ************************
-                var syncPlaying = false;
-                function syncPlayPause(){
-                    let button = $('#sync-play-pause-button');
-                    if (syncPlaying){
-                        // pause
-                        if (button!==null){
-                            // switch the icon to "play"
-                            button.find('i').first().removeClass('fa-pause').addClass('fa-play');                                                
-                        }
-                        let allMediaPlayers = $('[name="syncMediaPlayer"]');
-                        $.each(allMediaPlayers, function(){
-                            $(this).get(0).pause();
-                        });
-                        syncPlaying = false;
-                        return;
-                    }
-                    if (button!==null){
-                        // switch the icon to "pause"
-                        button.find('i').first().removeClass('fa-play').addClass('fa-pause');                                                
-                    }
-                    let activeMediaPlayers = $('[data-selected="true"] [name="syncMediaPlayer"]');
-                    alert(activeMediaPlayers.length + " players selected.")
-                    $.each(activeMediaPlayers, function(){
-                        $(this).get(0).play();
-                    });
-                    syncPlaying = true;
-                    
-                }
-            </script>
+                    observer.observe(video);
+                });
+            });                    
+        </script>
     </head>
     <body>
         <% String pageName = "ZuMult"; %>
@@ -354,6 +143,13 @@
             <div class="col-1">
             </div>
             <div class="col-10">
+                <!-- **************************************************** -->
+                <!-- *** The upper row, empty intially                *** -->    
+                <!-- **************************************************** -->
+                <div class="d-flex flex-wrap align-items-stretch bg-light border border-primary border-2 rounded" id="up-row-div">
+                            
+                </div>
+
                 <div class="row align-items-end">
                     <div class="col-2 mb-3" id="countDiv">
                         <b id="filteredVideoCount"><%= videoList.size() %></b> (<%= videoList.size() %>) Video(s) / 
@@ -422,13 +218,6 @@
                 </div>
 
                           
-                <!-- **************************************************** -->
-                <!-- *** The upper row, empty intially                *** -->    
-                <!-- **************************************************** -->
-                <div class="d-flex flex-wrap align-items-stretch bg-light border border-primary border-2 rounded" id="up-row-div">
-                            
-                </div>
-
                 <!-- **************************************************** -->
                 <!-- *** The lower row, contains all media initally   *** -->    
                 <!-- **************************************************** -->

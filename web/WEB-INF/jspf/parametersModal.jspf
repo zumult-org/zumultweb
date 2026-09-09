@@ -2,21 +2,21 @@
 <%@page import="org.zumult.io.Constants"%>
 <%@page import="org.zumult.objects.IDList"%>
 <%@ page pageEncoding="UTF-8" %>
-    <div class="modal modal-lg" tabindex="-1" role="dialog" id="parametersModal">
-        <div class="modal-dialog" role="document" style="min-width:80%">
+    <div class="modal fade" tabindex="-1" role="dialog" id="parametersModal" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 
                 
-                <div class="modal-header" style="background: white; opacity: 0.88;">
+                <div class="modal-header" style="background: rgb(53, 104, 17)">
                     <h5 class="modal-title" id="parameters-title"><%=myResources.getString("Parameters")%></h5>
 
                     <span class="navbar-brand" style="margin-left:20px; margin-right: 20px; display: none" id="waitSpinner">
                         <i class="fas fa-spinner fa-spin"></i>                    
                     </span>
                     
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&#x00D7;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    
                 </div>
                 
                 <form action="#" method="post">
@@ -36,19 +36,14 @@
                         <!-- ********************************** -->
                         <!-- *    COLUMN HIDE/SHOW            * -->
                         <!-- ********************************** -->
-                        <div class="input-group-sm mb-3 form-check form-check-inline">
-                            <div class="input-group-prepend">
-                              <div class="input-group-text" style="width:240px;">
-                                <input type="checkbox" id="showLeftCol" checked="checked" onchange="changeColumnDisplay()">
-                                <label class="form-check-label checkbox-inline" for="showLeftCol" style="padding-left:10px;"><%=myResources.getString("ZuViel.LeftColumn")%></label>
-                              </div>
-                            </div>
-                            <div class="input-group-prepend">
-                              <div class="input-group-text" style="width:300px; margin-left: 50px;">
-                                <input type="checkbox" id="showRightCol" checked="checked" onchange="changeColumnDisplay()">
-                                <label class="form-check-label checkbox-inline" for="showRightCol" style="padding-left:10px;"><%=myResources.getString("ZuViel.RightColumn")%></label>
-                              </div>
-                            </div>
+                        <div class="form-check form-check-inline mb-3">
+                            <input type="checkbox" id="showLeftCol" checked="checked" onchange="changeColumnDisplay()">
+                            <label class="form-check-label checkbox-inline" for="showLeftCol" style="padding-left:10px;"><%=myResources.getString("ZuViel.LeftColumn")%></label>
+                        </div>
+                        <br/>
+                        <div class="form-check form-check-inline mb-3">
+                            <input type="checkbox" id="showRightCol" checked="checked" onchange="changeColumnDisplay()">
+                            <label class="form-check-label checkbox-inline" for="showRightCol" style="padding-left:10px;"><%=myResources.getString("ZuViel.RightColumn")%></label>
                         </div>
                         
                         
@@ -58,9 +53,9 @@
                         <!-- ********************************** -->
                         <div>
                             <div class="input-group mb-3 input-group-sm">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="formlabel"><%=myResources.getString("Transcript")%></span>
-                                </div>
+                                <span class="input-group-text" id="formlabel" style="min-width: 180px;">
+                                    <%=myResources.getString("Transcript")%>
+                                </span>
                                 <select class="form-control" id="form" name="form" onchange="changeForm()">
                                   <option value="trans" selected="selected"><%=myResources.getString("TranscribedForms")%></option>
                                   <option value="norm"><%=myResources.getString("NormalisedForms")%></option>
@@ -79,9 +74,9 @@
                         <% if (!videos.isEmpty()){ %>
                         <div>
                             <div class="input-group mb-3 input-group-sm">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="subtitletypelabel"><%=myResources.getString("Subtitles")%></span>
-                                </div>
+                                <span class="input-group-text" id="subtitletypelabel" style="min-width: 180px;">
+                                    <%=myResources.getString("Subtitles")%>
+                                </span>
                                 <select class="form-control" id="subtitletype" onchange="changeSubtitleType()">
                                   <option value="none"><%=myResources.getString("NoSubtitles")%></option>
                                   <option value="trans" selected="selected"><%=myResources.getString("TranscribedForms")%></option>
@@ -95,12 +90,12 @@
                         <!-- *    PLAYBACK SPEED              * -->
                         <!-- ********************************** -->
                         <div class="input-group mb-3 input-group-sm">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="playbackspeedlabel"><%=myResources.getString("PlaybackRate")%></span>
-                            </div>
+                            <span class="input-group-text" id="playbackspeedlabel" style="min-width: 180px;">
+                                <%=myResources.getString("PlaybackRate")%>
+                            </span>
                             <input type="range" min="50" max="150" value="100" 
-                                   class="slider" id="playbackSpeedSlider" aria-describedby="playbackspeedlabel"
-                                   oninput="updatePlaybackSpeed()" list="tickmarks"
+                                   class="form-range mx-2" id="playbackSpeedSlider" aria-describedby="playbackspeedlabel"
+                                   oninput="updatePlaybackSpeed()" list="tickmarks" style="width: 200px"
                             >
                             <output for="playbackSpeedSlider" id="playbackspeedlabel2">100%</output>                        
                         </div>
@@ -109,49 +104,66 @@
                         <!-- ********************************** -->
                         <!-- *    TRANSCRIPT FONT / SIZE      * -->
                         <!-- ********************************** -->
-                        <div>
-                            <div class="input-group mb-3 input-group-sm">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="transcriptfontlabel"><%=myResources.getString("TranscriptFont")%></span>
-                                </div>
-                                <select class="form-control" id="fontfamily" onchange="changeTranscriptFont()">
-                                  <option value="monospace"><%=myResources.getString("TranscriptFont")%></option>
-                                  <option value="sans-serif" selected="selected">Sans Serif</option>
-                                  <option value="serif">Serif</option>
-                                </select>       
-                                <input type="range" min="2" max="20" value="12" 
-                                       class="slider" id="fontsizeSlider" 
-                                       oninput="updateFontsize()" list="tickmarks-fontsize"
-                                       style="width: 80px"
-                                >
-                                <output for="fontsizeSlider" id="transcriptsizelabel">12pt</output>                        
-                            </div>
-                        </div>
-                        
+                        <div class="mb-3">
+                          <div class="input-group input-group-sm mb-3">
+
+                            <span class="input-group-text" id="transcriptfontlabel" style="min-width: 180px;">
+                              <%=myResources.getString("TranscriptFont")%>
+                            </span>
+
+                            <select class="form-select" id="fontfamily" onchange="changeTranscriptFont()">
+                              <option value="monospace">
+                                <%=myResources.getString("TranscriptFont")%>
+                              </option>
+                              <option value="sans-serif" selected>Sans Serif</option>
+                              <option value="serif">Serif</option>
+                            </select>
+
+                          </div>
+
+                          <!-- Separate controls (better in BS5) -->
+                          <div class="input-group input-group-sm">
+                            <span class="input-group-text" id="transcriptfontSizelabel" style="min-width: 180px;">
+                              <%=myResources.getString("FontSize")%>
+                            </span>
+
+                            <input type="range"
+                                   min="2" max="20" value="12"
+                                   class="form-range mx-2"
+                                   id="fontsizeSlider"
+                                   oninput="updateFontsize()"
+                                   style="width: 120px">
+
+                            <output for="fontsizeSlider" id="transcriptsizelabel">12pt</output>
+                          </div>
+                        </div>                                  
 
                         <!-- checkboxes for other options -->
-                        <div class="input-group-sm mb-3 form-check form-check-inline">
-                            <div class="input-group-prepend">
-                              <div class="input-group-text" style="">
-                                <input class="form-check-input" type="checkbox" value="TRUE" id="showNormDev" name="showNormDev" onchange="changeShowNormDev(this)"/>
-                                <label class="form-check-label" for="showNormDev">
-                                    <%=myResources.getString("ShowNormDev")%>                                    
-                                </label>
-                              </div>
-                            </div>
+                        <div class="form-check form-check-inline mb-3">
+                          <input class="form-check-input" type="checkbox"
+                                 value="TRUE"
+                                 id="showNormDev"
+                                 name="showNormDev"
+                                 onchange="changeShowNormDev(this)">
+
+                          <label class="form-check-label" for="showNormDev">
+                            <%=myResources.getString("ShowNormDev")%>
+                          </label>
                         </div>
 
-                        <div class="input-group-sm mb-3 form-check form-check-inline">
-                            <div class="input-group-prepend">
-                              <div class="input-group-text" style="">
-                                <input class="form-check-input" type="checkbox" value="TRUE" id="visSpeechRate" name="visSpeechRate" onchange="changeVisSpeechRate(this)"/>
-                                <label class="form-check-label" for="visSpeechRate">
-                                    <%=myResources.getString("VisSpeechRate")%>                                    
-                                </label>
-                              </div>
-                            </div>
+                        <!-- checkboxes for other options -->
+                        <div class="form-check form-check-inline mb-3">
+                          <input class="form-check-input" type="checkbox"
+                                 value="TRUE"
+                                 id="visSpeechRate"
+                                 name="visSpeechRate"
+                                 onchange="changeVisSpeechRate(this)">
+
+                          <label class="form-check-label" for="showNormDev">
+                            <%=myResources.getString("VisSpeechRate")%>
+                          </label>
                         </div>
-                                                
+
                     </div>
 
 

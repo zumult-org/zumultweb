@@ -193,8 +193,14 @@ function updateTime(){
             spanElement.classList.add("highlight-playback");            
             
             if (!scrollOnce){
-                spanElement.scrollIntoView();
-                window.scrollBy(0, -150);
+                spanElement.scrollIntoView(
+                    {
+                        behavior: 'smooth',   // optional
+                        block: 'center',
+                        inline: 'center'
+                    }                        
+                );
+                //window.scrollBy(0, -200);
                 scrollOnce = true;
             }
             

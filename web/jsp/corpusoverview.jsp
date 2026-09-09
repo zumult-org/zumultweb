@@ -17,6 +17,7 @@
 <%@include file="../WEB-INF/jspf/locale.jspf" %>     
 <html>
     <%
+       String corpusID = null; // needed to inform menu bar
        BackendInterface backendInterface = BackendInterfaceFactory.newBackendInterface();
        String backendName = backendInterface.getName();
        String backendAcronym = backendInterface.getAcronym();
@@ -35,8 +36,15 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>                
 
         <link rel="stylesheet" href="../css/overview.css"/>       
+        <style type="text/css">
+            .modal-dialog {
+              max-width: 90%;
+            }            
+        </style>
         
         <script>
+            var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';
+           
             $(document).ready(function(){
         
                 $("#selectLang").on("change", function(){
@@ -47,14 +55,29 @@
                 });
             });
             
+            function openMetadata(corpusID){
+                $.post(
+                    BASE_URL + "/ZumultDataServlet",
+                    { 
+                        command: 'getCorpusMetadata',
+                        format: 'html',
+                        corpusID : corpusID
+                    },
+                    function( data ) {
+                        $("#metadata-body").html(data);
+                        $("#metadata-title").html(corpusID);
+                        $('#metadataModal').modal("toggle");
+                    }
+                );                                    
+            }
+            
+            
         </script>
         
     </head>
-    <body>
-        <% String pageTitle = "Korpusübersicht"; 
-           if ("en".equals(language)) {
-               pageTitle = "Corpus overview";
-           }
+    <body style="margin-top: 80px;">
+        <%
+           String pageTitle = myResources.getString("CorpusOverview");
            String pageName = "ZuMult";
         %>
             
@@ -63,28 +86,10 @@
             <div class="col-sm-2">
             </div>
             <div class="col-sm-8">
-                <p class="text-justify">
-                <% if ("en".equals(language)) { %>
-                    This page gives an overview of the <%= corpora.size() %> corpora available in this 
-                    <a href="http://zumult.org" target="_blank">ZuMult</a> instance.
-                <% } else { %>
-                    Diese Seite gibt einen Überblick über die <%= corpora.size() %> Korpora, die in dieser
-                    <a href="http://zumult.org" target="_blank">ZuMult</a>-Instanz
-                    zugänglich sind. 
-                <% } %>
-                </p>
-            </div>
-            <div class="col-sm-2">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-2">
-            </div>
-            <div class="col-sm-8">
         
         <%
-            for (String corpusID : corpora){
-                Corpus corpus = backendInterface.getCorpus(corpusID); 
+            for (String cID : corpora){
+                Corpus corpus = backendInterface.getCorpus(cID); 
                 String acronym = corpus.getAcronym();
                 String name = corpus.getName(language);
                 String description = corpus.getDescription(language);
@@ -95,7 +100,8 @@
                         <figure class="figure">
                             <%
                                 String corpusImgSrc = "../images/words.jpg";
-                                String tryPath = "/images/corpora/" + corpusID + ".png";
+                                String tryPath = "/images/corpora/" + cID + ".png";
+                                System.out.println("Trying " + tryPath);
                                 String path = request.getSession().getServletContext().getRealPath(tryPath);
                                 if (path!=null){
                                     File image = new File(path);    
@@ -109,41 +115,42 @@
                     </div>
                     <div class="col-md-10">                  
                         <div class="card-body">
-                            <h5 class="card-title"><%=acronym%></h5>
-                            <h6 class="card-subtitle mb-2 text-muted"><%=name%></h6>
-                            <p class="card-text"><%=description%></p>
-                            <a class="card-link"  target="_blank" href="speecheventstable.jsp?corpusID=<%=corpusID%>">
-                                <%= backendInterface.getSpeechEvents4Corpus(corpusID).size() %>
-                                <% if ("en".equals(language)) { %>
-                                    Speech events
-                                <% } else { %>
-                                    Sprechereignisse
-                                <% } %>
-                                
-                            </a>
-                            <a class="card-link"  target="_blank" href="speakerstable.jsp?corpusID=<%=corpusID%>">
-                                <%= backendInterface.getSpeakers4Corpus(corpusID).size() %> 
-                                <% if ("en".equals(language)) { %>
-                                    Speakers
-                                <% } else { %>
-                                    Sprecher
-                                <% } %>
-                                
-                            </a>
+                            <div class="row">
+                                <div class="col-8">
+                                    <h5 class="card-title"><%=acronym%></h5>
+                                    <h6 class="card-subtitle mb-2 text-muted"><%=name%></h6>
+                                    <p class="card-text"><%=description%></p>
+                                </div>
+                                <div class="col-4">
+                                    <a class="card-link" href="#"
+                                       onclick="event.preventDefault(); openMetadata('<%= cID %>')"
+                                    >Corpus metadata</a><br/>
+                                    <a class="card-link" target="_blank" href="statistics.jsp?corpusID=<%= cID %>"
+                                    >Corpus statistics</a><br/>                                    
+                                    <a class="card-link"  target="_blank" href="speecheventstable.jsp?corpusID=<%=cID%>">
+                                        <%= backendInterface.getSpeechEvents4Corpus(cID).size() %>
+                                        <% if ("en".equals(language)) { %>
+                                            Speech events
+                                        <% } else { %>
+                                            Sprechereignisse
+                                        <% } %>
+
+                                    </a><br/>
+                                    <a class="card-link"  target="_blank" href="speakerstable.jsp?corpusID=<%=cID%>">
+                                        <%= backendInterface.getSpeakers4Corpus(cID).size() %> 
+                                        <% if ("en".equals(language)) { %>
+                                            Speakers
+                                        <% } else { %>
+                                            Sprecher
+                                        <% } %>
+
+                                    </a>
+                                </div>
+                            </div>
                       </div>
                     </div>
                 </div>
                 </div>
-                <!-- <h2><%=acronym%></h2>
-                <h3><%=name%></h3>
-                <p><%=description%></p>
-                <p>
-                    <a target="_blank" href="eventstable.jsp?corpusID=<%=corpusID%>">Events</a>
-                    <span>  *  </span>
-                    <a target="_blank" href="speecheventstable.jsp?corpusID=<%=corpusID%>">Speech Events</a>
-                    <span>  *  </span>
-                    <a target="_blank" href="speakerstable.jsp?corpusID=<%=corpusID%>">Speakers</a>
-                </p> -->
         <%
             }
         %>
@@ -153,6 +160,6 @@
             
 
         </div>
-        
+        <%@include file="../WEB-INF/jspf/metadataModal.jspf" %>                
     </body>
 </html>

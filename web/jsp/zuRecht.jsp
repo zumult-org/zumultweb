@@ -69,6 +69,18 @@
     AnnotationTagSet annotationTagSet = backend.getAnnotationTagSet(Constants.DEFAULT_POS_TAGSET);
     String annotationTagSetString = annotationTagSet.toXML().replaceAll("[\\t\\n\\r]+","").replaceAll("\\s+"," ").replaceAll("> <", "><");
     String annotationTagSetXML = annotationTagSetString.replace("\"", "\\\"").replace("\'", "\\\'");
+    
+    String pageName = "ZuMult";
+    String pageTitle = "ZuRecht - CQP Query"; 
+    String imgSrc = "";
+    String imgSrc2 = "";
+    
+    String corpusID = null; // for completeness sake
+    
+    String zumultQueryXML = "/org/zumult/io/ZuMultQueryExamples.xml";
+    String zumultQueryXSL = "/org/zumult/io/ZuMultQueryExamples2HTML.xsl";
+    String zumultQueryHTML = new IOHelper().applyInternalStylesheetToInternalFile(zumultQueryXSL, zumultQueryXML, new String[][]{});
+
 
 %>
 <%@include file="../WEB-INF/jspf/locale.jspf" %>     
@@ -88,11 +100,6 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
         <script src="https://kit.fontawesome.com/ed5adda70b.js" crossorigin="anonymous"></script>
         
-        
-        <!-- <script src="https://unpkg.com/wavesurfer.js"></script>
-        <script src="https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.regions.min.js"></script>
-        <script src="https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.cursor.min.js"></script>
-        <script src="https://unpkg.com/wavesurfer.js/dist/plugin/wavesurfer.timeline.min.js"></script> -->
 
         <script src="../js/jquery.twbsPagination.js" type="text/javascript"></script>
         <script src="../js/zuRecht.collapsible.js" type="text/javascript"></script>
@@ -101,11 +108,11 @@
         <script src="../js/xslTransformation.js" type="text/javascript"></script>
         <link rel="stylesheet" type="text/css" href="../css/query.css" />
         <link rel="stylesheet" type="text/css" href="../css/transcript.css" />
+        <link rel="stylesheet" type="text/css" href="../css/query_examples.css" />
         
-        <%@include file="../WEB-INF/jspf/matomoTracking.jspf" %>                
 
     </head>
-    <body>
+    <body style="margin-top:80px;">
 
         <div id="autocompleteForQueryInputField" class="list-group"></div>
 
@@ -115,51 +122,79 @@
         <% String maxNumberForDownload =  String.valueOf(Constants.MAX_NUMBER_FOR_KWIC_DOWNLOAD); %>
       
         <!-- navigation  -->
-        <%@include file="../WEB-INF/jspf/zuRechtNavBar.jspf" %>
+        <%@include file="../WEB-INF/jspf/zumultNav.jspf" %>
+        
 
         <br/>
-        <div class="container-fluid">
-            <div class="row">
+        <div class="d-flex" id="wrapper">
+            
+            
+            <!-- Sidebar -->
+            <div class="bg-light border-right" id="sidebar-wrapper">
+
+                <!-- Toggle Button -->
+                <button class="btn btn-sm btn-light border position-absolute"
+                        id="menu-toggle"
+                        style="top:10px; right:-18px; z-index:1000;">
+                    <span>&#9776;</span>
+                </button>                
                 
-                <!-- corpora -->
-                <div class="col-md-2"> 
+                <div class="px-3 py-3"> 
                     <%@include file="../WEB-INF/jspf/zuRechtCorpora.jspf" %>
                 </div>
+            </div>            
 
-                <!-- workspace -->
-                <div class="col-md-10">
+            
+                
+            <!-- Center section -->
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- workspace -->
+                    <div class="col-md-10">
 
-                    <!-- Nav tabs -->
-                    <ul class="nav nav-tabs small" role="tablist">
-                        <li class="nav-item"><a class="nav-link active" data-toggle="tab" id="query-tab" href="#query-tab-content" role="tab"><%=myResources.getString("Query")%></a></li>
-                    </ul>
 
-                    <!-- Tab panes -->
-                    <div class="tab-content">
+                        <!-- Nav tabs (there is only one!) -->
+                        <ul class="nav nav-tabs small" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" id="query-tab" href="#query-tab-content" role="tab"><%=myResources.getString("Query")%></a>
+                            </li>
+                        </ul>
 
-                        <!-- Query tab -->
-                        <div class="tab-pane mt-3 active" id="query-tab-content">
-                            <h2><%=myResources.getString("SearchByQuery")%></h2>
-                            <%@include file="../WEB-INF/jspf/zuRechtKWICSearchForm.jspf" %>
-                            <%@include file="../WEB-INF/jspf/zuRechtKWICSearchOptionsModal.jspf" %>
-                            <div id="kwic-search-result-area" class="searchResultArea">
+                        <!-- Tab panes (there is only one!) -->
+                        <div class="tab-content">
+                            <!-- Query tab -->
+                            <div class="tab-pane mt-3 active" id="query-tab-content">
+                                <%@include file="../WEB-INF/jspf/zuRechtKWICSearchForm.jspf" %>
+                                <%@include file="../WEB-INF/jspf/zuRechtKWICSearchOptionsModal.jspf" %>
+                                <div id="kwic-search-result-area" class="searchResultArea"></div>
                             </div>
                         </div>
+                                
+                        <div>
+                            <!-- Initial help -->
+                            <a class="collapse-toggle" data-toggle="collapse" href="#query_intro"
+                               role="button" aria-expanded="true" aria-controls="query_intro">
+                              Query intro <span class="caret"></span>
+                            </a>                                    
+                            <div class="px-4 collapse show" id="query_intro" style="border: 1px solid rgb(220,220,220); background: rgb(250,250,250); padding: 5px;">
+                                <%= zumultQueryHTML %>        
+                            </div>
+                        </div>
+                                
                     </div>
-                            
-                    <!-- include start explanations -->        
-                    <%@include file="../WEB-INF/jspf/startexplanation.jspf" %>
+
+
                 </div>
+
+
             </div>
-                            
-                            
-        </div>
-        <%@include file="../WEB-INF/jspf/metadataModal.jspf" %>
+        </div>                                
+        <%@include file="../WEB-INF/jspf/metadataModal.jspf" %>        
         <%@include file="../WEB-INF/jspf/videoModal.jspf" %>
         <%@include file="../WEB-INF/jspf/imageModal.jspf" %>
   
         <%@include file="../WEB-INF/jspf/zuRechtConstants.jspf" %>
-         <%@include file="../WEB-INF/jspf/zuRechtAudioPlayback.jspf" %>
+        <%@include file="../WEB-INF/jspf/zuRechtAudioPlayback.jspf" %>
         <script type="text/javascript">
             var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';
             var languageTag = '<%=currentLocale.toLanguageTag()%>';
@@ -224,27 +259,6 @@
                     $('#modal-searchTabOptions').modal('show');
                 });
                 
-                /************* sample queries ****************/
-                addSampleQueries();
-                
-                $('input[type=checkbox]').change(function () {
-                    updateSampleQueries();
-                });
-                
-                /* This function displays sample queries in the query input field */
-                (function(){
-                    var show = document.getElementById("queryInputField");
-                    var instructions = document.getElementById("instructions");
-                    var sample = document.getElementById("sampleQueries");
-                    sample.addEventListener("change", function(){
-                        var str = sample.value;
-                        var txt = str.replace(/%22/g, "\"").replace(/%26/g, " & ")
-                                .replace(/%3C/g, "<").replace(/%3E/g, ">").replace(/%2B/g, "+").replace(/%23/g, "#");
-                        show.value=txt;
-                        instructions.innerHTML="";
-                    });
-                })();
-
 
                 // load html for displaying kwic results
                 $("#kwic-search-result-area").load(zuRechtKWICResultView, function() {
@@ -311,6 +325,29 @@
                 }
                 
             }
+            
+            function insertQuery(element){
+                let queryString = element.textContent;
+                let qif = document.getElementById("queryInputField");
+                qif.value = queryString;
+                
+                let corpus = element.dataset.corpus;
+                if (corpus){
+                    selectCorpus(corpus);
+                }
+            }
+            
+            function selectCorpus(corpus){
+                let corpuscheckBoxes = document.getElementsByName("corpus");
+                corpuscheckBoxes.forEach(el => {
+                    el.checked = false;
+                });
+                let theCheckBox = document.getElementById(corpus);
+                if (theCheckBox){
+                    theCheckBox.checked = true;
+                }
+            }
+            
             
             /**********************************************************/
             /*                      ajax calls                        */
@@ -410,16 +447,16 @@
 
                     // add results
                     displayKWIC(selector, xml);
-                }else {
+                } else {
                     $(selector).find('.KWICSearch-result h4').prepend('<%=myResources.getString("No")%>' + " ");
                     $(selector).find('.KWICSearch-result').find("a").remove();
                 }
             }
             
             function displayKWIC(selector, xml){
-                $('#start-explanation').remove();
+                $('#query_intro').collapse('hide'); 
             
-                $(selector).find(".openXML-KWICSearch-area").css("display", "block");
+                // $(selector).find(".openXML-KWICSearch-area").css("display", "block");
                 $(selector).find('.rowData-KWICSearch').text(xml);
                 
                 var data = new FormData();
@@ -443,8 +480,7 @@
                 //display summary
 
                 // display buttons for opening metadata view, grouping hits and download
-                $(selector).find('.KWICSearch-result').append("<h4><%=myResources.getString("Results")%></h4><div class='clearfix'>\n\
-                        <div class='float-left'><%=myResources.getString("ForSearching")%> " + query +"</div>");
+                $(selector).find('.KWICSearch-result').append("<div><%=myResources.getString("Results")%> <%=myResources.getString("ForSearching")%> " + query +"</div>");
                 
                 $("#showMoreQuery").on('click', function(){
                     addResultsHead(selector, longQuery, queryStr, corpusQueryStr, longQuery, shortQuery);
@@ -516,7 +552,8 @@
                 $.post(
                     BASE_URL + "/ZumultDataServlet",
                     { 
-                        command: 'getSpeakerMetadataHTML',
+                        command: 'getSpeakerMetadata',
+                        format: 'html',
                         speakerID: speakerID,
                         transcriptID: transcriptID
                     },
@@ -646,10 +683,7 @@
             }
             
             function insertVideoPlayer(parent, videoURL, time){
-                //let randomID = 'id-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
                 let videoHTML = "<video id=\"modal-video\" controls=\"controls\" type=\"video/mp4\" src=\"" + videoURL +  "\"></video>";
-                //let pauseHTML = "<i class=\"fa-solid fa-pause\"></i>";
-                //$(parent).html(pauseHTML);
                 $('#video-div').html(videoHTML);                
                 const video = $('#modal-video')[0];
                 // Check if the video is ready to play
@@ -665,9 +699,6 @@
                     });
                 }  
                 $('#videoModal').modal("toggle");
-                //parent.onclick = function(){
-                    //stopVideo(this, randomID);
-                //};                
             }
             
             function stopVideo(){
@@ -792,64 +823,11 @@
             
             /* This function is used in updateSampleQueries() and in $(document).ready(function(){...})*/
             function addSampleQueries(){
-
-                <% ArrayList<SampleQuery> queries2 = IOHelper.getQueriesFromFile(Constants.SAMPLE_QUERIES_FOR_TRASCRIPT_BASED_SEARCH);
-                        for (int i = 0; i < queries2.size(); i++) { 
-                            SampleQuery query = queries2.get(i); 
-                        %>
-
-                        addQuery('<%=query.getCorpus() %>', '<%=query.getQueryString() %>', '<%=query.getQueryString().replaceAll("\"", "%22") %>', '<%=query.getDescription().replaceAll("\'", "%22") %>');
-
-
-                <%}%>
+                    // do nothing here
             }
   
-            /* This function is used in addSampleQueries() */
-            function addQuery(corpusStr, queryString, queryValue, description){
-
-                var test = false;
-
-                if(corpusStr === ""){
-                    test=true;
-                }else{
-
-                    var checkedCorpora = [];
-
-                    $.each($("input[name='corpus']:checked"), function(){
-                        checkedCorpora.push($(this).val());
-                    });
-
-
-                    var corpora = corpusStr.split("|");
-                    for (i = 0; i < corpora.length; i++) {
-
-                        if(checkedCorpora.indexOf(corpora[i])>=0){
-                            test=true;
-                        }
-                    }
-                }
-
-
-                if(test===true){                         
-                    title = description.replace(/%22/g, "\'");
-
-                    $('#sampleQueries').append($('<option>', {
-                        value: queryValue,
-                        text: queryString,
-                        title: title    
-                    }));
-                }
-
-            }
-
-            /* This function updates sample queries depending on the selected corpus and search mode */
-            function updateSampleQueries(){
-                $('#sampleQueries').empty();
-                addSampleQueries();
-            }
-     
             function emptyPage(selector){
-               $(selector).find(".openXML-KWICSearch-area").css("display", "none");
+               // $(selector).find(".openXML-KWICSearch-area").css("display", "none");
                $(selector).find(".kwic-tab").css("display", "none"); 
                $("#wait-audio").css("display", "none");
                $(selector).find(".rowData-KWICSearch").empty();

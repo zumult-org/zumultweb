@@ -1,0 +1,19 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/css.css to edit this template
+*/
+/* 
+    Created on : 10.03.2026, 13:31:40
+    Author     : bernd
+*/
+.query-expression {
+    cursor:pointer; 
+    font-size:14pt; 
+    color: #337AB7; 
+    font-weight: bold    
+}
+
+.form {
+    color: rgb(53, 104, 17);  
+    font-style: italic;
+}

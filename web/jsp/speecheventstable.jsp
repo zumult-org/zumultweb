@@ -1,75 +1,205 @@
-<%-- 
-    Document   : eventstable
-    Created on : 01.05.2018, 14:54:21
-    Author     : Thomas_Schmidt
---%>
-
-<%@page import="java.util.Comparator"%>
-<%@page import="java.util.TreeSet"%>
+<%@page import="java.util.Arrays"%>
+<%@page import="java.util.HashSet"%>
 <%@page import="org.zumult.objects.ObjectTypesEnum"%>
 <%@page import="java.util.Locale"%>
 <%@page import="java.util.ResourceBundle"%>
-<%@page import="org.zumult.objects.SpeechEvent"%>
+<%@page import="java.util.List"%>
+<%@page import="org.zumult.objects.Location"%>
 <%@page import="org.zumult.objects.MetadataKey"%>
-<%@page import="org.zumult.objects.Event"%>
+<%@page import="org.zumult.objects.Speaker"%>
 <%@page import="org.zumult.objects.IDList"%>
 <%@page import="java.util.Set"%>
 <%@page import="org.zumult.objects.Corpus"%>
 <%@page import="org.zumult.backend.BackendInterfaceFactory"%>
 <%@page import="org.zumult.backend.BackendInterface"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <%@include file="../WEB-INF/jspf/locale.jspf" %>     
+<%
+    String corpusID = request.getParameter("corpusID");
+
+    String pageName = "ZuMult";
+    String pageTitle = "Speech events overview";
+    //String imgSrc = "../images/eslo_bandeau.jpg";
+   
+    BackendInterface backendInterface = BackendInterfaceFactory.newBackendInterface();
+    Corpus corpus = backendInterface.getCorpus(corpusID);
+    Set<MetadataKey> metadataKeys = corpus.getMetadataKeys(ObjectTypesEnum.SPEECH_EVENT);     
+
+    List<String> selectionSet = new ArrayList<>();
+    for (MetadataKey mk : metadataKeys){
+        selectionSet.add(mk.getName("en"));
+    }
+    
+    // this is new for #270, 07-03-2026
+    // I am going out of may way here to make this robust
+    // I will hopefully be given an award for this
+    // the FIFA Peace Prize will do for now
+    MetadataKey selectionKey = backendInterface.findMetadataKeyByID("Corpus_zumult:speechEventMetadataTableSelection");
+    if (selectionKey!=null){
+        String allMetadataNames = corpus.getMetadataValue(selectionKey);
+        if (allMetadataNames!=null && allMetadataNames.length()>0){
+            List<String> configuredSelectionSet = new ArrayList<>();
+            String[] tokenizedMetadataNames = allMetadataNames.split(";");
+            for (String mn : tokenizedMetadataNames){
+                MetadataKey mk = backendInterface.findMetadataKeyByID("SpeechEvent_" + mn);
+                if (mk!=null){
+                    configuredSelectionSet.add(mk.getName("en"));
+                }
+            }
+            if (!(configuredSelectionSet.isEmpty())){
+                selectionSet = configuredSelectionSet;
+            }
+        }
+    }
+    
+
+
+
+%>
+
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Speech Events</title>
+        <title>ZuMult - Speech events overview</title>
         <style type="text/css">
-            tr:nth-child(even) {background: #DDD}
-            tr:nth-child(odd) {background: #FFF}
-            body{font-size:smaller;}
+            .id-column {font-weight: bold;}
+            .actions-column {white-space: nowrap;}
+            td {
+                /*max-width: 200px;*/
+                white-space: normal;
+                word-wrap: break-word;
+            }            
         </style>
-
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="crossorigin="anonymous"></script>        
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        
+        <link rel="stylesheet" href="../css/overview.css"/>       
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+        
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>                
         <script src="https://kit.fontawesome.com/ed5adda70b.js" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="../css/overview.css"/>       
-
-
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css">
         <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
-        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>
-        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.colVis.min.js"></script>
+        
+        
         
 
         <script type="text/javascript">
             var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';
 
+            // ********************************
+            // init the table
             $(document).ready( function () {
                 //$('#myTable').DataTable();
                 $('#myTable').DataTable( {
+                    autoWidth: false,
+                    serverSide: true,
+                    processing : true,
+                    language: {
+                        processing: "Loading data from server..."  // custom message
+                    },                    
+                    ajax: {
+                        url: '../DataTableServlet', // <-- your server endpoint
+                        type: 'POST',       // or 'GET' depending on your backend
+                        data: {
+                            corpusID : '<%=corpusID%>',
+                            command : 'communications'
+                        }
+                    },  
+                    columnDefs : [
+                        { targets: 0, className: 'actions-column'},
+                        { targets: 1, className: 'id-column'}
+                    ],    
+                    columns: [
+                    {
+                      data: 'Actions', 
+                      title: 'Actions',
+                      orderable: false,
+                      searchable: false
+                    },  
+                    { 
+                        data: 'ID', 
+                        title: 'ID'
+                    },
+                    <% for (String keyName : selectionSet){ %>
+                        { 
+                            data: '<%= keyName %>', 
+                            title: '<%= keyName %>'
+                        },
+                    <% } %>
+                    ],                    
+                    pageLength: 20,
                     dom: 'Bfrtip',
                     buttons: [
                         {
                             extend: 'colvis',
-                            columns: ':not(.noVis)'
+                            columns: ':not(.noVis)',
+                            text: 'Select columns'       
                         }
                     ]
                 } );
-            } );          
-
+            } ); 
+            
             function openTranscript(transcriptID){
                 let url = "./zuViel.jsp?transcriptID=" + transcriptID;
                 window.open(url, '_blank');    
             }
             
-            function openMedia(speechEventID){
-                let url = "./mediaOverview.jsp?speechEventID=" + speechEventID;
+            function openZupass(transcriptID){
+                let url = "./zuPass.jsp?transcriptID=" + transcriptID;
                 window.open(url, '_blank');    
             }
+
+            function playAudio(audioID, element){
+                let randomID = 'id-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+                $.post(
+                    BASE_URL + "/ZumultDataServlet",
+                    { 
+                        command: 'getAudio',
+                        audioID: audioID
+                    },
+                    function( data ) {
+                        let audioURL = $(data).find("audio").first().text();
+                        if (audioURL.length === 0){
+                            alert('No audio for ' + transcriptID);                            
+                        } else {
+                            let audioHTML = "<audio type=\"audio/mp3\" src=\"" + audioURL + "\" id=\"" + randomID + "\"></audio>";
+                            let pauseHTML = "<i class=\"fa-solid fa-pause\"></i>";
+                            $(element).html(audioHTML + pauseHTML);
+                            const audio = $('#' + randomID)[0];
+                            // Check if the audio is ready to play
+                            if (audio.readyState >= 2) { // 2 = HAVE_CURRENT_DATA
+                                //audio.currentTime = time; // Set the playback position
+                                audio.play(); // Start playing
+                            } else {
+                                // If the audio is not ready, wait until it is loaded
+                                audio.addEventListener('canplay', function onCanPlay() {
+                                //audio.currentTime = time; // Set the playback position
+                                audio.play(); // Start playing
+                                audio.removeEventListener('canplay', onCanPlay); // Remove the event listener
+                                });
+                            }  
+                            element.onclick = function(){
+                                stopAudio(this, randomID);
+                            };                                
+                        }
+                    }
+                );                        
+                
+            }
+            
+            function stopAudio(parent, audioID){
+                const audio = $('#' + audioID)[0];
+                audio.pause();
+                let playHTML = "<i class=\"fa-solid fa-play\"></i>";
+                $(parent).html(playHTML);
+                parent.onclick = function(){
+                    playbackAudio(this);
+                };                
+            }
+            
 
             function openMetadata(speechEventID){
                 $.post(
@@ -85,47 +215,45 @@
                     }
                 );                                    
             }
+            
+            
+            function showSpeakers(speechEventID){
+                $.post(
+                    BASE_URL + "/ZumultDataServlet",
+                    { 
+                        command: 'getSpeakerMetadata',
+                        format: 'html',
+                        speechEventID : speechEventID
+                    },
+                    function( data ) {
+                        $("#metadata-body").html(data);
+                        $("#metadata-title").html("<i class=\"fa-solid fa-comment-dots\" aria-hidden=\"true\"></i> " + speechEventID);
+                        $('#metadataModal').modal("toggle");
+                    }
+                );                                                    
+            }
+            
+            
         </script>
         
-        
-        
     </head>
-    <body>
-        <%
-            String corpusID = request.getParameter("corpusID");
-            BackendInterface backendInterface = BackendInterfaceFactory.newBackendInterface();
-            Corpus corpus = backendInterface.getCorpus(corpusID);
-            String corpusName = corpus.getName("en");
-            Set<MetadataKey> metadataKeys = corpus.getMetadataKeys(ObjectTypesEnum.SPEECH_EVENT);
-            List<MetadataKey> sortedMetadataKeys = new ArrayList<>(metadataKeys);   
-            sortedMetadataKeys.sort(new Comparator<MetadataKey>(){
-                @Override
-                public int compare(MetadataKey m1, MetadataKey m2){
-                    return m1.getName("en").compareTo(m2.getName("en"));
-                }
-            });
-            IDList eventIDs = backendInterface.getEvents4Corpus(corpusID);           
-            IDList speechEventIDs = new IDList("speechEvent");
-            for (String eventID : eventIDs){
-                speechEventIDs.addAll(backendInterface.getEvent(eventID).getSpeechEvents());
-            }
-        %>
-        <% String pageName = "ZuMult"; %>
-        <% String pageTitle = "Speech event overview corpus  - " + corpusName; %>
+    <body margin-top="80px;">
         <%@include file="../WEB-INF/jspf/zumultNav.jspf" %>                                                
         
         <div class="row">
             <div class="col-sm-1">
             </div>
             <div class="col-sm-10">
-                <table id="myTable" style="font-size:smaller;" class="stripe compact">
+                <table id="myTable" class="stripe compact">
                     <thead>
                         <tr>
-                            <th></th>
-                            <th>Name</th>
+                            <th style="min-width: 100px;"></th>
+                            <th>ID</th>
                             <%
-                                for (MetadataKey metadataKey : sortedMetadataKeys){
+                                for (MetadataKey metadataKey : metadataKeys){
                                     String keyName = metadataKey.getName("en");
+                                    if(!selectionSet.contains(keyName)) continue;
+
                             %>
                                 <th><%=keyName%></th>    
                             <%
@@ -133,58 +261,11 @@
                             %>
                         </tr>
                     </thead>
-                    <tbody>
-                    <%
-                        //Long time = System.currentTimeMillis();
-                        for (String speechEventID : speechEventIDs){
-                          //  Long dur = System.currentTimeMillis() - time;
-                          //  time = System.currentTimeMillis();
-                            SpeechEvent speechEvent = backendInterface.getSpeechEvent(speechEventID);
-                            String firstTranscriptID = null;
-                            if (!speechEvent.getTranscripts().isEmpty()){
-                                firstTranscriptID = speechEvent.getTranscripts().get(0);
-                            }
-                            String name = speechEvent.getName();
-                    %>
-                            <tr>
-                                <th>
-                                    <button onclick="openMetadata('<%= speechEventID %>')" type="button" class="btn btn-sm py-0 px-1" title="Show all metadata">
-                                        <i class="fas fa-info-circle"></i>
-                                    </button>
-                                    <button onclick="openMedia('<%= speechEventID %>')" type="button" class="btn btn-sm py-0 px-1" 
-                                            title="Open media overview (<%= speechEventID %>) in ZuViel">
-                                        <i class="fa-solid fa-video"></i>
-                                    </button>
-                                    <% if (firstTranscriptID!=null){ %>
-                                        <button onclick="openTranscript('<%= firstTranscriptID %>')" type="button" class="btn btn-sm py-0 px-1" 
-                                                title="Open first transcript (<%= firstTranscriptID %>) in ZuViel">
-                                            <i class="fa-regular fa-file-lines"></i>
-                                        </button>
-                                    <% } %>    
-                                </th>
-                                <th><%=name %></th>
-                                <% 
-                                    for (MetadataKey metadataKey : sortedMetadataKeys){ 
-                                    String metadataValue = speechEvent.getMetadataValue(metadataKey);
-                                %>
-                                <td class="metadata"
-                                    title="<%=metadataValue%>">
-                                    <%=metadataValue%>
-                                </td>
-                                <%
-                                    }
-                                %>
-                            </tr>
-                    <%
-                        }
-                    %>
-                    </tbody>
                 </table>
             </div>
             <div class="col-sm-1">
             </div>
         </div>
-        <%@include file="../WEB-INF/jspf/metadataModal.jspf" %>
-                    
+        <%@include file="../WEB-INF/jspf/metadataModal.jspf" %>        
     </body>
 </html>

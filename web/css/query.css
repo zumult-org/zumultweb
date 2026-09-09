@@ -177,3 +177,27 @@ span.thumb-time {
 
 /****************** help *************************/
 .btn-open-help{background-color: #d9edf7;}
+
+
+    .collapse-toggle {
+      cursor: pointer;
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #666; /* Bootstrap link color */
+    }
+
+    /* Small triangle caret */
+    .collapse-toggle .caret {
+      display: inline-block;
+      margin-left: 4px;
+      transition: transform 0.2s ease;
+      border-top: 4px solid currentColor;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+    }
+
+    /* Rotate caret when open */
+    .collapse.show + .collapse-toggle .caret,
+    .collapse-toggle[aria-expanded="true"] .caret {
+      transform: rotate(180deg);
+    }

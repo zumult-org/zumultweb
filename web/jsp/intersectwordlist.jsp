@@ -298,7 +298,6 @@
                 border-top: none;
             }
         </style>
-        <%@include file="../WEB-INF/jspf/matomoTracking.jspf" %>                
     </head>
     <body>
         <h1>Word list intersection</h1>

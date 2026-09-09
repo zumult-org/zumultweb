@@ -25,7 +25,6 @@
             tr:nth-child(odd) {background: #FFF}
             td {border: 1px solid; font-weight:bold; text-align:center;}
         </style>
-        <%@include file="../WEB-INF/jspf/matomoTracking.jspf" %>                        
     </head>
     <body>
         <h1>Speech Event metadata matrix</h1>

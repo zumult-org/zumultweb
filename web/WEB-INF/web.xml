@@ -5,10 +5,19 @@
         <servlet-name>ZumultDataServlet</servlet-name>
         <servlet-class>org.zumult.webservices.ZumultDataServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>DataTableServlet</servlet-name>
+        <servlet-class>org.zumult.webservices.DataTableServlet</servlet-class>
+    </servlet>    
     <servlet-mapping>
         <servlet-name>ZumultDataServlet</servlet-name>
         <url-pattern>/ZumultDataServlet</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DataTableServlet</servlet-name>
+        <url-pattern>/DataTableServlet</url-pattern>
+    </servlet-mapping>
+    
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>

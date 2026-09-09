@@ -33,7 +33,10 @@
     String pageName = "ZuPass";
     String pageTitle = transcriptID;
     
-    String speechEventID = backend.getSpeechEvent4Transcript(transcriptID);
+    String speechEventID = backend.getSpeechEvent4Transcript(transcriptID);    
+    String corpusID = backend.getCorpus4Event(backend.getEvent4SpeechEvent(speechEventID));
+
+    
     //String transcriptID = "ISO_robmus_2015_01_002";
     //String transcriptID = "IDE57E5B6C-E67B-B454-E462-4E4868C79333";
     Transcript exbTranscript = backend.getTranscript(transcriptID, Transcript.TranscriptFormats.EXB);
@@ -86,7 +89,20 @@
             var speechEventID = '<%= speechEventID %>';
             var transcriptID = '<%= transcriptID %>';
             var vttURL = '<%= vttURL %>';
-            var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';                    
+            var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';          
+            
+           
+            $(document).ready(function(){
+        
+                $("#selectLang").on("change", function(){
+                    var value = $(this).val();
+                    var urlTest = new URL(window.location.href);
+                    urlTest.searchParams.set('lang',value);
+                    window.location = urlTest;
+                });
+            });
+            
+            
         </script>
 
 
@@ -96,7 +112,7 @@
                
         <div id="video-form" class="row justify-content-center" style="margin-top:80px;">
             <div class="col-auto">        
-                <table>
+                <table class="my-4 zupass-media-table">
                     <%
                         if (!audioIDs.isEmpty() && videoIDs.isEmpty()){
                     %>
