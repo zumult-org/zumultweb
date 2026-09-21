@@ -1,46 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
-    <description>Prototype Implementation of ZuMult</description>
-    <servlet>
-        <servlet-name>DGDLink</servlet-name>
-        <servlet-class>org.zumult.webservices.DGDLink</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>getMoreTranscript</servlet-name>
-        <servlet-class>org.zumult.webservices.getMoreTranscript</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>getSpeechEvents</servlet-name>
-        <servlet-class>org.zumult.webservices.getSpeechEvents</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>getData</servlet-name>
-        <servlet-class>org.zumult.webservices.getData</servlet-class>
-    </servlet>
+    <description>Default web implementation of ZuMult</description>
     <servlet>
         <servlet-name>ZumultDataServlet</servlet-name>
         <servlet-class>org.zumult.webservices.ZumultDataServlet</servlet-class>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>DGDLink</servlet-name>
-        <url-pattern>/DGDLink</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>getMoreTranscript</servlet-name>
-        <url-pattern>/getMoreTranscript</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>getSpeechEvents</servlet-name>
-        <url-pattern>/getSpeechEvents</url-pattern>
-    </servlet-mapping>
+    <servlet>
+        <servlet-name>DataTableServlet</servlet-name>
+        <servlet-class>org.zumult.webservices.DataTableServlet</servlet-class>
+    </servlet>        
     <servlet-mapping>
         <servlet-name>ZumultDataServlet</servlet-name>
         <url-pattern>/ZumultDataServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>getData</servlet-name>
-        <url-pattern>/getData</url-pattern>
-    </servlet-mapping>
+        <servlet-name>DataTableServlet</servlet-name>
+        <url-pattern>/DataTableServlet</url-pattern>
+    </servlet-mapping>    
     <session-config>
         <session-timeout>
             30
