@@ -57,6 +57,12 @@ RUN git clone --depth 1 https://$GITHUB_PAT@github.com/zumult-org/exmaraldademoc
 WORKDIR exmaraldademocorpus
 RUN git lfs install && git lfs pull
 RUN git status
+
+#New 21-09-2026: Download and unpack Praat
+WORKDIR $PRAAT_PATH
+RUN curl -Ls ${PRAAT_URL} -o praat.tar.gz && gunzip praat.tar.gz && tar xvf praat.tar && chmod +x praat && rm praat.tar
+
+
 WORKDIR $HOME
 #RUN mv exmaraldademocorpus/src/main/java/data/corpora/EXMARaLDA-DemoKorpus $CORPUSDATA/corpora
 RUN mv exmaraldademocorpus/src/main/java/data/* $CORPUSDATA
