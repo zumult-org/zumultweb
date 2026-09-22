@@ -40,7 +40,7 @@ ENV ZUMULT_CONFIG_PATH=/usr/app/Configuration.xml
 ENV CORPUSDATA=/home/corpusdata
 ARG GITHUB_PAT
 ENV JAVA_TOOL_OPTIONS=-Djavax.xml.transform.TransformerFactory="net.sf.saxon.TransformerFactoryImpl"
-ENV PATH=$PATH:$HOME/praat
+ENV PATH=$PATH:/home/praat
 ENV PRAAT_PATH=/home
 
 VOLUME ["/home/corpusdata"]
