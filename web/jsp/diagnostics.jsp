@@ -50,12 +50,21 @@
             <p class="fine">Reading configuration from <%= PATH %>.<p>
             <% 
                 String biPath = Configuration.getBackendInterfaceClassPath();
+                
                 String metadataPath = Configuration.getMetadataPath();
                 boolean metadataPathExists = new File(metadataPath).exists();
+                
                 String mediaPath = Configuration.getMediaPath();
+                
                 String searchIndexPath = Configuration.getSearchIndexPath();
                 boolean indexPathExists = new File(metadataPath).exists();
                 
+                String ffmpegPath = Configuration.getFfmpegPath();
+                boolean ffmpegPathExists = new File(ffmpegPath).exists();
+                
+                String praatPath = Configuration.getPraatPath();
+                boolean praatPathExists = new File(praatPath).exists();
+
                 TransformerFactory factory = TransformerFactory.newInstance();
                 String transformerClassName = factory.getClass().getName();
 
@@ -98,6 +107,22 @@
                 </li>
                 <li>
                     <b>Transformer class name: </b> <%= transformerClassName %>
+                </li>
+                <li>
+                    <b>FFMPeg path: </b> <%= ffmpegPath %>
+                    <% if(ffmpegPathExists){ %>
+                        <span class="fine"> Path exists.</span>
+                    <% } else { %>
+                        <span class="error"> Path does not exist.</span>
+                    <% } %>
+                </li>
+                <li>
+                    <b>Praat path: </b> <%= praatPath %>
+                    <% if(ffmpegPathExists){ %>
+                        <span class="fine"> Path exists.</span>
+                    <% } else { %>
+                        <span class="error"> Path does not exist.</span>
+                    <% } %>
                 </li>
                 
                 

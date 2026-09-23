@@ -128,7 +128,7 @@
                                        onclick="event.preventDefault(); openMetadata('<%= cID %>')">
                                         <%=myResources.getString("CorpusMetadata")%>
                                     </a><br/>
-                                    <a class="card-link" target="_blank" href="statistics.jsp?corpusID=<%= cID %>">
+                                    <a class="card-link" target="_blank" href="statistics.jsp?corpusID=<%= cID %>&amp;lang="<%= language %>">
                                         <%=myResources.getString("CorpusStatistics")%>
                                         </a>
                                         <br/>                                    
@@ -139,6 +139,9 @@
                                     <a class="card-link"  target="_blank" href="speakerstable.jsp?corpusID=<%=cID%>">
                                         <%= backendInterface.getSpeakers4Corpus(cID).size() %> 
                                         <%=myResources.getString("SpeakersPL")%>
+                                    </a><br/>
+                                    <a class="card-link"  target="_blank" href="downloadCorpus.jsp?corpusID=<%=cID%>">
+                                        <%=myResources.getString("CorpusQuickDownload")%>
                                     </a>
                                 </div>
                             </div>
