@@ -20,11 +20,16 @@ RUN mkdir -p $HOME
 ADD . $HOME
 WORKDIR $HOME
 RUN mvn clean package -s docker-config/settings.xml "-Dproject.packaging=war" "-Dgithub.token=${GITHUB_PAT}" "-Dgithub.username=${GITHUB_USERNAME}"
-COPY target/zumultweb.war /usr/app/target/zumultapi.war
+# the WAR is produced by the build above; copying it from the build context
+# only worked if someone had run mvn package on the host beforehand
+RUN cp target/zumultweb.war target/zumultapi.war
 #
 # Deploy stage
 #
-FROM tomcat:9-jdk17
+# Ubuntu base pinned: the unpinned tag now points to 26.04, where libc++1
+# no longer pulls in libunwind (Praat failed to start, 2026-10-13).
+# Stays on Tomcat 9, see zumult-org/zumultapi#278.
+FROM tomcat:9.0-jdk17-temurin-resolute
 ARG WAR_FILE=/usr/app/target/zumultapi.war
 ARG PRAAT_URL=https://github.com/praat/praat/releases/download/v6.4.44a/praat6444_linux-intel64.tar.gz
 LABEL org.opencontainers.image.source=https://github.com/zumult-org/zumultapi
@@ -34,11 +39,10 @@ ENV CATALINA_WEBAPP=${CATALINA_HOME}/webapps
 USER root:root
 
 RUN apt-get update \
-    && apt-get install --no-install-recommends -y unzip ffmpeg git git-lfs libc++1 nano
+    && apt-get install --no-install-recommends -y unzip ffmpeg git git-lfs libc++1 nano libgtk-3-0t64 llvm-libunwind1
 ENV HOME=/usr/app
 ENV ZUMULT_CONFIG_PATH=/usr/app/Configuration.xml
 ENV CORPUSDATA=/home/corpusdata
-ARG GITHUB_PAT
 ENV JAVA_TOOL_OPTIONS=-Djavax.xml.transform.TransformerFactory="net.sf.saxon.TransformerFactoryImpl"
 ENV PATH=$PATH:/home/praat
 ENV PRAAT_PATH=/home
@@ -53,19 +57,17 @@ COPY --from=build $HOME/docker-config/server.xml /usr/app/server.xml
 COPY --from=build $HOME/docker-config/Configuration.xml /usr/app/Configuration.xml
 COPY --from=build $HOME/docker-config/web.xml /usr/app/web.xml
 RUN mkdir -p $CORPUSDATA
-RUN git clone --depth 1 https://$GITHUB_PAT@github.com/zumult-org/exmaraldademocorpus.git
-WORKDIR exmaraldademocorpus
-RUN git lfs install && git lfs pull
-RUN git status
+# The demo corpus is NOT cloned into the image any more. Mount a clone of
+# zumult-org/exmaraldademocorpus (src/main/java/data) at /home/corpusdata.
+# Reasons: the image does not grow by ~5 GB of LFS media, a corpus update
+# is a git pull instead of a rebuild, and the bundled MTAS index under
+# data/indices comes along.
 
-#New 21-09-2026: Download and unpack Praat
+# Praat ends up in $PRAAT_PATH=/home, i.e. /home/praat, matching
+# <praat-path> in docker-config/Configuration.xml.
 WORKDIR $PRAAT_PATH
 RUN curl -Ls ${PRAAT_URL} -o praat.tar.gz && gunzip praat.tar.gz && tar xvf praat.tar && chmod +x praat && rm praat.tar
-
-
 WORKDIR $HOME
-#RUN mv exmaraldademocorpus/src/main/java/data/corpora/EXMARaLDA-DemoKorpus $CORPUSDATA/corpora
-RUN mv exmaraldademocorpus/src/main/java/data/* $CORPUSDATA
 
 
 EXPOSE 8080
@@ -80,3 +82,5 @@ RUN cp -f /usr/app/server.xml ${CATALINA_HOME}/conf/server.xml \
 
 HEALTHCHECK CMD curl --fail http://localhost:8080/zumultapi || exit 1
 
+ENTRYPOINT ["/usr/app/docker-entrypoint.sh"]
+CMD ["catalina.sh", "run"]

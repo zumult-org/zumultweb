@@ -46,5 +46,13 @@
 CONNECTOR='<Connector port="8081" protocol="HTTP/1.1" maxThreads="150" clientAuth="false" SSLEnabled="false" scheme="https" secure="true" proxyPort="443" />';
 sed -i -e "s@<Service name=\"Catalina\">@<Service name=\"Catalina\">$CONNECTOR@" ${CATALINA_HOME}/conf/server.xml
 
+# Behind a reverse proxy the hardcoded localhost URLs in Configuration.xml
+# must be rewritten, otherwise the client calls localhost.
+# e.g. PUBLIC_BASE_URL=https://zumult.awhamburg.de
+if [ -n "${PUBLIC_BASE_URL:-}" ]; then
+    sed -i -e "s@http://localhost:8080@${PUBLIC_BASE_URL}@g" "${ZUMULT_CONFIG_PATH}"
+    echo "[entrypoint] base URLs rewritten to ${PUBLIC_BASE_URL}"
+fi
+
 # run the command given in the Dockerfile at CMD 
 exec "$@"
