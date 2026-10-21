@@ -17,7 +17,7 @@
         </repository>
         <repository>
           <id>githubzumult</id>
-          <url>https://maven.pkg.github.com/zumult-org/*</url>
+          <url>https://maven.pkg.github.com/zumult-org/zumultapi</url>
           <snapshots>
             <enabled>true</enabled>
           </snapshots>
