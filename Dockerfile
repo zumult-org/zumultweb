@@ -11,7 +11,7 @@
 FROM maven:3.6.3-openjdk-17-slim AS build
 
 LABEL org.opencontainers.image.source=https://github.com/zumult-org/zumultweb
-LABEL org.opencontainers.image.authors="Anne Ferger"
+LABEL org.opencontainers.image.authors="Thomas Schmidt (linguisticbits.de)"
 
 ARG GITHUB_PAT
 ARG GITHUB_USERNAME
