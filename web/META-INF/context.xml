@@ -8,7 +8,7 @@
             name="jdbc/USER_DB" 
             removeAbandoned="true" removeAbandonedTimeout="300" testOnBorrow="true" testWhileIdle="true" timeBetweenEvictionRunsMillis="60000" 
             type="javax.sql.DataSource" 
-            url="jdbc:mariadb://jdbc:mariadb://${ZUMULT_DB_HOST}:3306/db_userdb" 
+            url="jdbc:mariadb://${ZUMULT_DB_HOST}:3306/db_userdb" 
             username="${ZUMULT_DB_USER}" 
             password="${ZUMULT_DB_PASSWORD}" 
             validationQuery="select 1"/>
