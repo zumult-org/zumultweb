@@ -13,7 +13,13 @@
             password="${ZUMULT_DB_PASSWORD}" 
             validationQuery="select 1"/>
   <!-- The user DB -->
-  <Realm className="org.apache.catalina.realm.DataSourceRealm" dataSourceName="jdbc/USER_DB" debug="99" localDataSource="true" roleNameCol="role" userCredCol="password" userNameCol="email" userRoleTable="db_userdb.t_roles" userTable="db_userdb.t_users">
+  <Realm className="org.apache.catalina.realm.DataSourceRealm" dataSourceName="jdbc/USER_DB" debug="99" 
+         localDataSource="true" 
+         roleNameCol="role" 
+         userCredCol="password" 
+         userNameCol="email" 
+         userRoleTable="db_userdb.t_roles" 
+         userTable="db_userdb.t_users">
     <!-- <CredentialHandler algorithm="md5" className="org.apache.catalina.realm.MessageDigestCredentialHandler"/> -->
   </Realm>
 </Context>
