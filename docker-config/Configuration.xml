@@ -22,7 +22,7 @@
         <!-- ***** WHAT FOLLOWS IS NOT SPECIFIC TO SERVER OR LOCAL MACHINES -->
         <!-- ************************************************************** -->
 
-        <search-index-speaker-based>TB_EXMARaLDA-DemoKorpus</search-index-speaker-based>
-        <corpus-ids-for-indexing>EXMARaLDA-DemoKorpus</corpus-ids-for-indexing>
+        <search-index-speaker-based>SB_expoko</search-index-speaker-based>
+        <corpus-ids-for-indexing>expoko</corpus-ids-for-indexing>
     </backend>
 </configuration> 
