@@ -113,6 +113,7 @@
         <script src="../js/zuRecht.collapsible.js" type="text/javascript"></script>
         <script src="../js/query.stringConverter.js" type="text/javascript"></script>
         <script src="../js/zuRecht.corpusCheckbox.js" type="text/javascript"></script>
+        <script src="../js/SaxonJS2.rt.js"></script>
         <script src="../js/xslTransformation.js" type="text/javascript"></script>
         <link rel="stylesheet" type="text/css" href="../css/query.css" />
         <link rel="stylesheet" type="text/css" href="../css/transcript.css" />
@@ -461,24 +462,36 @@
                 }
             }
             
-            function displayKWIC(selector, xml){
+            async function displayKWIC(selector, xml){
                 $('#query_intro').collapse('hide'); 
             
                 // $(selector).find(".openXML-KWICSearch-area").css("display", "block");
                 $(selector).find('.rowData-KWICSearch').text(xml);
-                
-                var data = new FormData();
-                data.append('speakerInitialsToolTip', '<%=myResources.getString("ShowSpeakerMetadata")%>');
-                data.append('transcriptIdToolTip', '<%=myResources.getString("ShowEventMetadata")%>');
-                data.append('zuMultToolTip', '<%=myResources.getString("ShowExcerptInZuMult")%>');
-                data.append('dgdToolTip', '<%=myResources.getString("ShowExcerptInDGD")%>');
 
-                var fragment = transform(xml, "zuRechtKwic2Html.xsl", data); // implemented in xslTransformation.js
-                $(selector).find('.myKWIC').html(fragment);
-                
-                $(selector).find(".kwic-tab").css("display", "block");
-                $(selector).find('.KWICSearch-result').css("display", "block");
+                const parameters = {
+                    speakerInitialsToolTip:
+                        '<%=myResources.getString("ShowSpeakerMetadata")%>',
+                    transcriptIdToolTip:
+                        '<%=myResources.getString("ShowEventMetadata")%>',
+                    zuMultToolTip:
+                        '<%=myResources.getString("ShowExcerptInZuMult")%>',
+                    dgdToolTip:
+                        '<%=myResources.getString("ShowExcerptInDGD")%>'
+                };
 
+                try {
+                    var fragment = await transformXmlToHtml(
+                    xml,
+                    "<%= request.getContextPath() %>/js/sef/zuRechtKwic2Html.sef.json",
+                    parameters
+                    ); // implemented in xslTransformation.js
+                    $(selector).find('.myKWIC').html(fragment);
+
+                    $(selector).find(".kwic-tab").css("display", "block");
+                    $(selector).find('.KWICSearch-result').css("display", "block");
+                } catch (error) {
+                    console.error("kwic transformation failed:", error);
+                }   
             }
                                   
             function addResultsHead(selector, query, queryStr, corpusQueryStr, longQuery, shortQuery){
