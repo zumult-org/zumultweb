@@ -1,0 +1,29 @@
+<%-- any content can be specified here e.g.: --%>
+<%@ page pageEncoding="UTF-8" %>
+<footer class="footer container mt-5 mb-4">
+    <hr class="mb-4">
+
+    <div class="d-flex flex-wrap align-items-center justify-content-center gap-4">
+
+        <img src="https://transcription-plus.awhamburg.de/img/ude-logo.svg"
+             title="University of Duisburg-Essen: Institute for Communication Studies"
+             alt="University of Duisburg-Essen"
+             class="footer-logo">
+
+        <img src="https://transcription-plus.awhamburg.de/img/adwhh_logo.png"
+             title="Academy of Sciences and Humanities in Hamburg"
+             alt="Academy of Sciences and Humanities in Hamburg"
+             class="footer-logo">
+
+        <img src="https://transcription-plus.awhamburg.de/img/uhh-logo.png"
+             title="University of Hamburg: Centre for Sustainable Research Data Management"
+             alt="University of Hamburg"
+             class="footer-logo">
+
+        <img src="https://transcription-plus.awhamburg.de/img/text-plus-logo.svg"
+             title="Text+ in NFDI"
+             alt="Text+"
+             class="footer-logo">
+
+    </div>
+</footer>

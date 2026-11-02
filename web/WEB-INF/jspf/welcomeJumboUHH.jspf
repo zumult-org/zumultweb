@@ -1,0 +1,57 @@
+<%-- any content can be specified here e.g.: --%>
+<%@ page pageEncoding="UTF-8" %>
+
+    <div class="bg-body-tertiary p-4 rounded-3">
+
+        <div class="d-flex align-items-start">
+            <img src="<%= Configuration.getWebAppBaseURL() %>/images/cropped-ZuMult.png"
+                 class="me-3"
+                 style="width:60px; flex-shrink:0;"
+                 alt="ZuMult Logo">
+
+            <div>
+                <p class="lead">
+                    <b>ZuMult</b>
+                    <%=myResources.getString("STARTIntro")%>:<br/>
+                    <a target="_blank" href="https://zumult.org">zumult.org</a>
+                    <span> • </span>
+                    <a target="_blank" href="https://zenodo.org/communities/zumult/">ZuMult@Zenodo</a>
+                    <span> • </span>
+                    <a target="_blank" href="https://github.com/zumult-org">ZuMult@GitHub</a>.
+                </p>
+
+                <p>
+                    <% switch (Objects.requireNonNullElse(request.getParameter("lang"), "en")) {
+                        case "fr": %>
+                            Cette instance de ZuMult a été mise en place dans le cadre du
+                            <a href="https://transcription-plus.awhamburg.de/index_fr.html" target="_blank">projet Transcription+</a>,
+                            en collaboration entre l’<a href="https://www.uni-due.de/kowi/mukom/forschung_en" target="_blank">Institut des sciences de la communication de l’UDE</a>
+                            et l’<a href="https://www.awhamburg.de/en/academy/portrait.html" target="_blank">Académie des sciences et des humanités de Hambourg</a>.
+                            Elle a été financée en tant que projet de coopération du
+                            <a href="https://text-plus.org/en/">consortium NFDI Text+</a>.
+                        <% break;
+
+                        case "de": %>
+                            Diese ZuMult-Instanz wurde im Rahmen des
+                            <a href="https://transcription-plus.awhamburg.de/index_de.html" target="_blank">Projekts Transcription+</a>
+                            eingerichtet, einer Kooperation zwischen dem
+                            <a href="https://www.uni-due.de/kowi/mukom/" target="_blank">Institut für Kommunikationswissenschaft der UDE</a>
+                            und der <a href="https://www.awhamburg.de/akademie/portrait.html" target="_blank">Akademie der Wissenschaften in Hamburg</a>.
+                            Das Projekt wurde als Kooperationsprojekt des
+                            <a href="https://text-plus.org/">NFDI-Konsortiums Text+</a> gefördert.
+                        <% break;
+
+                        default: %>
+                            This ZuMult instance was set up for the
+                            <a href="https://transcription-plus.awhamburg.de/" target="_blank">Transcription+ project</a>
+                            in a collaboration between the
+                            <a href="https://www.uni-due.de/kowi/mukom/forschung_en" target="_blank">Institute for Communication Studies at UDE</a>
+                            and the
+                            <a href="https://www.awhamburg.de/en/academy/portrait.html" target="_blank">Academy of Sciences and Humanities in Hamburg</a>,
+                            funded as a cooperation project of the
+                            <a href="https://text-plus.org/en/">NFDI consortium Text+</a>.
+                    <% } %>
+                </p>
+            </div>
+        </div>
+    </div>
