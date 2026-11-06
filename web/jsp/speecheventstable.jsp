@@ -74,15 +74,17 @@
                 word-wrap: break-word;
             }            
         </style>
-        <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="crossorigin="anonymous"></script>        
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-        
         <link rel="stylesheet" href="../css/overview.css"/>       
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/>
+        <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/> -->
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
-        
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>                
-        <script src="https://kit.fontawesome.com/ed5adda70b.js" crossorigin="anonymous"></script>
+
+
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="crossorigin="anonymous"></script>        
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <!-- <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script> -->               
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script type="text/javascript" src="https://kit.fontawesome.com/ed5adda70b.js" crossorigin="anonymous"></script>
         <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
         
         
@@ -144,12 +146,12 @@
                 } );
             } ); 
             
-            function openTranscript(transcriptID){
+            function openLineTranscript(transcriptID){
                 let url = "./zuViel.jsp?transcriptID=" + transcriptID;
                 window.open(url, '_blank');    
             }
             
-            function openZupass(transcriptID){
+            function openScoreTranscript(transcriptID){
                 let url = "./zuPass.jsp?transcriptID=" + transcriptID;
                 window.open(url, '_blank');    
             }
@@ -173,37 +175,35 @@
                             const audio = $('#' + randomID)[0];
                             // Check if the audio is ready to play
                             if (audio.readyState >= 2) { // 2 = HAVE_CURRENT_DATA
-                                //audio.currentTime = time; // Set the playback position
                                 audio.play(); // Start playing
                             } else {
                                 // If the audio is not ready, wait until it is loaded
                                 audio.addEventListener('canplay', function onCanPlay() {
-                                //audio.currentTime = time; // Set the playback position
                                 audio.play(); // Start playing
                                 audio.removeEventListener('canplay', onCanPlay); // Remove the event listener
                                 });
                             }  
                             element.onclick = function(){
-                                stopAudio(this, randomID);
+                                stopAudio(this, randomID, audioID);
                             };                                
                         }
                     }
                 );                        
-                
+
             }
-            
-            function stopAudio(parent, audioID){
-                const audio = $('#' + audioID)[0];
+
+            function stopAudio(parent, elementID, audioID){
+                const audio = $('#' + elementID)[0];
                 audio.pause();
                 let playHTML = "<i class=\"fa-solid fa-play\"></i>";
                 $(parent).html(playHTML);
                 parent.onclick = function(){
-                    playbackAudio(this);
+                    playAudio(audioID, this);
                 };                
             }
             
 
-            function openMetadata(speechEventID){
+            function openSpeechEventMetadata(speechEventID){
                 $.post(
                     BASE_URL + "/ZumultDataServlet",
                     { 
@@ -234,6 +234,52 @@
                     }
                 );                                                    
             }
+            
+            function playVideo(videoID){
+                $.post(
+                    BASE_URL + "/ZumultDataServlet",
+                    { 
+                        command: 'getVideo',
+                        videoID: videoID
+                    },
+                    function( data ) {
+                        let time = 0.0;
+                        let videoURL = $(data).find("video").first().text();
+                        if (videoURL.length === 0){
+                            alert('No video found with ID ' + videoID);                            
+                        } else {
+                            insertVideoPlayer(videoURL, Math.max(0.0, time - 1.0));
+                        }
+                    }
+                );                    
+
+            }
+
+            function insertVideoPlayer(videoURL, time){
+                let videoHTML = "<video id=\"modal-video\" controls=\"controls\" type=\"video/mp4\" src=\"" + videoURL +  "\"></video>";
+                $('#video-div').html(videoHTML);                
+                const video = $('#modal-video')[0];
+                // Check if the video is ready to play
+                if (video.readyState >= 2) { // 2 = HAVE_CURRENT_DATA
+                    video.currentTime = time; // Set the playback position
+                    video.play(); // Start playing
+                } else {
+                    // If the audio is not ready, wait until it is loaded
+                    video.addEventListener('canplay', function onCanPlay() {
+                        video.currentTime = time; // Set the playback position
+                        video.play(); // Start playing
+                        video.removeEventListener('canplay', onCanPlay); // Remove the event listener
+                    });
+                }  
+                $('#videoModal').modal("toggle");
+            }
+
+            function stopVideo(){
+                const video = $('#modal-video')[0];
+                video.pause();
+                video.remove();
+            }
+            
             
             
         </script>
@@ -269,5 +315,16 @@
             </div>
         </div>
         <%@include file="../WEB-INF/jspf/metadataModal.jspf" %>        
+        <%@include file="../WEB-INF/jspf/videoModal.jspf" %>
+        
+        <script>
+            $(document).ready(function () {
+                document.getElementById('videoModal').addEventListener('hidden.bs.modal', function () {
+                    // Stop video playback
+                    stopVideo();
+                });                
+            });
+        </script>
+        
     </body>
 </html>

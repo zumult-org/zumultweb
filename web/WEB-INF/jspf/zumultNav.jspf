@@ -29,9 +29,9 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- ******************************************* -->
-                <!-- * Page name linked to the ZuMult homepage * -->
+                <!-- * Page name linked to the start page * -->
                 <!-- ******************************************* -->
-                <a class="navbar-brand" href="http://www.zumult.org"><b style="color:white;"><%= pageName %></b></a>
+                <a class="navbar-brand" href="${pageContext.request.contextPath}/index.jsp"><b style="color:white;"><%= pageName %></b></a>
                 <!-- ******************************************* -->
                 <!-- * Title of this particular page           * -->
                 <!-- ******************************************* -->

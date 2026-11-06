@@ -1,25 +1,19 @@
-<%-- 
-    Document   : transcript2
-    Created on : 29.12.2019, 16:42:36
-    Author     : thomas.schmidt
---%>
-
 <%@page import="java.util.Objects"%>
 <%@page import="java.util.Locale"%>
 <%@page import="java.util.ResourceBundle"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.TreeMap"%>
-<%@page import="org.zumult.objects.TokenList"%>
 <%@page import="java.io.File"%>
+<%@page import="org.zumult.backend.BackendInterface"%>
+<%@page import="org.zumult.backend.BackendInterfaceFactory"%>
 <%@page import="org.zumult.backend.Configuration"%>
-<%@page import="org.zumult.io.FileIO"%>
+<%@page import="org.zumult.objects.TokenList"%>
 <%@page import="org.zumult.objects.ObjectTypesEnum"%>
 <%@page import="org.zumult.objects.IDList"%>
+<%@page import="org.zumult.objects.Transcript"%>
+<%@page import="org.zumult.io.FileIO"%>
 <%@page import="org.zumult.io.Constants"%>
 <%@page import="org.zumult.io.IOHelper"%>
-<%@page import="org.zumult.objects.Transcript"%>
-<%@page import="org.zumult.backend.BackendInterfaceFactory"%>
-<%@page import="org.zumult.backend.BackendInterface"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page errorPage="errorPage.jsp" %>
 <!DOCTYPE html>
@@ -57,8 +51,6 @@
 -->
 
 <% 
-    
-    
     BackendInterface backend = BackendInterfaceFactory.newBackendInterface(); 
     
     // get parameters
@@ -222,16 +214,11 @@
         {"END_ANNOTATION_BLOCK_ID", endAnnotationBlockID},
         {"AROUND_ANNOTATION_BLOCK_ID", aroundAnnotationBlockID},
         {"HOW_MUCH_AROUND", howMuchAround},
-        //{"HIGHLIGHT_IDS", highlightIDsForCurrentTranscript},
         {"HIGHLIGHT_IDS_1", highlightIDsArray[0]},
         {"HIGHLIGHT_IDS_2", highlightIDsArray[1]}, 
-        //{"EXTRA_HIGHLIGHT_IDS", extraHighlightIDsForCurrentTranscript}, 
-        //{"TOKEN_LIST_URL", pathToWordList}
         {"SPEAKER_SELECTION", speakerSelection}         
     };
     
-    //String transcriptHTML = new IOHelper().applyInternalStylesheetToString(Constants.ISOTEI2HTML_STYLESHEET2, transcript.toXML(), transcriptParameters); 
-    //String transcriptSVG = new IOHelper().applyInternalStylesheetToString("/org/zumult/io/isotei2score_svg.xsl", transcript.toXML(), transcriptParameters);  
     
     String[][] largeSVGParameters = {
         {"START_ANNOTATION_BLOCK_ID", startAnnotationBlockID}, 
@@ -244,8 +231,6 @@
         {"TOKEN_LIST_URL", pathToWordList},
         {"TOKEN_LIST_ARRAY", tokenList}        
     };
-    //String wordListHTML = new IOHelper().applyInternalStylesheetToString("/org/zumult/io/tokenlist2html_table.xsl", lemmaList4Transcript.toXML(), wordlistParameters); 
-    //String posListHTML = new IOHelper().applyInternalStylesheetToString("/org/zumult/io/tokenlist2html_table.xsl", posList4Transcript.toXML()); 
 
     //http://zumult.ids-mannheim.de/ProtoZumult/ZumultDataServlet?command=getVTT&transcriptID=FOLK_E_00069_SE_01_T_01
     String vttURL = Configuration.getWebAppBaseURL() + "/ZumultDataServlet?command=getVTT&transcriptID=" + transcriptID;
@@ -286,9 +271,7 @@
         <script src="../js/download.js"></script>
         <script src="../js/collections.js"></script>
 
-        <!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>  -->              
-        
+       
         <script>
             // probably all variables from the URL should be mirrored in this way
             var speechEventID = '<%= speechEventID %>';
@@ -464,7 +447,7 @@
             
         </div>
     </div>
-        </div>
+</div>
 
         <!-- ************************************** -->
         <!-- ************************************** -->

@@ -1,7 +1,7 @@
 <%-- any content can be specified here e.g.: --%>
 <%@ page pageEncoding="UTF-8" %>
 
-    <div class="bg-body-tertiary p-4 rounded-3">
+    <div class="bg-body-tertiary px-5 py-4 mx-5 rounded-3">
 
         <div class="d-flex align-items-start">
             <img src="<%= Configuration.getWebAppBaseURL() %>/images/cropped-ZuMult.png"

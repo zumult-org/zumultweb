@@ -22,7 +22,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">        
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
         
         <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="crossorigin="anonymous"></script>        
         <script src="https://kit.fontawesome.com/ed5adda70b.js" crossorigin="anonymous"></script>
@@ -86,7 +86,7 @@
         <% String pageName = "ZuMult"; %>
         <%@include file="../WEB-INF/jspf/zumultNav.jspf" %>   
         
-        <div class="container">
+        <div class="container-fluid px-5">
             <%@include file="../WEB-INF/jspf/welcomeJumboUHH.jspf" %>   
 
             <div class="container-fluid py-4">
@@ -113,7 +113,9 @@
                             }     
                             String corpusDesc = corpus.getDescription(pageParam_lang);
                         %>    
-                        <div class="card border border-primary flex-shrink-0 p-3" style="width: 300px;">
+                        <div class="card corpus-card flex-shrink-0 p-3"
+                             data-corpus-id="<%= cID %>"
+                             style="width: 300px; cursor: pointer;">
                             <img src="<%= corpusImgSrc %>" class="card-img-top" alt="Corpus image">
                             <div class="card-body">
                                 <h5 class="card-title"><%= corpusName %></h5>
@@ -147,33 +149,60 @@
 
                         <!-- ZuGang -->
                         <div class="card" style="width: 500px;">
-                            <div class="card-body">
+                            <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">ZuGang</h5>
-                                <img src="./images/start-speechevents.png" class="card-img-top start" alt="ZuGang screenshot" 
+                                <img src="./images/start-speechevents.png" class="card-img-top start my-3" alt="ZuGang screenshot" 
                                      style="width:450px; border: 2px solid gray; border-radius: 5px;">
                                 
                                 <p class="card-text">
                                       <%=myResources.getString("STARTOverviewTables")%>
                                 </p>
-                                <a href="jsp/zuGang.jsp?corpusID=<%= randomCorpusID %>"" class="btn btn-primary">Open ZuGang</a>
+                                <a id="zugang-link" href="jsp/zuGang.jsp?corpusID=<%= randomCorpusID %>" 
+                                   class="btn btn-primary mt-auto">Open ZuGang</a>
                             </div>
                         </div>
 
                         <!-- ZuRecht -->
                         <div class="card" style="width: 500px;">
-                            <div class="card-body">
+                            <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">ZuRecht</h5>
-                                <img src="./images/query.png" class="card-img-top start" alt="ZuRecht screenshot" 
+                                <img src="./images/query.png" class="card-img-top start my-3" alt="ZuRecht screenshot" 
                                      style="width:450px; border: 2px solid gray; border-radius: 5px;">
                                 
                                 <p class="card-text">
                                     <%=myResources.getString("STARTZurecht1")%> <b>CQP</b>. 
                                     <%=myResources.getString("STARTZurecht2")%>                                    
                                 </p>
-                                <a href="jsp/zuRecht.jsp" class="btn btn-primary">Open ZuRecht</a>
+                                <a id="zurecht-link" href="jsp/zuRecht.jsp?corpusID=<%= randomCorpusID %>" 
+                                   class="btn btn-primary mt-auto">Open ZuRecht</a>
                             </div>
                         </div>
 
+                        <!-- ZuViel -->
+                        <div class="card" style="width: 500px;">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">ZuViel</h5>
+                                <img src="./images/transcript2.png" class="card-img-top start my-3" alt="ZuViel screenshot" 
+                                     style="width:450px; border: 2px solid gray; border-radius: 5px;">
+                                
+                                <p class="card-text">
+                                    <%=myResources.getString("STARTZuviel")%>
+                                </p>
+                                <div class="d-flex align-items-center gap-2 mt-auto">
+                                    <a id="zuviel-link"
+                                       href="jsp/zuViel.jsp"
+                                       class="btn btn-primary">
+                                        Open ZuViel
+                                    </a>
+                                    <select id="zuviel-transcript-select"
+                                            class="form-select w-auto">
+                                        <option value="">Select corpus for list of transcripts</option>
+                                    </select>
+                                </div>                                
+                            </div>
+                        </div>
+
+                            
                         <!-- More application cards -->
 
                     </div>
@@ -185,7 +214,73 @@
 
         </div>
         
-        
+        <script>
+                const transcriptsByCorpus = {
+                    <%
+                        for (int c = 0; c < allCorpusIDs.size(); c++) {
+                            String cID = allCorpusIDs.get(c);
+                            IDList ids = bi.getTranscripts4Corpus(cID);
+                    %>
+                    "<%= cID %>": [
+                        <%
+                            for (int t = 0; t < ids.size(); t++) {
+                        %>
+                        "<%= ids.get(t) %>"<%= t < ids.size() - 1 ? "," : "" %>
+                        <% } %>
+                    ]<%= c < allCorpusIDs.size() - 1 ? "," : "" %>
+                    <% } %>
+                };
+    
+                document.querySelectorAll('.corpus-card').forEach(card => {
+                card.addEventListener('click', function(event) {
+
+                    // Don't interfere with the "Read more" link
+                    if (event.target.closest('a')) return;
+
+                    // Remove previous selection
+                    document.querySelectorAll('.corpus-card').forEach(c => {
+                        c.classList.remove('selected');
+                    });
+
+                    // Select clicked corpus
+                    this.classList.add('selected');
+
+                    const corpusID = this.dataset.corpusId;
+                    console.log("Selected corpus:", corpusID);
+                    
+                    // adjust the corpus ID parameter for ZuGang;
+                    const zugangLink = document.getElementById('zugang-link');
+                    if (zugangLink) {
+                        const url = new URL(zugangLink.href);
+                        url.searchParams.set('corpusID', corpusID);
+                        zugangLink.href = url.toString();
+                    }  
+                    
+                    const select = document.getElementById('zuviel-transcript-select');
+                    select.replaceChildren();
+                    for (const transcriptID of transcriptsByCorpus[corpusID] || []) {
+                        select.add(new Option(transcriptID, transcriptID));
+                    }                    
+                    updateZuVielLink();
+                    
+                });
+            });
+            
+            // Select the first corpus automatically
+            document.querySelector('.corpus-card')?.click();  
+            
+            
+            function updateZuVielLink() {
+                const select = document.getElementById('zuviel-transcript-select');
+                const link = document.getElementById('zuviel-link');
+
+                const url = new URL(link.href);
+                url.searchParams.set('transcriptID', select.value);
+                link.href = url.toString();
+            }
+
+            document.getElementById('zuviel-transcript-select').addEventListener('change', updateZuVielLink);            
+        </script>        
         
     </body>
 </html>

@@ -364,6 +364,7 @@
                     form: selectedForm,
                     showNormDev : showNormDev,
                     visSpeechRate : visSpeechRate,
+                    
                     highlightIDs1 : highlightIDs1,
                     highlightIDs2 : highlightIDs2,
                     highlightIDs3 : highlightIDs3,
