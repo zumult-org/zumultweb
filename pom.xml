@@ -67,7 +67,13 @@
             <groupId>org.zumult</groupId>
             <artifactId>zumultapi</artifactId>
             <version>0.1.29</version>
-        </dependency>             
+        </dependency> 
+        <!-- this is for taglibs -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>                    
     </dependencies>
     <reporting>
         <plugins> 
