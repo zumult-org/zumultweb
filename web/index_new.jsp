@@ -47,6 +47,38 @@
                 max-width: 160px;
                 object-fit: contain;
             }            
+            
+            .overview-section {
+                display: flex;
+                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .overview-section-title {
+                flex: 0 0 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-right: 1px solid rgba(66, 88, 59, .35);
+            }
+
+            .overview-section-title h2 {
+                writing-mode: vertical-rl;
+                transform: rotate(180deg);
+                margin: 0;
+                font-size: 1.15rem;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: .14em;
+                color: #42583b;
+                white-space: nowrap;
+            }
+
+            .overview-section-content {
+                flex: 1;
+                min-width: 0;
+            }            
+            
         </style>
         
         <link rel="stylesheet" href="css/overview.css"/>       
@@ -92,9 +124,10 @@
             <div class="container-fluid py-4">
 
                 <!-- CORPORA -->
-                <section class="mb-5">
-                    <h2>Corpora</h2>
-
+                <section class="overview-section mb-5">
+                    <div class="overview-section-title">
+                        <h2>Corpora</h2>
+                    </div>
                     <div class="d-flex flex-nowrap gap-3 overflow-auto pb-3">
 
                         <% 
@@ -116,9 +149,9 @@
                         <div class="card corpus-card flex-shrink-0 p-3"
                              data-corpus-id="<%= cID %>"
                              style="width: 300px; cursor: pointer;">
-                            <img src="<%= corpusImgSrc %>" class="card-img-top" alt="Corpus image">
+                            <img src="<%= corpusImgSrc %>" class="card-img-top d-block mx-auto" alt="Corpus image" style="width:200px;">
                             <div class="card-body">
-                                <h5 class="card-title"><%= corpusName %></h5>
+                                <h5 class="card-title fs-5"><%= corpusName %></h5>
                             </div>
                             <div class="collapse" id="fullCorpusDescription_<%= cID %>">
                                 <p class="card-text">
@@ -141,21 +174,26 @@
                     </div>
                 </section>
 
-                <!-- APPLICATIONS -->
-                <section>
-                    <h2>Applications</h2>
+                <!-- MAIN APPLICATIONS -->
+                <section class="overview-section mb-3">
+                    <div class="overview-section-title">
+                        <h2>Main Applications</h2>
+                    </div>                    
 
                     <div class="d-flex flex-wrap gap-3">
 
                         <!-- ZuGang -->
                         <div class="card" style="width: 500px;">
                             <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">ZuGang</h5>
-                                <img src="./images/start-speechevents.png" class="card-img-top start my-3" alt="ZuGang screenshot" 
-                                     style="width:450px; border: 2px solid gray; border-radius: 5px;">
+                                <h5 class="card-title" title="Zugang zur Gesamtheit aller notwendigen Grundinformationen"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> ZuGang <span class="text-muted">- Corpora</span></h5>
+                                
+                                <a id="zugang-link-img" href="jsp/zuGang.jsp?corpusID=<%= randomCorpusID %>"> 
+                                    <img src="./images/start-zugang.png" class="card-img-top start my-3" alt="ZuGang screenshot" 
+                                         style="width:450px; border: 2px solid gray; border-radius: 5px;"/>
+                                </a>
                                 
                                 <p class="card-text">
-                                      <%=myResources.getString("STARTOverviewTables")%>
+                                      <%=myResources.getString("Start-ZuGang")%>
                                 </p>
                                 <a id="zugang-link" href="jsp/zuGang.jsp?corpusID=<%= randomCorpusID %>" 
                                    class="btn btn-primary mt-auto">Open ZuGang</a>
@@ -165,9 +203,11 @@
                         <!-- ZuRecht -->
                         <div class="card" style="width: 500px;">
                             <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">ZuRecht</h5>
-                                <img src="./images/query.png" class="card-img-top start my-3" alt="ZuRecht screenshot" 
-                                     style="width:450px; border: 2px solid gray; border-radius: 5px;">
+                                <h5 class="card-title" title="Zugang zu Recherche in Transkripten"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> ZuRecht <span class="text-muted">- Query</span></h5>
+                                <a id="zurecht-link-img" href="jsp/zuRecht.jsp?corpusID=<%= randomCorpusID %>"> 
+                                    <img src="./images/start-zurecht.png" class="card-img-top start my-3" alt="ZuRecht screenshot" 
+                                         style="width:450px; border: 2px solid gray; border-radius: 5px;"/>
+                                </a>
                                 
                                 <p class="card-text">
                                     <%=myResources.getString("STARTZurecht1")%> <b>CQP</b>. 
@@ -181,9 +221,11 @@
                         <!-- ZuViel -->
                         <div class="card" style="width: 500px;">
                             <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">ZuViel</h5>
-                                <img src="./images/transcript2.png" class="card-img-top start my-3" alt="ZuViel screenshot" 
-                                     style="width:450px; border: 2px solid gray; border-radius: 5px;">
+                                <h5 class="card-title" title="Zugang zu Visualisierungselementen für Transkripte"><i class="fa-solid fa-align-left" aria-hidden="true"></i> ZuViel <span class="text-muted">- Transcripts</span></h5>
+                                <a id="zuviel-link-img" href="jsp/zuViel.jsp"> 
+                                    <img src="./images/start-zuviel.png" class="card-img-top start my-3" alt="ZuViel screenshot" 
+                                         style="width:450px; border: 2px solid gray; border-radius: 5px;"/>
+                                </a>
                                 
                                 <p class="card-text">
                                     <%=myResources.getString("STARTZuviel")%>
@@ -202,12 +244,35 @@
                             </div>
                         </div>
 
-                            
-                        <!-- More application cards -->
-
                     </div>
                 </section>
+                                
+                <!-- SPECIAL APPLICATIONS -->
+                <section class="overview-section">
+                    <div class="overview-section-title">
+                        <h2>Special Applications</h2>
+                    </div>          
+                    
+                    <!-- ZuHauf -->
+                    <div class="card" style="width: 300px;">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title" title="Zugang zum Herunterladen aller unterstützten Formate"><i class="fa-solid fa-download" aria-hidden="true"></i> ZuHauf <span class="text-muted">- Downloads</span></h5>
 
+                            <a id="zuhauf-link-img" href="jsp/zuHauf.jsp?corpusID=<%= randomCorpusID %>"> 
+                                <img src="./images/start-zuhauf.png" class="card-img-top start my-3" alt="ZuHauf screenshot" 
+                                     style="width:250px; border: 2px solid gray; border-radius: 5px;"/>
+                            </a>
+
+                            <p class="card-text">
+                                  <%=myResources.getString("Start-ZuHauf")%>
+                            </p>
+                            <a id="zuhauf-link" href="jsp/zuHauf.jsp?corpusID=<%= randomCorpusID %>" 
+                               class="btn btn-primary mt-auto">Open ZuHauf</a>
+                        </div>
+                    </div>
+                    
+                                
+                </section>
             </div>
 
             <%@include file="../WEB-INF/jspf/footerUHH.jspf" %>   
@@ -250,12 +315,40 @@
                     
                     // adjust the corpus ID parameter for ZuGang;
                     const zugangLink = document.getElementById('zugang-link');
+                    const zugangLinkImg = document.getElementById('zugang-link-img');
                     if (zugangLink) {
                         const url = new URL(zugangLink.href);
                         url.searchParams.set('corpusID', corpusID);
                         zugangLink.href = url.toString();
+                        if (zugangLinkImg) {
+                            zugangLinkImg.href = url.toString();
+                        }  
+                    }  
+                    // adjust the corpus ID parameter for ZuRecht;
+                    const zurechtLink = document.getElementById('zurecht-link');
+                    const zurechtLinkImg = document.getElementById('zurecht-link-img');
+                    if (zurechtLink) {
+                        const url = new URL(zurechtLink.href);
+                        url.searchParams.set('corpusID', corpusID);
+                        zurechtLink.href = url.toString();
+                        if (zurechtLinkImg) {
+                            zurechtLinkImg.href = url.toString();                        
+                        }
                     }  
                     
+                    // adjust the corpus ID parameter for ZuHauf;
+                    const zuhaufLink = document.getElementById('zuhauf-link');
+                    const zuhaufLinkImg = document.getElementById('zuhauf-link-img');
+                    if (zurechtLink) {
+                        const url = new URL(zuhaufLink.href);
+                        url.searchParams.set('corpusID', corpusID);
+                        zuhaufLink.href = url.toString();
+                        if (zuhaufLinkImg) {
+                            zuhaufLinkImg.href = url.toString();                        
+                        }
+                    }  
+
+                    // adjust the dropdown to the selected corpus
                     const select = document.getElementById('zuviel-transcript-select');
                     select.replaceChildren();
                     for (const transcriptID of transcriptsByCorpus[corpusID] || []) {
@@ -273,10 +366,12 @@
             function updateZuVielLink() {
                 const select = document.getElementById('zuviel-transcript-select');
                 const link = document.getElementById('zuviel-link');
+                const link2 = document.getElementById('zuviel-link-img');
 
                 const url = new URL(link.href);
                 url.searchParams.set('transcriptID', select.value);
                 link.href = url.toString();
+                link2.href = url.toString();
             }
 
             document.getElementById('zuviel-transcript-select').addEventListener('change', updateZuVielLink);            
