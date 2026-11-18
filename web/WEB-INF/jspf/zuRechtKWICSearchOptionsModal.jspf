@@ -1,12 +1,20 @@
-<div class="modal" id="modal-searchTabOptions" role="dialog" data-keyboard="false" data-backdrop="static">
+<div class="modal"
+     id="modal-searchTabOptions"
+     tabindex="-1"
+     aria-labelledby="searchOptionsModalTitle"
+     aria-hidden="true"
+     data-bs-keyboard="false"
+     data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title"><%=myResources.getString("SearchOptions")%></h2>                     
+                <h2 class="modal-title" id="searchOptionsModalTitle">
+                    <%=myResources.getString("SearchOptions")%>
+                </h2>
             </div>
-            <div class="modal-body">    
+            <div class="modal-body">
                 <%@include file="zuRechtPageLengthOptions.jspf" %>
-                <%@include file="zuRechtContextOptions.jspf" %> 
+                <%@include file="zuRechtContextOptions.jspf" %>
                 <%@include file="zuRechtSimpleSearchOptions.jspf" %>
             </div>
             <%@include file="zuRechtStandardModalFooter.jspf" %>

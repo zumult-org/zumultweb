@@ -132,53 +132,57 @@
     }
     
     
-    var lastFormSearched = '';
-    var countSearch = 0;
 
-    function findForms(type, form){
-        var searchRegex = new RegExp("\\b" + form + "\\b");
-        //
-        //alert(type + " / " + form);        
-        //
-        // very annoying -- distinguish here between dom and jquery elements
-        if (form!==lastFormSearched){
-            //$("span[data-" + type + "='" + lastFormSearched + "']").removeClass("highlight-search");            
-            var lastSearchRegex = new RegExp("\\b" + lastFormSearched + "\\b");
-            // issue #66 allow regex
-            $("span").filter(function() { return ($(this).data(type)!==null && typeof $(this).data(type) === 'string' && $(this).data(type).match(lastSearchRegex)); }).removeClass("highlight-search");
-            
-            countSearch=0;
-        } else {
-            countSearch++;
-            //if (countSearch >= $("span[data-" + type + "='" + form + "']").length){
-            // issue #66 allow regex
-            if (countSearch >= $("span").filter(function() { return ($(this).data(type)!==null && typeof $(this).data(type) === 'string' && $(this).data(type).match(searchRegex)); }).length){
-                countSearch = 0;
-            }
+    let lastSearchExpression = null;
+    let countSearch = 0;
+
+    function findForms(type, form) {
+        const searchRegex = new RegExp("\\b" + form + "\\b");
+        const expression = type + "=" + form;
+
+        // Find all matching elements
+        const $matches = $("span").filter(function() {
+            const value = $(this).data(type);
+            return typeof value === "string" && searchRegex.test(value);
+        });
+
+        if ($matches.length === 0) {
+            return;
         }
-        //$("span[data-" + type + "='" + form + "']").fadeIn(500);
-        //$("span[data-" + type + "='" + form + "']").addClass("highlight2");
-        
-        // issue #66 allow regex
-        $("span").filter(function() {return ($(this).data(type)!==null && typeof $(this).data(type) === 'string' && $(this).data(type).match(searchRegex)); }).fadeIn(500);
-        $("span").filter(function() {return ($(this).data(type)!==null && typeof $(this).data(type) === 'string' && $(this).data(type).match(searchRegex)); }).addClass("highlight2");
-        
-        //var currentForm = $("span[data-" + type + "='" + form + "']")[countSearch];
-        var currentForm = $("span").filter(function() {return ($(this).data(type)!==null && typeof $(this).data(type) === 'string' && $(this).data(type).match(searchRegex)); })[countSearch];
-        currentForm.scrollIntoView(true);
-        
-        // make it briefly flash, the more things flash, the better the science
-        var orig = currentForm.style.background;
-        currentForm.style.background = '#42f545';
-        setTimeout(function(){
-                currentForm.style.background = orig;
-        }, 500);        
-        
-        
-        window.scrollBy(0, -70);
-        lastFormSearched = form;        
-    }
+
+        // Determine the index of the current match
+        if (expression !== lastSearchExpression) {
+            countSearch = 0;
+
+            // Highlight all matches using the currently selected color
+            $matches
+                .fadeIn(500)
+                .addClass("highlight2")
+                .css("--search-highlight-color", getHighlightColor());
+        } else {
+            countSearch = (countSearch + 1) % $matches.length;
+        }
+
+        // Navigate to the current match
+        const currentForm = $matches[countSearch];
+
+        // currentForm.scrollIntoView(true);
+        // window.scrollBy(0, -30);
+        currentForm.scrollIntoView({
+            block: 'center',
+            inline: 'nearest'
+        });
+
+        // Make the current match flash briefly
+        $(currentForm)
+            .stop(true, true)
+            .fadeTo(200, 0.3)
+            .delay(300)
+            .fadeTo(600, 1);
     
+        lastSearchExpression = expression;
+    }    
+ 
     function clearSearch(){
         $('.highlight2').removeClass('highlight2');
     }
@@ -188,8 +192,15 @@
         //$("span[data-" + type + "='" + form + "']").addClass("highlight2");
         // issue #66 allow regex
         var searchRegex = new RegExp("\\b" + form + "\\b");
-        $("span").filter(function() { return ($(this).data(type) && $(this).data(type).match(searchRegex)); }).addClass("highlight2");
+        $("span").filter(function() { 
+            return ($(this).data(type) && $(this).data(type).match(searchRegex)); 
+        }).addClass("highlight2")
+        .css("--search-highlight-color", getHighlightColor());
     }
+    
+    function getHighlightColor() {
+        return HIGHLIGHT_COLORS[highlightColorIndex];
+    }    
 
     function searchFromBox(){
         var searchTerm = $("#searchBox").val();
