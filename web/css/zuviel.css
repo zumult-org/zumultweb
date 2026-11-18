@@ -1,0 +1,456 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 29.12.2019, 18:47:00
+    Author     : thomas.schmidt
+*/
+
+    body#zuviel-body { 
+        /*padding-top: 140px; 
+        padding-bottom: 100px;*/
+    }
+    
+    /*********************************************/
+    /*********************************************/
+    /*********************************************/
+    /*********************************************/   
+    
+    
+    table.transcript {
+        /*font-family: Consolas, Courier New, mono-spaced;*/
+        width: 100%;
+    }
+
+    table.transcript tr {
+        display: flex;
+        align-items: stretch;        
+    }
+
+    table.transcript tr.selectionStart {
+        border-top: thick solid gray;
+        border-left: thick solid gray;
+        border-right: thick solid gray;
+    }
+    
+    table.transcript tr.selectionEnd {
+        border-bottom: thick solid gray;
+        border-left: thick solid gray;
+        border-right: thick solid gray;
+    }
+
+    table.transcript td {
+        vertical-align: top;
+    }
+    
+    table.transcript td.speaker {
+        font-weight: bold;
+    }
+    
+    table.transcript td.tablerow_cursor {
+        font-size:0.5pt;
+        width: 1px;
+        max-width: 1px;
+    }
+    
+    table.transcript td.cont {
+        color: rgb(200,200,200);
+    }
+    
+    table.transcript .pause, .desc {
+        color: rgb(100,100,100);
+    }
+    
+    table.transcript td.transcript-text {
+        flex : 1;
+    }
+    
+    table.transcript td.td-dropdown {
+        /*max-height: 10px;*/
+    }
+    
+    /* this is the color for the annotation block */
+    table.transcript td.highlight-playback {
+        background-color: #00008b;
+    }
+
+    table.transcript span.normdev {
+        text-decoration:underline;
+        text-decoration-style: dotted;
+    }
+    
+    table.transcript span.translation {
+        color: gray;
+        font-size: 10pt;
+    }
+    
+    /* this one for distinguishing speakers */
+    .color-1{color : navy !important; fill: navy; stroke: navy;}
+    .color-2{color : maroon !important; fill: maroon; stroke: maroon;}
+    .color-3{color : green !important; fill: green; stroke: green;}
+    .color-4{color : teal !important; fill: teal; stroke: teal;}
+    .color-5{color : purple !important; fill: purple; stroke: purple;}
+    .color-6{color : orange !important; fill: orange; stroke: orange;}
+    .color-7{color : olive !important; fill: olive; stroke: olive;}
+    
+    
+    /* the following ones for different types of highlighting */
+    /* span.highlight { */
+    span.highlight1 {        
+        background-color : #fdffe2;
+    }
+    
+    /* span.highlight-search { */
+    /*span.highlight2 {
+        border: 3px solid red; 
+    } */
+    
+    span.highlight2 {
+        outline: 3px solid var(--search-highlight-color, red);
+        border-radius: 3px;
+        scroll-margin-top: 85px;
+    }
+
+    /* span.highlight-search-extra {*/
+    span.highlight3 {
+        border-bottom: 1px solid red; /* a red line underneath it */
+    }
+    
+    /* span.highlight-search-extra {*/
+    span.highlight4 {
+        border-bottom: 1px solid green; /* a green line underneath it */
+    }
+        
+    /* this is the color for tokens */
+    span.highlight-playback {
+        background-color: #ccffff;
+    }
+
+    /*********************************************/
+    /*********************************************/
+    /*********************************************/
+    /*********************************************/   
+    
+    table.table-partitur {
+        border-collapse : collapse;
+    }
+    table.table-partitur td {
+        white-space:nowrap;
+        border: 1px solid rgb(200,200,200);;
+    }
+    table.table-partitur td.empty {
+        background: rgb(230,230,230);
+        border: none;
+    }
+
+    table.table-partitur td.t {
+       font-size: 14pt;
+       font-weight: bold;
+    }
+
+    table.table-partitur td.d {
+        font-size: 10pt;
+    }
+
+    table.table-partitur td.a {
+        font-size: 10pt;
+        background-color: rgb(220,220,220);
+    }
+
+    table.table-partitur span.pause {
+        color: gray;
+        font-weight: normal;
+    }
+
+    /* use 5 different hässliche background colors for events in d-tiers */
+    table.table-partitur td.d-1 {
+        background : rgb(204,255,204);        
+    }
+    table.table-partitur td.d-2 {
+        background : rgb(177,233,244);    
+    }
+    table.table-partitur td.d-3 {
+        background : rgb(255, 255, 204);    
+    }
+    table.table-partitur td.d-4 {
+        background : rgb(230, 242, 255);    
+    }
+    table.table-partitur td.d-5 {
+        background : rgb(255, 230, 255);    
+    }
+
+    /* use 5 different hässliche font colors for events in a-tiers */
+    table.table-partitur td.a-1 {
+        color : rgb(0, 51, 204);      
+    }
+    table.table-partitur td.a-2 {
+        color : rgb(0, 102, 0);    
+    }
+    table.table-partitur td.a-3 {
+        color : rgb(128, 0, 0);    
+    }
+    table.table-partitur td.a-4 {
+        color : rgb(200, 100, 100);    
+    }
+    table.table-partitur td.a-5 {
+        color : rgb(102, 0, 102);    
+    }
+
+    
+    table.table-partitur td.label {
+        position: sticky;
+        left: 0; 
+        z-index: 1;
+        background-color: white;
+        padding: 3px;
+    }
+
+    table.table-partitur th.tli {
+        position: sticky;
+        top: 0; 
+        z-index: 2;
+        font-size:8pt;
+        color: rgb(200,200,200);
+        background-color: white;
+        overflow: hidden;
+        text-overflow: ellipsis;    
+        max-width:20px; 
+    }
+
+    table.table-partitur th.absolute {
+        position: sticky;
+        top: 16px; 
+        z-index: 3;
+    }
+    
+    
+    
+    table.table-partitur td.highlight-playback{
+        border: 2px solid gray; 
+        /*color: red;*/
+        background-color: #FFF7C8;
+    }      
+    
+    /*********************************************/
+    /*********************************************/
+    /*********************************************/
+    /*********************************************/   
+    
+    
+
+    .svg-wrapper {
+            position: relative;
+            display: inline-block;
+    }
+
+
+    .svg-wrapper:hover .magnify-svg {
+            display: block;
+    }
+
+    .magnify-svg {
+            padding-top: 7px;	
+            padding-right: 7px;
+            position: absolute;
+            right: 0;
+            top: 0;
+            display: none;
+    }
+    
+    
+    div#svg {
+       width:480px; 
+       overflow: auto; 
+       margin-bottom: 20px;
+       border: 2px solid gray;
+       border-radius: 3px;
+       /*position: fixed;  */
+       /*top: 100px; */
+    }
+
+    div#svg-large {
+       overflow: auto; 
+       margin-bottom: 10px;
+       border: 2px solid gray;
+       border-radius: 3px;
+       /*position: fixed;  */
+       /*top: 100px; */
+    }
+    
+    /*********************************************/
+    /*********************************************/
+    /*********************************************/
+    /*********************************************/   
+
+    
+    div.wordlist {
+        font-size: smaller;
+        /*margin-left: 10px;*/
+        padding-left: 20px;
+        /*border: 1px solid gray;*/
+        /*border-radius: 3px;*/
+        height:480px;
+        overflow-y:auto;        
+    }
+    
+    table.wordlist {
+        width: 150px;
+    }
+    
+    table.wordlist td:nth-child(2){
+        text-align: right;
+    }
+    
+    .wordlist-entry {
+        cursor: pointer;
+    }
+    
+    
+    /*********************************************/
+    /*********************************************/
+    /*********************************************/
+    /*********************************************/   
+
+    /* this is for getting a smaller dropdown icon */
+    .navbar .dropdown-toggle::after {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        margin-left: 0.255em;
+        vertical-align: 0.255em;
+        content: "";
+        border-top: 0.3em solid currentColor;   /* uses text color automatically */
+        border-right: 0.3em solid transparent;
+        border-left: 0.3em solid transparent;
+    }    
+    
+    span.titleID {
+        font-weight: bold;
+        color: gray;
+        font-size: 8pt;        
+    }
+    
+    div#playercontrols{
+        width: 480px;
+        padding:10px;
+    }
+    
+    span.input-group-text {
+        width:120px;
+    }
+    
+    
+    .slidecontainer {
+      width: 480px; /* Width of the outside container */
+    }
+
+    /* The slider itself */
+    .slider {
+      /*height: 25px;*//* Specified height */
+      margin-left: 30px;
+      margin-right: 30px;
+      width: 220px;
+      background: #d3d3d3; /* Grey background */
+      /*outline: none; *//* Remove outline */
+      opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+      -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+      transition: opacity .2s;
+    }
+
+    /* Mouse-over effects */
+    .slider:hover {
+      opacity: 1; /* Fully shown on mouse-over */
+    }
+    
+    
+    /*********************************************/
+    /*********************************************/
+    /*********************************************/
+    /*********************************************/
+    
+    /* now : annotations display */
+    table.annotations td {
+        border : 1px solid rgb(240,240,240);
+    }
+    .anno-label {
+        background : gray;
+        color : white;
+        font-size : smaller;
+        white-space: nowrap;
+        padding-left : 3px;
+        padding-right : 3px;
+        border-radius : 3px;
+        font-weight: normal;
+        text-align: right;
+        border: 2px solid white;        
+    }
+    .anno-span {
+        background : lightGray;
+        border: 2px solid white;
+        padding: 2px;
+        font-size : smaller;
+        text-align: center;
+    }
+    
+    table.annotations td {
+        white-space: nowrap;
+    }
+
+    table.annotations tr.trans td {
+        font-weight : bold;
+    }
+
+    table.annotations tr.token-anno td {
+        font-size : smaller;
+    }
+    table.annotations tr.norm td { color: blue; }
+    table.annotations tr.lemma td { color: green; }
+    table.annotations tr.pos td { color: red; font-weight: bold;}
+    table.annotations tr.ids td { color: lightGray; font-size: smaller;}
+    
+    table.annotations tr.trans td.nv {
+        color : gray;
+    }
+
+    table.annotations-table th.speaker {
+        min-width:50px; 
+        vertical-align: top;
+    }
+    
+    
+    /*********************************************/
+    /*********************************************/
+    /*********************************************/
+    /*********************************************/
+    
+    
+    td.protocol-time {
+        font-size : smaller;
+        background : rgb(230,230,230);
+        border : 1px solid gray;
+        padding-left : 5px;
+        padding-right : 5px;
+    }
+    
+    td.protocol-entry {
+        border : 1px solid gray;
+        padding-left : 5px;
+        padding-right : 5px;        
+    }
+    
+    span.ol-marker {
+        color : gray;
+    }
+    
+    span.annotating-anchor {
+        color : gray;        
+    }
+
+
+    
+
+    
+
+
