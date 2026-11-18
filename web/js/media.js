@@ -83,7 +83,20 @@ function addOnDblClicks(){
         e.preventDefault();
         clearSelection();        
         jump(this.dataset.start);
+    });     
+    
+    $("table.table-partitur td").dblclick(function(e) {
+        e.preventDefault();
+        clearSelection();        
+        jump(this.dataset.start);
     });       
+
+    $("table.annotations-table td").dblclick(function(e) {
+        e.preventDefault();
+        clearSelection();        
+        jump(this.dataset.start);
+    });       
+    
 }
 
 function clearSelection() {
@@ -159,8 +172,36 @@ function updateTime(){
         } else {
             tableCursorElement.classList.remove("highlight-playback");            
         }
+    }
+    
+    scrollOnce = false;
+    var partiturCursorElements = document.getElementsByClassName('tli');
+    for (var i = 0; i < partiturCursorElements.length; i++) {
+        const tableCursorElement = partiturCursorElements[i];
+        const start = parseFloat(tableCursorElement.getAttribute('data-start'));
+        const end = parseFloat(tableCursorElement.getAttribute('data-end'));
+        if ((!player.paused) && (start < elapsedTime) && (end > elapsedTime)){
+            //tableCursorElement.style.border = "thick solid #0000FF";
+            tableCursorElement.classList.add("highlight-playback");            
+            
+            if (!scrollOnce){
+                tableCursorElement.scrollIntoView(
+                    {
+                        behavior: 'smooth',   // optional
+                        block: 'center',
+                        inline: 'center'
+                    }                        
+                );
+                //window.scrollBy(0, -200);
+                scrollOnce = true;
+            }
+            
+        } else {
+            tableCursorElement.classList.remove("highlight-playback");            
+        }
         
     }
+    
     
     
 }
