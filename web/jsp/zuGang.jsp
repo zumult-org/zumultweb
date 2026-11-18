@@ -4,15 +4,20 @@
 <%@page import="java.util.ResourceBundle"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.Set"%>
+
+<%@page import="org.zumult.backend.BackendInterfaceFactory"%>
+<%@page import="org.zumult.backend.BackendInterface"%>
 <%@page import="org.zumult.objects.Location"%>
 <%@page import="org.zumult.objects.MetadataKey"%>
 <%@page import="org.zumult.objects.Speaker"%>
 <%@page import="org.zumult.objects.IDList"%>
 <%@page import="org.zumult.objects.ObjectTypesEnum"%>
 <%@page import="org.zumult.objects.Corpus"%>
-<%@page import="org.zumult.backend.BackendInterfaceFactory"%>
-<%@page import="org.zumult.backend.BackendInterface"%>
+<%@page import="org.zumult.objects.CorpusStatistics"%>
+<%@page import="org.zumult.backend.Configuration"%>
 <%@page import="org.zumult.web.ZuMultWebHelper"%>
+
+<%@ taglib prefix="zumult" tagdir="/WEB-INF/tags" %>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
@@ -49,8 +54,26 @@
     Set<MetadataKey> transcriptMetadataKeys = corpus.getMetadataKeys(ObjectTypesEnum.TRANSCRIPT);     
     List<String> transcriptSelectionSet = ZuMultWebHelper.getSelectionSet(backendInterface, corpus, mediaMetadataKeys,
             "Transcript_", "Corpus_zumult:transcriptMetadataTableSelection");
+    
+    CorpusStatistics stats = corpus.getCorpusStatistics();
+    String statsXML = stats.toXML();
+    // where default = "/org/zumult/io/statistics2HTML.xsl"
+    String statsXSL = Configuration.getStatistics2HTMLStylesheet();
+    String lang = request.getParameter("lang");
+    if (lang==null) lang = "en";
+    String[][] statsParam = {
+        {"lang", lang}
+    };
+    String statsHTML = new IOHelper().applyInternalStylesheetToString(statsXSL, statsXML, statsParam);
 
 %>
+
+<%
+    // need to put those variables in the pageContext so I can use them 
+    // inside the navbar tag 
+    pageContext.setAttribute("corpusID", corpusID);
+%>
+
 
 <html>
     <head>
@@ -86,6 +109,7 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
         
         <link rel="stylesheet" type="text/css" href="../css/overview.css"/>       
+        <link rel="stylesheet" type="text/css" href="../css/navbar.css"/>       
         
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="crossorigin="anonymous"></script>        
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
@@ -93,9 +117,6 @@
         <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js" charset="utf8"></script>
 
         <script type="text/javascript" src="../js/zuGang.js" charset="utf8"></script>
-        
-        
-        
 
         <script type="text/javascript">
             var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';
@@ -321,8 +342,50 @@
         </script>
         
     </head>
-    <body>
-        <%@include file="../WEB-INF/jspf/zumultNav.jspf" %>                                                
+    <body id="zugang-body">
+        <!-- include file="../WEB-INF/jspf/zumultNav.jspf" -->
+        
+        <!-- navigation  -->        
+        <zumult:navbar
+            applicationName="ZuGang"
+            objectTitle="${corpusID}"
+            institutionLogo="../images/ude-logo.png"
+            institutionName="Universität Duisburg-Essen"
+            institutionURL="https://www.utexas.edu/"
+            language="en"
+            helpURL="https://zumult.org"
+            helpLabel="Help">            
+            
+            
+                <jsp:attribute name="menus">
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle"
+                           href="#"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            <i class="fa-regular fa-compass"></i>
+                            Navigation
+                        </a>
+
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="../index.jsp" title="Start page of this ZuMult instance">Home</a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="https://zumult.org" target="_blank">ZuMult website</a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+
+                </jsp:attribute>
+                    
+        
+            </zumult:navbar>       
+        
         
         <div class="container-fluid px-4 mt-4" style="width: 90%;">
             <div class="row g-4">
@@ -357,7 +420,7 @@
 
                         <!-- CORPUS tab header -->
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fs-4 px-4 py-3"
+                            <button class="nav-link px-4 py-3"
                                     id="corpus-tab"
                                     data-bs-toggle="tab"
                                     data-bs-target="#corpus-pane"
@@ -368,10 +431,25 @@
                                 <i class="fa-solid fa-layer-group" aria-hidden="true"></i> Corpus
                             </button>
                         </li>
+                        
+                        <!-- STATISTICS tab header -->
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link px-4 py-3"
+                                    id="statistics-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#statistics-pane"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="statistics-pane"
+                                    aria-selected="false">
+                                <i class="fa-solid fa-chart-simple" aria-hidden="true"></i> Statistics
+                            </button>
+                        </li>
+                        
 
                         <!-- SPEECH EVENTS tab header -->
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active fs-4 px-4 py-3"
+                            <button class="nav-link active px-4 py-3"
                                     id="speechEvents-tab"
                                     data-bs-toggle="tab"
                                     data-bs-target="#speechEvents-pane"
@@ -385,7 +463,7 @@
 
                         <!-- SPEAKERS tab header -->
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fs-4 px-4 py-3"
+                            <button class="nav-link px-4 py-3"
                                     id="speakers-tab"
                                     data-bs-toggle="tab"
                                     data-bs-target="#speakers-pane"
@@ -399,7 +477,7 @@
 
                         <!-- MEDIA tab header -->
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fs-4 px-4 py-3"
+                            <button class="nav-link px-4 py-3"
                                     id="media-tab"
                                     data-bs-toggle="tab"
                                     data-bs-target="#media-pane"
@@ -413,7 +491,7 @@
 
                         <!-- TRANSCRIPTS tab header -->
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fs-4 px-4 py-3"
+                            <button class="nav-link px-4 py-3"
                                     id="transcripts-tab"
                                     data-bs-toggle="tab"
                                     data-bs-target="#transcripts-pane"
@@ -424,6 +502,7 @@
                                 <i class="fa-regular fa-file-lines" aria-hidden="true"></i> Transcripts
                             </button>
                         </li>
+
 
                     </ul>
 
@@ -438,6 +517,17 @@
                              tabindex="0">     
                             <div id="corpus-content">
                                 Getting content from server...
+                            </div>                    
+                        </div>
+
+                        <!-- STATISTICS -->
+                        <div class="tab-pane fade show"
+                             id="statistics-pane"
+                             role="tabpanel"
+                             aria-labelledby="statistics-tab"
+                             tabindex="0">     
+                            <div id="statistics-content">
+                                <%= statsHTML %>
                             </div>                    
                         </div>
 

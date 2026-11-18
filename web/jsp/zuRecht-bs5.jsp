@@ -1,0 +1,1081 @@
+<%-- 
+    Document   : zuRecht
+    Created on : 10.01.2020, 14:07:25
+    Author     : Elena_Frick
+--%>
+
+
+
+<%@page import="java.util.Objects"%>
+<%@page import="java.util.Locale"%>
+<%@page import="java.util.ResourceBundle"%>
+<%@page import="java.util.List"%>
+<%@page import="java.util.Arrays"%>
+<%@page import="java.util.regex.Matcher"%>
+<%@page import="java.util.regex.Pattern"%>
+<%@page import="java.io.FileNotFoundException"%>
+<%@page import="java.io.File"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.Scanner"%>
+<%@page import="org.zumult.objects.ObjectTypesEnum"%>
+<%@page import="org.zumult.backend.BackendInterfaceFactory"%>
+<%@page import="org.zumult.backend.BackendInterface"%>
+<%@page import="org.zumult.objects.AnnotationTagSet"%>
+<%@page import="org.zumult.query.searchEngine.SortTypeEnum"%>
+<%@page import="org.zumult.query.SampleQuery"%>
+<%@page import="org.zumult.io.Constants"%>
+<%@page import="org.zumult.io.IOHelper"%>
+<%@page import="org.zumult.backend.Configuration"%>
+<%@page import="org.zumult.objects.IDList"%>
+
+<%@ taglib prefix="zumult" tagdir="/WEB-INF/tags" %>
+
+
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+
+<%
+    String pageParam_q = request.getParameter("q");
+    String pageParam_cq = request.getParameter("cq"); // e.g. &cq=GWSS
+    List userSpecifiedCorpora = null;   
+    if (pageParam_cq!=null){
+       String[] pageParam_corpora = pageParam_cq.split("\\|");
+       userSpecifiedCorpora = Arrays.asList(pageParam_corpora);
+    }
+
+    String pageParam_form = request.getParameter("form");
+
+    String pageParam_context = Objects.requireNonNullElse(request.getParameter("context"), "8-t,8-t");
+
+    String pageParam_leftContext = null;
+    String pageParam_rightContext = null;
+
+    if (Pattern.matches("\\d{1,2}-t,\\d{1,2}-t", pageParam_context)) {
+        String[] contexts = pageParam_context.split(Constants.KWIC_LEFT_RIGHT_CONTEXT_DELIMITER);
+        int leftContext = Integer.parseInt(contexts[0].split(Constants.KWIC_CONTEXT_DELIMITER)[0]);
+        int rightContext = Integer.parseInt(contexts[1].split(Constants.KWIC_CONTEXT_DELIMITER)[0]);
+        pageParam_leftContext = String.valueOf(Math.min(leftContext, Constants.KWIC_TOKEN_LEFT_CONTEXT_LENGTH_MAX));
+        pageParam_rightContext = String.valueOf(Math.min(rightContext, Constants.KWIC_TOKEN_RIGHT_CONTEXT_LENGTH_MAX));
+    }
+    String pageParam_mode = request.getParameter("mode"); // e.g. &mode=SPEAKER_BASED_INDEX
+
+    // get part-of-speech tagset
+    BackendInterface backend = BackendInterfaceFactory.newBackendInterface();
+    AnnotationTagSet annotationTagSet = backend.getAnnotationTagSet(Constants.DEFAULT_POS_TAGSET);
+    String annotationTagSetString = annotationTagSet.toXML().replaceAll("[\\t\\n\\r]+","").replaceAll("\\s+"," ").replaceAll("> <", "><");
+    String annotationTagSetXML = annotationTagSetString.replace("\"", "\\\"").replace("\'", "\\\'");
+    
+    /*String pageName = "ZuMult";
+    String pageTitle = "ZuRecht - CQP Query"; 
+    String imgSrc = "";
+    String imgSrc2 = "";*/
+    
+    String corpusID = Objects.requireNonNullElse(request.getParameter("corpusID"), "");
+    //String transcriptID = null; // for completeness sake
+    String allCorpora = String.join(";", backend.getCorpora()) + ";Generic";
+    String[][] params = {
+        {"SELECTION", allCorpora}
+    };
+    String zumultQueryXML = "/org/zumult/io/ZuMultQueryExamples.xml";
+    String zumultQueryXSL = "/org/zumult/io/ZuMultQueryExamples2HTML.xsl";
+    String zumultQueryHTML = new IOHelper().applyInternalStylesheetToInternalFile(zumultQueryXSL, zumultQueryXML, params);
+    
+    String restAPIBaseURL = Configuration.getRestAPIBaseURL();
+    String webAppBaseURL = Configuration.getWebAppBaseURL();
+    String defaultNumberForDownload =  String.valueOf(Constants.DEFAUL_NUMBER_FOR_KWIC_DOWNLOAD);
+    String maxNumberForDownload =  String.valueOf(Constants.MAX_NUMBER_FOR_KWIC_DOWNLOAD);
+
+%>
+<%@include file="../WEB-INF/jspf/locale.jspf" %>     
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>ZuRecht</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+                
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+        <script type="text/javascript" src="https://kit.fontawesome.com/ed5adda70b.js" crossorigin="anonymous"></script>
+        
+
+        <script type="text/javascript" src="../js/jquery.twbsPagination.js" type="text/javascript"></script>
+        <script type="text/javascript" src="../js/zuRecht.collapsible.js" type="text/javascript"></script>
+        <script type="text/javascript" src="../js/query.stringConverter.js" type="text/javascript"></script>
+        <script type="text/javascript" src="../js/zuRecht.corpusCheckbox.js" type="text/javascript"></script>
+        <script type="text/javascript" src="../js/SaxonJS2.rt.js"></script>
+        <script type="text/javascript" src="../js/xslTransformation.js" type="text/javascript"></script>
+        <script type="text/javascript" src="../js/navbar.js" type="text/javascript"></script>
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="stylesheet" type="text/css" href="../css/navbar.css" />
+        <link rel="stylesheet" type="text/css" href="../css/zurecht.css" />
+        <link rel="stylesheet" type="text/css" href="../css/zuviel.css" />
+        <link rel="stylesheet" type="text/css" href="../css/query_examples.css" />
+        
+        <style type="text/css">
+        </style>
+        
+        
+
+    </head>
+    <body>
+
+        <div id="autocompleteForQueryInputField" class="list-group"></div>
+
+        <!-- navigation  -->        
+        <zumult:navbar
+            applicationName="ZuRecht"
+            objectTitle="Texas German Dialect Corpus"
+            institutionLogo="../images/ude-logo.png"
+            institutionName="Universität Duisburg-Essen"
+            institutionURL="https://www.utexas.edu/"
+            language="en"
+            helpURL="https://zumult.org"
+            helpLabel="Help">            
+            
+            
+                <jsp:attribute name="menus">
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle"
+                           href="#"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            <i class="fa-regular fa-compass"></i>
+                            Navigation
+                        </a>
+
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="../index.jsp" title="Start page of this ZuMult instance">Home</a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="https://zumult.org" target="_blank">ZuMult website</a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <!-- ******************* -->
+                    <!-- *     PARAMETERS  * -->
+                    <!-- ******************* -->
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="#modal-searchTabOptions"
+                           role="button"
+                           data-bs-toggle="modal"
+                           title="Set display parameters">
+                            <i class="fas fa-sliders-h"></i>
+                            Parameters
+                        </a>
+                    </li>
+                    
+
+                </jsp:attribute>
+                    
+                <jsp:attribute name="search">
+                    <div class="input-group input-group-sm" data-bs-theme="light">
+                        <form class="d-flex"
+                              onsubmit="searchFromBox(); return false;">
+
+                            <input type="text"
+                                   class="form-control form-control-sm"
+                                   id="searchBox"
+                                   placeholder="pos=ART">
+
+                            <button type="submit" class="btn btn-light btn-sm">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </form>                    
+                    </div>
+                </jsp:attribute>               
+                    
+                <jsp:attribute name="highlighting">
+
+                    <!-- Select highlight color -->
+                    <button type="button"
+                            class="btn btn-light btn-sm"
+                            title="Select next highlight color"
+                            aria-label="Select next highlight color"
+                            onclick="cycleHighlightColor()">
+
+                        <i class="fas fa-highlighter"></i>
+                        <span id="highlight-color-indicator"></span>
+
+                    </button>
+
+                    <!-- Remove highlighting -->
+                    <button type="button"
+                            class="btn btn-light btn-sm"
+                            title="Remove all highlighting"
+                            aria-label="Remove all highlighting"
+                            onclick="clearSearch()">
+
+                        <i class="fas fa-eraser"></i>
+
+                    </button>
+
+                </jsp:attribute>                    
+        
+            </zumult:navbar>       
+
+        <!-- ************************** -->
+        <!-- ************************** -->
+        <!-- ************************** -->
+        <br/>
+        <div class="d-flex" id="wrapper">
+            
+            <!-- Sidebar -->
+            <div class="bg-light border-end" id="sidebar-wrapper">
+                <!-- Toggle Button -->
+                <button class="btn btn-sm btn-light border position-absolute"
+                        id="menu-toggle"
+                        style="top:10px; right:-18px; z-index:1000;">
+                    <span>&#9776;</span>
+                </button>                
+                <div class="px-3 py-3"> 
+                    <%@include file="../WEB-INF/jspf/zuRechtCorpora.jspf" %>
+                </div>
+            </div>  <!-- end sidebar -->
+
+            <!-- ************************** -->
+            <!-- ************************** -->
+            <!-- ************************** -->
+                
+            <!-- Center section -->
+            <div class="container-fluid">
+                <div class="row">
+                    
+                    <!-- workspace -->
+                    <div class="col-md-10">
+
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs nav-justified mb-2" id="zuRechtTabs" role="tablist">
+
+                            <!-- CQP Query tab header -->
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active px-4 py-3"
+                                        id="cqp-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#cqp-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="cqp-pane"
+                                        aria-selected="false">
+                                    <i class="fa-solid fa-brackets-square" aria-hidden="true"></i> CQP Query
+                                </button>
+                            </li>
+
+                            <!-- Some other tab header -->
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link px-4 py-3"
+                                        id="other-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#other-pane"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="other-pane"
+                                        aria-selected="false">
+                                    <i class="fa-solid fa-question" aria-hidden="true"></i> Other Query
+                                </button>
+                            </li>
+                        </ul> <!-- end nav tabs -->
+                            
+
+                        <!-- Tab panes  -->
+                        <div class="tab-content">
+                            <!-- Query tab -->
+                            <div class="tab-pane active fade show"
+                                 id="cqp-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="cqp-tab"
+                                 tabindex="0">     
+                                <%@include file="../WEB-INF/jspf/zuRechtKWICSearchForm.jspf" %>
+                                <%@include file="../WEB-INF/jspf/zuRechtKWICSearchOptionsModal.jspf" %>
+                                <div id="kwic-search-result-area" class="searchResultArea"></div>
+                                
+                                <div>
+                                    <!-- Initial help -->
+                                    <a class="collapse-toggle" data-bs-toggle="collapse" href="#query_intro"
+                                       role="button" aria-expanded="true" aria-controls="query_intro">
+                                      Query intro <span class="caret"></span>
+                                    </a>                                    
+                                    <div class="px-4 collapse show" id="query_intro" style="border: 1px solid rgb(220,220,220); background: rgb(250,250,250); padding: 5px;">
+                                        <%= zumultQueryHTML %>        
+                                    </div>
+                                </div>
+                                
+                            </div>
+                                
+                            <!-- Query tab -->
+                            <div class="tab-pane fade show"
+                                 id="other-pane"
+                                 role="tabpanel"
+                                 aria-labelledby="other-tab"
+                                 tabindex="0">     
+                                Something else.
+                            </div>
+                        </div> <!-- end tab panes -->
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+        </div>                                
+        <%@include file="../WEB-INF/jspf/metadataModal.jspf" %>        
+        <%@include file="../WEB-INF/jspf/videoModal.jspf" %>
+        <%@include file="../WEB-INF/jspf/imageModal.jspf" %>
+  
+        <%@include file="../WEB-INF/jspf/zuRechtConstants.jspf" %>
+        <%@include file="../WEB-INF/jspf/zuRechtAudioPlayback.jspf" %>
+        
+
+        <!-- ************************** -->
+        <!-- ************************** -->
+        <!-- ************************** -->
+        
+        <script type="text/javascript">
+            var BASE_URL = '<%= Configuration.getWebAppBaseURL() %>';
+            var languageTag = '<%=currentLocale.toLanguageTag()%>';
+            var ajaxSearchRequest = null;
+            var ajaxDownLoadRequest = null;
+            var ajaxDownLoadMetadataRequest = null;
+            var wavesurfer = null;
+            var playMessage = true;
+            var metadataValuesURL = '<%=restAPIBaseURL%>' + "/SearchService/metadataKeys/values";
+            var annotationLayerValuesURL = '<%=restAPIBaseURL%>' + "/SearchService/annotationLayers/values";
+            var downloadURL = "../downloads/";
+            var DEFAULT_QUERY_LENGTH = 1000;
+            var DEFAULT_KWIC_RIGHT_CONTEXT_FOR_REPETITIONS = 20;
+            var zuRechtKWICResultView = "zuRechtKWICResultView.html";
+            var printStyleForQueryHelp = "  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css'>\n\
+                                            <style>\n\
+                                                .query-example {background-color: #f3f3f3; color: #337AB7;}\n\
+                                                .query-note span {background-color: #FFF7C8; display: table; padding: 10px; border-radius: 5px; border: 2px solid red;}\n\
+                                                .pattern {color: #337AB7;}\n\
+                                                .query-description {color: black;}\n\
+                                            </style>";
+
+                
+            var posTagSetXML = new DOMParser().parseFromString('<%=annotationTagSetXML%>', "text/xml");
+            var arrayWithPosToBeIgnored = ['AB','XY','NGIRR', 'ITJ', 'NGHES', 'ART'];
+            let customVarMap = new Map();
+    
+            $(document).ready(function(){
+                //alert("Page loaded");
+                                
+                // add tooltips
+                document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => bootstrap.Tooltip.getOrCreateInstance(el));
+
+        
+                // language changer
+                $("#selectLang").on("change", function(){
+                    var value = $(this).val();
+                    var urlTest = new URL(window.location.href);
+                    urlTest.searchParams.set('lang',value);
+                    window.location = urlTest;
+                });
+ 
+                /************ click events for cancel buttons **********************************/
+                
+                $("#modal-searchTabOptions").find('.btnCancel').on('click',function(){
+                    abortKWICSearchOptions(this, '#kwic-search-form');               
+                });                
+
+                /************ click events for ok buttons **********************************/
+                                
+                $("#modal-searchTabOptions").find('.btnOK').on('click',function(){
+                    setKWICSearchOptions(this, '#kwic-search-form');
+                });
+                
+                /********** click events for buttons with search options **********************/
+
+                $('#kwic-search-form').find('.btn-open-search-options').on("click", function(){
+                    bootstrap.Modal.getOrCreateInstance(document.querySelector("#modal-searchTabOptions")).show();
+                });
+                
+                
+                // listener for corpus selection
+                $('input[name="corpus"]').on('change', function() {
+                    updateObjectNameInNav();
+                });      
+                // do it once anyway
+                updateObjectNameInNav();
+
+                // load html for displaying kwic results
+                $("#kwic-search-result-area").load(zuRechtKWICResultView, function() {
+             
+                    $("#kwic-search-result-area").find(".wait-query-tab").html(searchLoadingIndicatorText).append(searchLoadingIndicatorAbortButton);
+ 
+
+                    $("#kwic-search-form").submit(function(){
+                                                
+                        if(ajaxSearchRequest){
+                            ajaxSearchRequest.abort();
+                            ajaxSearchRequest = null;
+                        }
+          
+           
+                            // get input parameter
+                            var q = $('#queryInputField').val().replace(/\“/g, "\"").replace(/\„/g, "\"");                    
+                            var pageLength = $(this).find('.pageLength').val();
+                            var pageIndex = $(this).find('.pageIndex').val();
+                            var leftContext = $(this).find('.leftContext').val();
+                            var rightContext = $(this).find('.rightContext').val();                
+                            var context = leftContext+ "-t," + rightContext + "-t";
+   
+                                var corpusQueryStr = getCorpusQueryStr();
+
+                                if (corpusQueryStr!==''){
+
+    
+                                    // delete search results of the previous query                
+                                    $("#kwic-search-result-area").find('.paging_container').empty();     // delete paging
+                                    $("#kwic-search-result-area").find(".query_summary").empty();        // delete the number of total hits
+                                    $("#kwic-search-result-area").find('.KWICSearch-result').empty();    // delete the summary of the performed search 
+                                    emptyPage('#kwic-search-result-area');                        // delete search results
+
+
+                            
+                                    // start loding indicator for ajax requests
+                                    $("#kwic-search-result-area").find(".wait-query-tab").css("display", "block");
+
+                                    // send request
+                                    ajaxCallToGetKWIC('#kwic-search-result-area', kwicURL, q, corpusQueryStr, pageLength, pageIndex, context);
+                                }
+                        // prevent page reload
+                        return false;
+                    });      
+                });
+            });
+            
+                    
+            function abortSearch(obj){
+                $(obj).closest('.wait-query-tab').css("display", "none");
+                var parentId = $(obj).closest('.searchResultArea').attr('id');
+                if (parentId === "kwic-search-result-area"){
+                    if(ajaxSearchRequest){
+                            ajaxSearchRequest.abort();
+                            ajaxSearchRequest = null;
+                    }
+                }
+                
+            }
+            
+            function insertQuery(element){
+                let queryString = element.textContent;
+                let qif = document.getElementById("queryInputField");
+                qif.value = queryString;
+                
+                let corpus = element.dataset.corpus;
+                if (corpus){
+                    selectCorpus(corpus);
+                }
+            }
+            
+            function selectCorpus(corpus){
+                let corpuscheckBoxes = document.getElementsByName("corpus");
+                corpuscheckBoxes.forEach(el => {
+                    el.checked = false;
+                });
+                let theCheckBox = document.getElementById(corpus);
+                if (theCheckBox){
+                    theCheckBox.checked = true;
+                }
+                updateObjectNameInNav();
+            }
+            
+            function updateObjectNameInNav(){
+                let selectedCorpora = $('input[name="corpus"]:checked').map(function() {
+                    return this.value;
+                }).get();
+                let count = selectedCorpora.length;
+                if (count===0){
+                    $('#nav-object-title').text("No corpus selected");
+                    $('#nav-object-title').attr('title', 'Select a corpus from the list');
+                } else if (count===1){
+                    $('#nav-object-title').text(selectedCorpora[0]);
+                    $('#nav-object-title').attr('title', 'Queries will be carried out on ' + selectedCorpora[0]);                    
+                } else {
+                    $('#nav-object-title').text(count + ' corpora selected');
+                    $('#nav-object-title').attr('title', 'Queries will be carried out on ' + selectedCorpora);                                        
+                }
+            }
+            
+            
+            /**********************************************************/
+            /*                      ajax calls                        */
+            /**********************************************************/
+            
+            function ajaxCallToGetKWIC(selector, url, q, corpusQueryStr, pageLength, pageIndex, context){                        
+
+                ajaxSearchRequest = $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: { q: q, cq :corpusQueryStr, count : pageLength, offset : pageIndex, context : context},
+                    dataType: "text",
+
+                    success: function(xml, status) { 
+                        //alert(xml);
+                        viewResult(selector, xml, url, context);
+   
+                    },
+                    error: function(xhr, status, error){
+                        if(xhr.status === 400 && !q.startsWith("[") && !q.startsWith("(") && !q.startsWith("<")){
+                           ajaxSearchRequest = ajaxCallToGetKWIC(selector, url, completeSearchQuerySyntax(q, selector), corpusQueryStr, pageLength, pageIndex, context);                          
+                        }else {
+                            $(selector).find(".wait-query-tab").css("display", "none");
+                            if (status === "abort"){
+                                //ignore
+                            }else {
+                                if (xhr.responseText.startsWith("Please check the query syntax")){
+                                    var errorMessage = xhr.responseText +  "\n\n<%=myResources.getString("QueryHelpMessage")%>";
+                                    alert(errorMessage);
+                                }else{
+                                    // show error message
+                                    var errorMessage = xhr.status + ' (' + xhr.statusText + ") " + xhr.responseText;
+                                    alert('Error: ' + errorMessage);
+                                }
+                            }
+                        }
+                    }
+                });
+           }
+    
+            function ajaxCallToGetMoreKWIC(selector, url, queryString, corpusQueryStr, itemsPerPage, pageIndex, context){
+                ajaxSearchRequest= $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: { q: queryString, cq :corpusQueryStr, count : itemsPerPage, offset : pageIndex, context : context},                      
+                        dataType: "text",
+
+                        success: function(xml, status) {
+                            $(selector).find(".wait-query-tab").css("display", "none");                                                      
+                            displayKWIC(selector, xml);                                    
+                        },
+                        error: function(xhr, status, error){
+                            $(selector).find(".wait-query-tab").css("display", "none");
+                            processError(xhr, status);                            
+                        }
+                    });
+            }
+            
+            /*********************************************/
+            /*             display kwic methods          */
+            /*********************************************/
+            
+            function viewResult(selector, xml, url, context){
+           
+                $(selector).find(".wait-query-tab").css("display", "none");
+                
+                // get parameters of the search query
+                var xmlDocument = $.parseXML(xml);
+                var $xmlObject = $(xmlDocument);
+                
+                var totalHits = $xmlObject.find('total').text();
+                var queryStr=$xmlObject.find('query').html();
+                var corpusQueryStr=$xmlObject.find('corpusQuery').text(); 
+                var corpora = getCorporaFromCorpusQuery(corpusQueryStr);  
+                var itemsPerPage = $xmlObject.find('itemsPerPage').text();
+                var repetitions = createXMLElement('<%= Constants.REPETITIONS%>', $xmlObject.find('repetitions').html());
+                var synonyms = createXMLElement('<%= Constants.REPETITION_SYNONYMS%>', $xmlObject.find('synonyms').text());
+                
+                //display summary + button for opening metadata view (GET)
+
+                var query = "<i>" + queryStr + "</i>" + " (in " + corpora.replace(/\s+\|\s+/g, ", ") + ")";
+                var longQuery = query+ "<span class='link' id='showLessQuery'> (<%=myResources.getString("ShowLess")%>) </span>";
+                var shortQuery = "<i>" + queryStr.substring(0, DEFAULT_QUERY_LENGTH) + "</i> ..." + 
+                                                "<span class='link' id='showMoreQuery'> (<%=myResources.getString("ShowMore")%>) </span>";
+                var length = queryStr.length;
+                if(length>DEFAULT_QUERY_LENGTH){
+                    query = shortQuery;
+                }                              
+                        
+                addResultsHead(selector, query, queryStr, corpusQueryStr, longQuery, shortQuery);
+                        
+                if (parseInt(totalHits) > 0){
+                    $(selector).find('.query_summary').append("<span id='search-results'><%=myResources.getString("Total")%>: </span>" + "<span id='total-hits'>" + totalHits + "</span>");
+                            
+                    // add pagination
+                    addPagination(selector, url, totalHits, itemsPerPage, decodeHTMLQuery(queryStr), corpusQueryStr, context, repetitions, synonyms);
+
+                    // add results
+                    displayKWIC(selector, xml);
+                } else {
+                    $(selector).find('.KWICSearch-result h4').prepend('<%=myResources.getString("No")%>' + " ");
+                    $(selector).find('.KWICSearch-result').find("a").remove();
+                }
+            }
+            
+            async function displayKWIC(selector, xml){
+                bootstrap.Collapse.getOrCreateInstance(document.getElementById('query_intro'), {toggle: false}).hide(); 
+            
+                // $(selector).find(".openXML-KWICSearch-area").css("display", "block");
+                $(selector).find('.rowData-KWICSearch').text(xml);
+
+                const parameters = {
+                    speakerInitialsToolTip:
+                        '<%=myResources.getString("ShowSpeakerMetadata")%>',
+                    transcriptIdToolTip:
+                        '<%=myResources.getString("ShowEventMetadata")%>',
+                    zuMultToolTip:
+                        '<%=myResources.getString("ShowExcerptInZuMult")%>',
+                    dgdToolTip:
+                        '<%=myResources.getString("ShowExcerptInDGD")%>'
+                };
+
+                try {
+                    var fragment = await transformXmlToHtml(
+                    xml,
+                    "<%= request.getContextPath() %>/js/sef/zuRechtKwic2Html.sef.json",
+                    parameters
+                    ); // implemented in xslTransformation.js
+                    $(selector).find('.myKWIC').html(fragment);
+
+                    $(selector).find(".kwic-tab").css("display", "block");
+                    $(selector).find('.KWICSearch-result').css("display", "block");
+                } catch (error) {
+                    console.error("kwic transformation failed:", error);
+                }   
+            }
+                                  
+            function addResultsHead(selector, query, queryStr, corpusQueryStr, longQuery, shortQuery){
+           
+                $(selector).find('.KWICSearch-result').empty();
+
+                //display summary
+
+                // display buttons for opening metadata view, grouping hits and download
+                $(selector).find('.KWICSearch-result').append("<div><%=myResources.getString("Results")%> <%=myResources.getString("ForSearching")%> " + query +"</div>");
+                
+                $("#showMoreQuery").on('click', function(){
+                    addResultsHead(selector, longQuery, queryStr, corpusQueryStr, longQuery, shortQuery);
+                });
+                                    
+                $("#showLessQuery").on('click', function(){
+                    addResultsHead(selector, shortQuery, queryStr, corpusQueryStr, longQuery, shortQuery);
+                });
+            }
+           
+            function addPagination(selector, url, totalHits, itemsPerPage, queryString, corpusQueryStr, context, repetitions, synonyms){
+                var paging = $("<ul></ul>").addClass("pagination-sm justify-content-center kwic-pagination");
+                $(selector).find('.paging_container').append(paging);
+
+                var totalPages_pre = (totalHits/itemsPerPage);
+                var totalPages = (totalHits % itemsPerPage) === 0 ? totalPages_pre : totalPages_pre + 1;
+
+                $(selector).find('.kwic-pagination').twbsPagination({
+                    totalPages: totalPages,
+                    visiblePages: 5,
+                    initiateStartPageClick: false,
+                    first: firstButtonLabel,
+                    prev: prevButtonLabel,
+                    next: nextButtonLabel,
+                    last: lastButtonLabel,
+                    onPageClick: function (event, page) {
+
+                        //hide summary of the query and delete previous page
+                        $(selector).find('.KWICSearch-result').css("display", "none");
+                        emptyPage(selector);
+                                                
+                        // start loding indicator for ajax requests
+                        $(selector).find(".wait-query-tab").css("display", "block");
+
+                        var pageIndex = ((page-1)*itemsPerPage);
+                                  
+                        // send request
+                        //if(selector==="#repetition-search-result-area"){
+
+                        if(selector==="#kwic-search-result-area"){
+                            ajaxCallToGetMoreKWIC(selector, url, queryString, corpusQueryStr, itemsPerPage, pageIndex, context);                  
+                        }else{
+                            ajaxCallToGetMoreKWICForRepetitions(selector, url, queryString, corpusQueryStr, itemsPerPage, pageIndex, context, repetitions, synonyms);
+                        }
+                      }
+                });            
+            }
+                            
+            function openMetadata(obj){
+                let transcriptID = $(obj).data('transcriptid');
+                $.post(
+                    BASE_URL + "/ZumultDataServlet",
+                    { 
+                        command: 'getEventMetadataHTML',
+                        transcriptID: transcriptID
+                    },
+                    function( data ) {
+                        $("#metadata-body").html(data);
+                        $("#metadata-title").html(transcriptID);
+                        bootstrap.Modal.getOrCreateInstance(document.querySelector("#metadataModal")).toggle();
+                    }
+                );                                    
+            }
+                         
+
+            function openSpeakerMetadata(obj){
+                let speakerID = $(obj).data('speakerid');
+                let transcriptID = $(obj).data('transcriptid');
+                $.post(
+                    BASE_URL + "/ZumultDataServlet",
+                    { 
+                        command: 'getSpeakerMetadata',
+                        format: 'html',
+                        speakerID: speakerID,
+                        transcriptID: transcriptID
+                    },
+                    function( data ) {
+                        $("#metadata-body").html(data);
+                        $("#metadata-title").html(speakerID);
+                        bootstrap.Modal.getOrCreateInstance(document.querySelector("#metadataModal")).toggle();
+                    }
+                );                    
+            }
+
+            //function foldoutTranscript(tdObj, transcriptID, startTokenID, endTokenID, highlightIDs1){
+            function foldoutTranscript(tdObj){
+                let transcriptID = $(tdObj).data('transcriptid');
+                let startTokenID = $(tdObj).data('starttokenid');
+                let endTokenID = $(tdObj).data('endtokenid');
+                let highlightIDs1 = $(tdObj).data('highlightids1');
+                $.post(
+                    BASE_URL + "/ZumultDataServlet",
+                    { 
+                        command: 'getTranscript',
+                        transcriptID: transcriptID,
+                        startTokenID: startTokenID,
+                        endTokenID: endTokenID,
+                        highlightIDs1: highlightIDs1,
+                        highlightIDs2: '',
+                        highlightIDs3: '',
+                        form: 'trans',
+                        showNormDev: 'FALSE',
+                        visSpeechRate: 'FALSE',
+                        dropdown: 'FALSE',
+                        wordlistID: 'NONE',
+                        howMuchAround: 2
+                    },
+                    function( data ) {
+                        let randomID = 'id-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+                        let tr = $(tdObj).closest('tr');
+                        let newRow = $('<tr id="' + randomID + '"><td></td><td></td><td></td><td colspan="3">' + data + '</td></tr>');
+                        tr.after(newRow);
+                        
+                        let collapseTranscriptHTML = '<i class="fa-regular fa-square-caret-down"></i>';
+                        $(tdObj).html(collapseTranscriptHTML);
+                        tdObj.onclick = function(){
+                            collapseTranscript(randomID, tdObj);
+                        };                
+
+                    }
+                );                    
+            }
+            
+            function foldoutStillSeries(tdObj){
+                let transcriptID = $(tdObj).data('transcriptid');
+                let startTokenID = $(tdObj).data('starttokenid');
+                let endTokenID = $(tdObj).data('endtokenid');
+                $.post(
+                    BASE_URL + "/ZumultDataServlet",
+                    { 
+                        command: 'getStillSeries',
+                        transcriptID: transcriptID,
+                        startTokenID: startTokenID,
+                        endTokenID: endTokenID,
+                    },
+                    function( data ) {
+                        if ($(data).find("error").length > 0){
+                            alert('No video for ' + transcriptID);                            
+                            return;
+                        }
+                        let randomID = 'id-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+                        let tr = $(tdObj).closest('tr');
+                        let newRow = $('<tr id="' + randomID + '"><td></td><td></td><td></td><td colspan="3">' + data + '</td></tr>');
+                        tr.before(newRow);
+                        
+                        /*let collapseTranscriptHTML = '<i class="fa-regular fa-square-caret-down"></i>';
+                        $(tdObj).html(collapseTranscriptHTML);
+                        tdObj.onclick = function(){
+                            collapseTranscript(randomID, tdObj);
+                        };*/                
+
+                    }
+                );                    
+            }
+            
+            
+            function collapseTranscript(id, tdObj){
+                $('#' + id).remove();
+                $(tdObj).html('<i class="fa-regular fa-square-caret-right"></i>');
+                tdObj.onclick = function(){
+                    foldoutTranscript(this);
+                };                
+            }
+                
+
+            function openTranscript(obj){
+                $(obj).closest('form').submit();    
+            }
+            
+            
+            function largerImage(obj){                
+                let imageURL = $(obj).attr('src');
+                let imageHTML = "<img id=\"modal-video\" src=\"" + imageURL +  "\"/>";
+                $('#image-div').html(imageHTML);                
+                bootstrap.Modal.getOrCreateInstance(document.querySelector("#imageModal")).toggle();
+            }
+            
+            
+            function playbackVideo(obj){
+                let transcriptID = $(obj).data('transcriptid');
+                let tokenID = $(obj).data('tokenid');
+                $.post(
+                    BASE_URL + "/ZumultDataServlet",
+                    { 
+                        command: 'getVideo',
+                        transcriptID: transcriptID,
+                        tokenID: tokenID
+                    },
+                    function( data ) {
+                        let time = $(data).find("time").text();
+                        let videoURL = $(data).find("video").first().text();
+                        if (videoURL.length === 0){
+                            alert('No video for ' + transcriptID);                            
+                        } else {
+                            insertVideoPlayer(obj, videoURL, Math.max(0.0, time - 1.0));
+                        }
+                    }
+                );                    
+        
+            }
+            
+            function insertVideoPlayer(parent, videoURL, time){
+                let videoHTML = "<video id=\"modal-video\" controls=\"controls\" type=\"video/mp4\" src=\"" + videoURL +  "\"></video>";
+                $('#video-div').html(videoHTML);                
+                const video = $('#modal-video')[0];
+                // Check if the video is ready to play
+                if (video.readyState >= 2) { // 2 = HAVE_CURRENT_DATA
+                    video.currentTime = time; // Set the playback position
+                    video.play(); // Start playing
+                } else {
+                    // If the audio is not ready, wait until it is loaded
+                    video.addEventListener('canplay', function onCanPlay() {
+                        video.currentTime = time; // Set the playback position
+                        video.play(); // Start playing
+                        video.removeEventListener('canplay', onCanPlay); // Remove the event listener
+                    });
+                }  
+                bootstrap.Modal.getOrCreateInstance(document.querySelector("#videoModal")).toggle();
+            }
+            
+            function stopVideo(){
+                const video = $('#modal-video')[0];
+                video.pause();
+                video.remove();
+            }
+      
+            /**************************************************/
+            /*             other help methods          */
+            /**************************************************/
+
+            function setKWICSearchOptions(obj, formSelector){
+                var modalWindow = $(obj).closest('.modal');  
+                configurePageLength(modalWindow, formSelector);
+                configureContext(modalWindow, formSelector);
+                configureSimpleSearchOption(modalWindow, formSelector);
+                bootstrap.Modal.getOrCreateInstance(modalWindow[0]).hide();
+            }
+            
+            function abortKWICSearchOptions(obj, formSelector){
+                var modalWindow = $(obj).closest('.modal'); 
+                abortConfigPageLength(modalWindow, formSelector);
+                abortConfigContext(modalWindow, formSelector);
+                abortSimpleSearchOption(modalWindow, formSelector);
+            }
+            
+            function createXMLElement(name, content){
+                if(content!==''){
+                    content = "<" + name 
+                        + ">" + content + "</" + name + ">";
+                }
+                return content;
+            }            
+
+            function getCorporaFromCorpusQuery(corpusQueryStr){
+                var pattern = /corpusSigle=(.*)/;
+                var match = pattern.exec(corpusQueryStr);
+                var str = match[1].replace(/\"/g, "");
+                return str;
+            }            
+
+            function configureSimpleSearchOption(selectorModal, selectorForm){ 
+                var selectedLevel = $(selectorModal).find('.customSimpleQuerySyntaxLevel option:selected').val();
+                $(selectorForm).find('.simpleQuerySyntaxLevel').val(selectedLevel);
+            }
+            
+            function configurePageLength(selectorModal, selectorForm){
+                var selectedOption = $(selectorModal).find('.customPageLength option:selected').text();
+                $(selectorForm).find('.pageLength').val(selectedOption);       
+            }
+            
+            
+            function configureContext(selectorModal, selectorForm){
+                var defaultContextLength = 8; // changed that from 3
+                var regex = /^(0?\d|1\d|2[0-5])$/;
+                var left = $(selectorModal).find(":text.customLeftContextLength").val();
+                if (!left.match(regex)) {                        
+                    $(selectorModal).find(":text.customLeftContextLength").val(defaultContextLength);
+                    $(selectorForm).find(".leftContext").val(defaultContextLength);
+                }else{
+                    $(selectorForm).find(".leftContext").val(left); 
+                }
+                  
+                var right = $(selectorModal).find(":text.customRightContextLength").val(); 
+                
+                if(selectorModal==="#modal-repetitionsTabOptions"){
+                    regex = /^(0?\d|[1-3]\d|4[0-5])$/;
+                    defaultContextLength = 20;
+                }
+
+                if (!right.match(regex)) {                        
+                    $(selectorModal).find(":text.customRightContextLength").val(defaultContextLength);
+                    $(selectorForm).find('.rightContext').val(defaultContextLength);
+                }else{
+                    $(selectorForm).find('.rightContext').val(right);
+                }       
+            }
+   
+            function abortSimpleSearchOption(selectorModal, selectorForm){
+                var selectedOption = $(selectorForm).find('.simpleQuerySyntaxLevel').val();
+                    $(selectorModal).find('.customSimpleQuerySyntaxLevel').val(selectedOption);
+            }
+
+            function abortConfigPageLength(selectorModal, selectorForm){
+                var selectedOption = $(selectorForm).find('.pageLength').val();
+                $(selectorModal).find('.customPageLength').val(selectedOption);
+            }
+            
+            function abortConfigContext(selectorModal, selectorForm){
+                var selectedOptionLeft = $(selectorForm).find(".leftContext").val(); 
+                $(selectorModal).find(".customLeftContextLength").val(selectedOptionLeft);
+                
+                var selectedOptionRight = $(selectorForm).find(".rightContext").val(); 
+                $(selectorModal).find(".customRightContextLength").val(selectedOptionRight);   
+            }
+         
+            function completeSearchQuerySyntax(queryStr, selector){
+                var simpleQuerySyntaxLevel = $(selector).parent().find("form:first").find('.simpleQuerySyntaxLevel').val();
+                var q = "";        
+                if(queryStr.startsWith('$')){
+                    q = "["+simpleQuerySyntaxLevel+"="+ queryStr + "]";
+                }else{
+                    var split = queryStr.split(" ");
+                    
+                    for (var i = 0; i < split.length; i++) {
+                        var w = split[i];
+                        if(!w.startsWith("\"")){
+                            w = "\""+w; 
+                        }
+                        if(!w.endsWith("\"")){
+                            w = w+"\""; 
+                        }
+                        q = q+"["+simpleQuerySyntaxLevel+"="+ w + "]";
+                        if (i<q.length-1){
+                            q=q+" "; 
+                        }
+                    }
+                }
+                return q;
+            }
+            
+            /* This function is used in updateSampleQueries() and in $(document).ready(function(){...})*/
+            function addSampleQueries(){
+                    // do nothing here
+            }
+  
+            function emptyPage(selector){
+               // $(selector).find(".openXML-KWICSearch-area").css("display", "none");
+               $(selector).find(".kwic-tab").css("display", "none"); 
+               $("#wait-audio").css("display", "none");
+               $(selector).find(".rowData-KWICSearch").empty();
+               $(selector).find('.myKWIC').empty();
+            }
+            
+            /* This function copies the search query string from the modal window and set it into the query input field */
+            function copyQuery(obj) {
+
+                // set corpora
+                var corpora = getCorporaNames(obj);      
+                setCorpora(corpora);
+                
+                // set query
+                var str = $(obj).children(".float-start, .float-left").text();
+                var show = document.getElementById("queryInputField");
+                show.value=str;
+                
+                // swith to the search tab
+                bootstrap.Tab.getOrCreateInstance(document.getElementById('query-tab')).show();
+                
+                // close modal
+                document.querySelectorAll('.search-help-modal').forEach(el => bootstrap.Modal.getOrCreateInstance(el).hide());
+            }
+            
+            function getCorporaNames(obj){
+                var corporaText = $(obj).children(".float-end, .float-right").text();
+                var myRegexp = /Corp(ora|us):\s(.*)/;
+                var match = myRegexp.exec(corporaText);
+                var mySplitResult = match[2].split(",");
+                return mySplitResult;
+            }
+                       
+            function includeHTML(obj) {
+                $(obj).find('[data-include]').each(function() {
+                    var fileName = $(this).attr("data-include");
+                    $(this).load(fileName);
+                 });
+            }
+
+            function processError(xhr, status){
+                if (status === "abort"){
+                    //ignore
+                }else {
+                    // show error message
+                    var errorMessage = xhr.status + ' (' + xhr.statusText + ") " + xhr.responseText;
+                    alert('Error: ' + errorMessage);
+                }
+            }
+  
+            function setDefaulValue(obj){
+                var value = $(obj).prop('defaultValue');
+                $(obj).val(value);
+            }
+
+            function deselectOtherOptions(obj){
+                if ($(obj).is(':checked')) {
+                    if ( $(obj).hasClass( "withinContributionCheckBox" ) ){
+                        $(obj).parent().parent().find('.outsideContributionCheckBox').prop("checked", false);
+                    }else{
+                        $(obj).parent().parent().find('.withinContributionCheckBox').prop("checked", false);
+                    }
+                }
+            }
+                       
+            function setDefaultValueForSelect(obj){
+                $(obj).find('option:selected').removeAttr("selected");
+                $(obj).find("option[value=null]").prop('selected', 'selected');
+            }
+
+            // Add an event listener for when the modal is fully hidden
+            $(document).on('hidden.bs.modal','#videoModal', function () {
+                stopVideo();
+            });            
+
+        </script>
+    </body>
+</html>

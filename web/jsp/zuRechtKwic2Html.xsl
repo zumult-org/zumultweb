@@ -86,9 +86,6 @@
                     </xsl:attribute>
                     <i class="fa-solid fa-play"></i>
                 </button>
-            </td>
-            
-            <td class="signal">
                 <button type="button" onclick="playbackVideo(this)" class="btn btn-sm py-0 px-1" title="Playback video">
                     <xsl:attribute name="data-tokenid">
                         <xsl:value-of select="(snippet/*[@match='true']/@xml:id)[1]"/>
@@ -98,6 +95,9 @@
                     </xsl:attribute>
                     <i class="fa-solid fa-video"></i>
                 </button>
+            </td>
+            
+            <td class="signal">
             </td>
            
             <td class="signal">

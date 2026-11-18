@@ -15,6 +15,8 @@
 <%@page import="org.zumult.io.Constants"%>
 <%@page import="org.zumult.io.IOHelper"%>
 
+<%@ taglib prefix="zumult" tagdir="/WEB-INF/tags" %>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 
@@ -23,23 +25,14 @@
     BackendInterface backend = BackendInterfaceFactory.newBackendInterface(); 
     
     // get parameters
-    request.setCharacterEncoding("UTF-8");
-    
+    request.setCharacterEncoding("UTF-8");    
     String transcriptID = request.getParameter("transcriptID");
     if (transcriptID==null){
         // redirect to error page
     }
     String customTitle = request.getParameter("customTitle");
 
-    
-    /**** START: for user defined vocabulary lists ****/
-    
-    
-    Transcript transcript = backend.getTranscript(transcriptID);
-    
-    
-    /**** END: for user defined vocabulary lists ****/
-    
+    Transcript transcript = backend.getTranscript(transcriptID);   
     
     String form = Objects.requireNonNullElse(request.getParameter("form"), "trans");
     String showNormDev = Objects.requireNonNullElse(request.getParameter("showNormDev"), "FALSE");
@@ -87,11 +80,6 @@
         }        
     }
     
-
-
-    /**** START: for user defined vocabulary lists and for action sequences****/
-    
-    
     //String highlightIDs = request.getParameter("highlightIDs");
     String tokenList = request.getParameter("tokenList");
     if (tokenList==null){   
@@ -117,24 +105,18 @@
   
         
     if (startTokenID!=null && endTokenID!=null){
-
         /* if firstTokenId and lastTokenId are specified, than aroundAnnotationBlockID and aroundTokenID should be ignored; */
         aroundAnnotationBlockID = "";
         aroundTokenID = "";
         startAnnotationBlockID = backend.getNearestAnnotationBlockID4TokenID(transcriptID, startTokenID);;
         endAnnotationBlockID = backend.getNearestAnnotationBlockID4TokenID(transcriptID, endTokenID);;
-
         if(howMuchAround.length()>0){
             startAnnotationBlockID = transcript.getAnnotationBlockID(startAnnotationBlockID, -Integer.parseInt(howMuchAround));
             endAnnotationBlockID = transcript.getAnnotationBlockID(endAnnotationBlockID, Integer.parseInt(howMuchAround));
-
         }
     }
         
         
-    //}
-    
-    /**** END: for user defined vocabulary lists ****/
                     
     String corpusID = backend.getCorpus4Event(backend.getEvent4SpeechEvent(backend.getSpeechEvent4Transcript(transcriptID)));
     String speechEventID = backend.getSpeechEvent4Transcript(transcriptID); //transcriptID.substring(0,18);
@@ -156,8 +138,7 @@
     } else {
         followingTranscriptID = allTranscriptsForThisCorpus.get(0);
     }
-    
-    
+        
     String speechEventName = backend.getSpeechEvent(speechEventID).getName();
     
     Transcript partTranscript = transcript;
@@ -190,27 +171,41 @@
         //{"TOKEN_LIST_URL", pathToWordList}
         {"SPEAKER_SELECTION", speakerSelection}         
     };
-    
-    //String transcriptHTML = new IOHelper().applyInternalStylesheetToString(Constants.ISOTEI2HTML_STYLESHEET2, transcript.toXML(), transcriptParameters); 
-    //String transcriptSVG = new IOHelper().applyInternalStylesheetToString("/org/zumult/io/isotei2score_svg.xsl", transcript.toXML(), transcriptParameters);  
-    
+        
     String[][] largeSVGParameters = {
         {"START_ANNOTATION_BLOCK_ID", startAnnotationBlockID}, 
         {"END_ANNOTATION_BLOCK_ID", endAnnotationBlockID},
         {"SIZE", "medium"},        
     };
-    String largeSVG = new IOHelper().applyInternalStylesheetToString("/org/zumult/io/isotei2score_svg.xsl", transcript.toXML(), largeSVGParameters);  
+    String largeSVG = new IOHelper().applyInternalStylesheetToString("/org/zumult/io/isotei2score_svg.xsl", partTranscript.toXML(), largeSVGParameters);  
     
     String[][] wordlistParameters ={
         {"TOKEN_LIST_URL", pathToWordList},
         {"TOKEN_LIST_ARRAY", tokenList}        
     };
-    //String wordListHTML = new IOHelper().applyInternalStylesheetToString("/org/zumult/io/tokenlist2html_table.xsl", lemmaList4Transcript.toXML(), wordlistParameters); 
-    //String posListHTML = new IOHelper().applyInternalStylesheetToString("/org/zumult/io/tokenlist2html_table.xsl", posList4Transcript.toXML()); 
 
     //http://zumult.ids-mannheim.de/ProtoZumult/ZumultDataServlet?command=getVTT&transcriptID=FOLK_E_00069_SE_01_T_01
     String vttURL = Configuration.getWebAppBaseURL() + "/ZumultDataServlet?command=getVTT&transcriptID=" + transcriptID;
     
+    String annotationHtml = new IOHelper().applyInternalStylesheetToString("/org/zumult/io/isotei2html_annotations.xsl", partTranscript.toXML(), transcriptParameters);      
+    
+    String[][] htmlParameters = {
+        {"HIGHLIGHT_IDS_1", highlightIDsArray[0]}
+    };
+    String xml1 = new IOHelper().applyInternalStylesheetToString("/org/exmaralda/tei/xml/token2timeSpanReferences.xsl", partTranscript.toXML(), transcriptParameters); 
+    String xml2 = new IOHelper().applyInternalStylesheetToString("/org/zumult/io/addLowLevelAnchors.xsl", xml1, transcriptParameters);  
+    String xml3 = new IOHelper().applyInternalStylesheetToString("/org/zumult/io/isotei2exmaralda_Keep_Tokens.xsl", xml2, transcriptParameters);     
+    String partiturHtml = new IOHelper().applyInternalStylesheetToString("/org/zumult/io/exb2Partitur_Keep_Tokens.xsl", xml3, htmlParameters); 
+
+    
+%>
+
+<%
+    // need to put those variables in the pageContext so I can use them 
+    // inside the navbar tag 
+    pageContext.setAttribute("previousTranscriptID", previousTranscriptID);
+    pageContext.setAttribute("followingTranscriptID", followingTranscriptID);
+    pageContext.setAttribute("corpusID", corpusID);
 %>
 
 <%@include file="../WEB-INF/jspf/locale.jspf" %>     
@@ -221,11 +216,6 @@
         <title>ZuMult - ZuViel</title>
 
         <style type="text/css">
-            td {
-                /*max-width: 200px;*/
-                white-space: normal;
-                word-wrap: break-word;
-            }          
             #zuVielTabs .nav-link {
                 color: #343a40;
                 background-color: #f8f9fa;
@@ -241,10 +231,11 @@
 
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
         
-        <link rel="stylesheet" type="text/css" href="../css/overview.css"/>       
-        <link rel="stylesheet"  href="../css/transcript.css"/>
-        <link rel="stylesheet"  href="../css/transcript_print.css"media="print"/>         <!-- issue #54 -->
-        <link rel="stylesheet" href="../css/query.css"/>
+        <!-- <link rel="stylesheet" type="text/css" href="../css/overview.css"/>       -->
+        <link rel="stylesheet" type="text/css" href="../css/zuviel.css"/>
+        <link rel="stylesheet" type="text/css" href="../css/transcript_print.css"media="print"/>         <!-- issue #54 -->
+        <link rel="stylesheet" type="text/css" href="../css/query.css"/>
+        <link rel="stylesheet" type="text/css" href="../css/navbar.css"/>
         
         <%@include file="../WEB-INF/jspf/zuVielJS.jspf" %>     
         
@@ -255,6 +246,7 @@
         <script type="text/javascript" src="../js/zuGang.js" charset="utf8"></script>
         <script type="text/javascript" src="../js/metadata.js"></script>
         <script type="text/javascript" src="../js/download.js"></script>
+        <script type="text/javascript" src="../js/navbar.js"></script>
         <script type="text/javascript" src="../js/collections.js"></script>
         
         <script>
@@ -308,7 +300,171 @@
         
     </head>
     <body onload="init()" id="zuviel-body">        
-        <%@include file="../WEB-INF/jspf/transcriptNav.jspf" %>                                                
+        <!-- include file="../WEB-INF/jspf/transcriptNav.jspf" -->                                                
+        <!-- navigation  -->        
+        <zumult:navbar
+            applicationName="ZuViel"
+            objectTitle="<%= transcriptID %>"
+            institutionLogo="../images/ude-logo.png"
+            institutionName="Universität Duisburg-Essen"
+            institutionURL="https://www.utexas.edu/"
+            language="en"
+            helpURL="https://zumult.org"
+            helpLabel="Help">            
+            
+            
+            <jsp:attribute name="menus">
+
+                    <!-- Navigation -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle"
+                           href="#"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            <i class="fa-regular fa-compass"></i>
+                            Navigation
+                        </a>
+
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item"
+                                   href="../index.jsp"
+                                   title="Start page of this ZuMult instance">
+                                    Home
+                                </a>
+                            </li>
+
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li>
+                                <a class="dropdown-item"
+                                   href="zuViel.jsp?transcriptID=${previousTranscriptID}"
+                                   title="Previous transcript in ${corpusID}">
+                                    <i class="fa-solid fa-caret-left"></i>
+                                    ${previousTranscriptID}
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item"
+                                   href="zuViel.jsp?transcriptID=${followingTranscriptID}"
+                                   title="Following transcript in ${corpusID}">
+                                    <i class="fa-solid fa-caret-right"></i>
+                                    ${followingTranscriptID}
+                                </a>
+                            </li>
+
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li>
+                                <a class="dropdown-item"
+                                   href="https://zumult.org"
+                                   target="_blank"
+                                   rel="noopener">
+                                    ZuMult website
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- ******************* -->
+                    <!-- *     PARAMETERS  * -->
+                    <!-- ******************* -->
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           href="#parametersModal"
+                           role="button"
+                           data-bs-toggle="modal"
+                           title="Set display parameters">
+                            <i class="fas fa-sliders-h"></i>
+                            Parameters
+                        </a>
+                    </li>
+
+
+                    <!-- ******************* -->
+                    <!-- *     SELECTION   * -->
+                    <!-- ******************* -->
+                    <li class="nav-item dropdown active" id="selectionMenuItem">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa-solid fa-crop-simple"></i>
+                            Selection
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li>
+                                <a class="dropdown-item" onclick="javascript:reduceToSelection()"
+                                   title="Show current selection">
+                                    <i class="fa-solid fa-file-lines"></i>
+                                    Show current selection</a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" 
+                                   href="#downloadModal" data-bs-toggle="modal" 
+                                   title="Download selection">
+                                    <i class="fa-solid fa-download"></i>
+                                   Download selection...
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+
+
+                </jsp:attribute>
+    
+                <jsp:attribute name="search">
+                    <div class="input-group input-group-sm" data-bs-theme="light">
+                        <form class="d-flex"
+                              onsubmit="searchFromBox(); return false;">
+
+                            <input type="text"
+                                   class="form-control form-control-sm"
+                                   id="searchBox"
+                                   placeholder="pos=ART">
+
+                            <button type="submit" class="btn btn-light btn-sm">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+
+                        </form>                    
+                    </div>
+                </jsp:attribute>               
+                    
+                <jsp:attribute name="highlighting">
+
+                    <!-- Select highlight color -->
+                    <button type="button"
+                            class="btn btn-light btn-sm"
+                            title="Select next highlight color"
+                            aria-label="Select next highlight color"
+                            onclick="cycleHighlightColor()">
+
+                        <i class="fas fa-highlighter"></i>
+                        <span id="highlight-color-indicator"></span>
+
+                    </button>
+
+                    <!-- Remove highlighting -->
+                    <button type="button"
+                            class="btn btn-light btn-sm"
+                            title="Remove all highlighting"
+                            aria-label="Remove all highlighting"
+                            onclick="clearSearch()">
+
+                        <i class="fas fa-eraser"></i>
+
+                    </button>
+
+                </jsp:attribute>                    
+        
+            </zumult:navbar>       
+        
+        
+        
+        
         <div class="container-fluid px-4 mt-4">
             <!-- TAB HEADINGS -->
             <ul class="nav nav-tabs nav-justified" id="zuVielTabs" role="tablist">
@@ -367,6 +523,7 @@
                  role="tabpanel"
                  aria-labelledby="lines-tab"
                  tabindex="0">     
+                
                     <div class="row">
 
                         <!-- *********************** -->
@@ -446,10 +603,6 @@
                             <% } %>
                         </div>
 
-
-
-
-
                         <!-- *********************** -->
                         <!-- *********************** -->
                         <!-- *********************** -->
@@ -458,7 +611,9 @@
                         <div class="col-auto" id="columnRight" style="min-width: 540px;">
                             <div style="position: fixed;">                    
                                 <%@include file="../WEB-INF/jspf/zuVielDensityNav.jspf" %> 
-                                <%@include file="../WEB-INF/jspf/zuVielMediaPlayers.jspf" %> 
+                                <div id="lines-media-container">
+                                    <%@include file="../WEB-INF/jspf/zuVielMediaPlayers.jspf" %> 
+                                </div>
                             </div>    
                         </div> 
                         <% } %>
@@ -466,12 +621,60 @@
 
 
                     </div>
+            </div> <!-- end lines tab -->
+                        
+            <!-- PARTITUR -->
+            <div class="tab-pane fade"
+                id="partitur-pane"
+                role="tabpanel"
+                aria-labelledby="partitur-tab"
+                tabindex="0">
+
+                <!-- TOP: MEDIA Players -->
+                <div id="video-form" class="row justify-content-center mb-5">
+                    <div class="col-auto">     
+                        <div id="partitur-media-container"></div>
+                    </div>
                 </div>
-            </div>
                 
-        </div>
+                <!-- REST: Partitur -->
+                <div id="partitur-form" class="row mt-2">
+                    <div class="col-1">&nbsp;</div>
+                    <div class="col-10 overflow-auto" style="max-height: 800px;">
+                            <%= partiturHtml %>                
+                    </div>
+                    <div class="col-1">&nbsp;</div>
+                </div>                     
+            </div> <!-- end partitur-tab -->
+                        
+            <!-- ANNOTATIONS -->
+            <div class="tab-pane fade"
+                id="annotations-pane"
+                role="tabpanel"
+                aria-labelledby="annotations-tab"
+                tabindex="0">
+                                 
+                <div class="row flex-nowrap">
+                    <div class="col-auto d-flex flex-column align-items-end" style="height: 85vh;">
+                        <div id="annotation-types-container" class="container flex-grow-1 overflow-auto px-5">
+                            <ul>
+                                <% for (String annotationType : partTranscript.getAnnotationTypes()) { %>
+                                    <li><%= annotationType %></li>
+                                <% } %>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col d-flex flex-column" id="columnCenter" style="height: 100vh; min-width:0;">
+                        <div class="flex-grow-1 overflow-auto">
+                            <%= annotationHtml %>
+                        </div>                        
+                    </div>
+                </div>                
+            </div> <!-- end Annotations tab -->
+                            
+        </div> <!-- end tab content -->
+    </div> <!-- the end of it all -->
             
-    </div>
         
     <!-- ************************************** -->
     <!-- ************************************** -->
@@ -491,12 +694,31 @@
     <%@include file="../WEB-INF/jspf/printDownloadWordlistModal.jspf" %>                                                
 
     <script type="text/javascript">
+        // Lines
         reloadWordlist();
         reloadTranscript('<%= makeVisibleID %>');
         reloadSVG('small');
         jump(startTime);
         getMasterMediaPlayer().pause();
+        
+        // event listener transferring the players div from line to partitur
+        // and vice versa, changing the layout from flex-row to flex-column
+        document.querySelectorAll('#line-tab, #partitur-tab').forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function (event) {
 
+                const players = document.getElementById('players');
+
+                if (event.target.id === 'partitur-tab') {
+                    document.getElementById('partitur-media-container').appendChild(players);
+                    players.classList.remove('flex-column');
+                    players.classList.add('flex-row');
+                } else {
+                    document.getElementById('lines-media-container').appendChild(players);
+                    players.classList.remove('flex-row');
+                    players.classList.add('flex-column');
+                }
+            });
+        });        
     </script>
 
     </body>
